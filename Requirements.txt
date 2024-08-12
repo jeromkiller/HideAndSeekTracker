@@ -1,8 +1,0 @@
-Record people who come within a certain radius of you -- in future allow quartering off a specific radius
-Record people only once
-Track how many clues people have been given before finding you
-Support multiple rounds
-  - could export each round induvidually
-  - could add button to start next round
-Name Entry for participants -- keep in order for export
-

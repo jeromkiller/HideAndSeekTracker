@@ -10,8 +10,7 @@ public interface HideAndSeekTrackerConfig extends Config
 	@ConfigSection(
 			name = "Area",
 			description = "Seeking Area Settings",
-			position = 0,
-			closedByDefault = false
+			position = 0
 	)
 	String AreaSection = "Area";
 

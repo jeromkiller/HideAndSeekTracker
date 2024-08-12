@@ -6,7 +6,7 @@ import java.util.LinkedHashMap;
 
 public class HideAndSeekTableModel extends AbstractTableModel {
     private final String[] columnNames = {"#", "Name", "Place", "Hints", "pts" };
-    private LinkedHashMap<String, HideAndSeekPlayer> data;
+    private final LinkedHashMap<String, HideAndSeekPlayer> data;
 
     HideAndSeekTableModel(LinkedHashMap<String, HideAndSeekPlayer> data)
     {
@@ -32,7 +32,7 @@ public class HideAndSeekTableModel extends AbstractTableModel {
 
     public Object getValueAt(int row, int col)
     {
-        ArrayList<HideAndSeekPlayer> list = new ArrayList(data.values());
+        ArrayList<HideAndSeekPlayer> list = new ArrayList<>(data.values());
         if(row >= list.size())
         {
             return 0;
@@ -40,7 +40,7 @@ public class HideAndSeekTableModel extends AbstractTableModel {
         return list.get(row).getValue(col);
     }
 
-    public Class getColumnClass(int c)
+    public Class<?> getColumnClass(int c)
     {
         return getValueAt(0, c).getClass();
     }

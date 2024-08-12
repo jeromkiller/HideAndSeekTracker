@@ -14,10 +14,10 @@ import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.util.ImageUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.image.BufferedImage;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.List;
 
 @Slf4j
@@ -44,18 +44,17 @@ public class HideAndSeekTrackerPlugin extends Plugin
 	@Inject
 	private ClientToolbar clientToolbar;
 
-	private HideAndSeekTrackerPanel panel;
-	private NavigationButton navButton;
+    private NavigationButton navButton;
 
 	public HideAndSeekGame game;
 
 	@Override
-	protected void startUp() throws Exception
+	protected void startUp()
 	{
 		overlayManager.add(sceneOverlay);
 
 		game = new HideAndSeekGame(config);
-		panel = new HideAndSeekTrackerPanel(this);
+        HideAndSeekTrackerPanel panel = new HideAndSeekTrackerPanel(this);
 		final BufferedImage icon = ImageUtil.loadImageResource(getClass(), "HnS_icon.png");
 		navButton = NavigationButton.builder()
 				.tooltip("Hide and Seek")
@@ -70,7 +69,7 @@ public class HideAndSeekTrackerPlugin extends Plugin
 	}
 
 	@Override
-	protected void shutDown() throws Exception
+	protected void shutDown()
 	{
 		overlayManager.remove(sceneOverlay);
 		clientToolbar.removeNavigation(navButton);
@@ -134,6 +133,4 @@ public class HideAndSeekTrackerPlugin extends Plugin
 		String[] playerNames = config.participantNames().split("\n");
         return game.setPlayers(playerNames);
 	}
-
-
 }

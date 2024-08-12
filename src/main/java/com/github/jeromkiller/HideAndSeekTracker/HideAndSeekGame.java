@@ -1,12 +1,8 @@
 package com.github.jeromkiller.HideAndSeekTracker;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.*;
 
 public class HideAndSeekGame {
-    private static final Logger log = LoggerFactory.getLogger(HideAndSeekGame.class);
     LinkedHashMap<String, HideAndSeekPlayer> participants;
     int hintsGiven;
     int placementIndex;
@@ -14,7 +10,7 @@ public class HideAndSeekGame {
     int leniencyTicks;
     int sharedPlacementSpot;
 
-    private HideAndSeekTrackerConfig config;
+    private final HideAndSeekTrackerConfig config;
 
     HideAndSeekGame(HideAndSeekTrackerConfig config)
     {

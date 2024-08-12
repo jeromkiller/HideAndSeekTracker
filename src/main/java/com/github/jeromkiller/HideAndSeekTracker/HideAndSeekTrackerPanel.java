@@ -4,24 +4,16 @@ import net.runelite.client.ui.FontManager;
 import net.runelite.client.ui.PluginPanel;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class HideAndSeekTrackerPanel extends PluginPanel {
-    private HideAndSeekTrackerPlugin plugin;
+    private final HideAndSeekTrackerPlugin plugin;
 
-    private JButton btn_loadPlayers;
     private JLabel lbl_syncCode;
-    private JSpinner spn_hintCount;
-    private JButton btn_resetButton;
-    private JButton btn_exportButton;
-    //private HideAndSeekTableModel table_model;
-    private HideAndSeekTable tbl_resultTable;
+    private final JSpinner spn_hintCount;
+    private final HideAndSeekTable tbl_resultTable;
 
     public HideAndSeekTrackerPanel(HideAndSeekTrackerPlugin plugin)
     {
@@ -46,13 +38,8 @@ public class HideAndSeekTrackerPanel extends PluginPanel {
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.gridwidth = 2;
-        btn_loadPlayers = new JButton("Load Player List");
-        btn_loadPlayers.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                syncPlayers();
-            }
-        });
+        JButton btn_loadPlayers = new JButton("Load Player List");
+        btn_loadPlayers.addActionListener(e -> syncPlayers());
         add(btn_loadPlayers, gbc);
 
         gbc.gridx = 0;
@@ -68,29 +55,9 @@ public class HideAndSeekTrackerPanel extends PluginPanel {
         lbl_syncCode.setHorizontalAlignment(SwingConstants.RIGHT);
         add(lbl_syncCode, gbc);
 
-//        // Add the Round Counter
-//        gbc.gridx = 0;
-//        gbc.gridy = 3;
-//        gbc.gridwidth = 1;
-//        JLabel txt_round = new JLabel("Round:");
-//        add(txt_round, gbc);
-//
-//        gbc.gridx = 1;
-//        gbc.gridy = 3;
-//        spn_roundCount = new JSpinner(new SpinnerNumberModel(1, 1, 100, 1));
-//        spn_roundCount.addChangeListener(new ChangeListener() {
-//            @Override
-//            public void stateChanged(ChangeEvent e) {
-//                updateRoundCount();
-//            }
-//        });
-//        updateRoundCount();
-//        add(spn_roundCount, gbc);
-
         // Add the Hint Counter
         gbc.gridx = 0;
         gbc.gridy = 4;
-        //gbc.insets = new Insets(5, 0, 5, 0); // add padding
         JLabel txt_hints = new JLabel("Hints Given:");
         txt_hints.setFont(FontManager.getRunescapeFont());
         txt_hints.setHorizontalAlignment(SwingConstants.LEFT);
@@ -99,12 +66,7 @@ public class HideAndSeekTrackerPanel extends PluginPanel {
         gbc.gridx = 1;
         gbc.gridy = 4;
         spn_hintCount = new JSpinner(new SpinnerNumberModel(1,1,10, 1));
-        spn_hintCount.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                updateHintCount();
-            }
-        });
+        spn_hintCount.addChangeListener(e -> updateHintCount());
         updateHintCount();
         add(spn_hintCount, gbc);
 
@@ -113,13 +75,8 @@ public class HideAndSeekTrackerPanel extends PluginPanel {
         gbc.gridx = 0;
         gbc.gridy = 5;
         gbc.gridwidth = 1;
-        btn_exportButton = new JButton("Export Direct");
-        btn_exportButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                export(false);
-            }
-        });
+        JButton btn_exportButton = new JButton("Export Direct");
+        btn_exportButton.addActionListener(e -> export(false));
         add(btn_exportButton, gbc);
 
         // Export button
@@ -127,14 +84,8 @@ public class HideAndSeekTrackerPanel extends PluginPanel {
         gbc.gridy = 5;
         gbc.gridwidth = 1;
         btn_exportButton = new JButton("Export Discord");
-        btn_exportButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                export(true);
-            }
-        });
+        btn_exportButton.addActionListener(e -> export(true));
         add(btn_exportButton, gbc);
-
 
 
         // Initializing the Table
@@ -152,14 +103,9 @@ public class HideAndSeekTrackerPanel extends PluginPanel {
         // Reset button
         gbc.gridx = 1;
         gbc.gridy = 8;
-        btn_resetButton = new JButton("Reset");
+        JButton btn_resetButton = new JButton("Reset");
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        btn_resetButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                reset();
-            }
-        });
+        btn_resetButton.addActionListener(e -> reset());
         add(btn_resetButton, gbc);
 
     }

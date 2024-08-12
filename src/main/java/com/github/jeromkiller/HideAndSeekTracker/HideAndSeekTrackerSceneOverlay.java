@@ -1,6 +1,5 @@
 package com.github.jeromkiller.HideAndSeekTracker;
 
-import net.runelite.api.Player;
 import net.runelite.api.Point;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
@@ -45,20 +44,16 @@ public class HideAndSeekTrackerSceneOverlay extends Overlay
     {
         GeneralPath path = new GeneralPath();
 
-
-
-        LocalPoint localpoint = LocalPoint.fromWorld(client, worldPoint.getX() ,worldPoint.getY());
-
         int posXoffset = (config.eastOffset() + 1);
         int posYoffset = (config.northOffset() + 1);
         int negXoffset = -config.westOffset();
         int negYoffset = -config.southOffset();
 
-        Boolean pointDrawn = false;
+        boolean pointDrawn = false;
         pointDrawn = drawLine(path, negXoffset, negYoffset, negXoffset, posYoffset, worldPoint, pointDrawn);
         pointDrawn = drawLine(path, negXoffset, posYoffset, posXoffset, posYoffset, worldPoint, pointDrawn);
         pointDrawn = drawLine(path, posXoffset, posYoffset, posXoffset, negYoffset, worldPoint, pointDrawn);
-        pointDrawn = drawLine(path, posXoffset, negYoffset, negXoffset, negYoffset, worldPoint, pointDrawn);
+        drawLine(path, posXoffset, negYoffset, negXoffset, negYoffset, worldPoint, pointDrawn);
 
         Stroke stroke = new BasicStroke((float)config.areaBorderWidth());
         graphics.setStroke(stroke);
@@ -91,7 +86,6 @@ public class HideAndSeekTrackerSceneOverlay extends Overlay
                 else {
                     if (pointDrawn) {
                         path.lineTo(screenPoint.getX(), screenPoint.getY());
-                        pointDrawn = true;
                     } else {
                         path.moveTo(screenPoint.getX(), screenPoint.getY());
                         pointDrawn = true;
@@ -104,24 +98,6 @@ public class HideAndSeekTrackerSceneOverlay extends Overlay
                 break;
         }
         return pointDrawn;
-    }
-
-    private void startPoint(GeneralPath path, int x, int y, int z)
-    {
-        Point screenPoint = toScreenPoint(x, y, z);
-        if(screenPoint == null)
-            return;
-
-        path.moveTo(screenPoint.getX(), screenPoint.getY());
-    }
-
-    private void addLine(GeneralPath path, int x, int y, int z)
-    {
-        Point screenPoint = toScreenPoint(x, y, z);
-        if(screenPoint == null)
-            return;
-
-        path.lineTo(screenPoint.getX(), screenPoint.getY());
     }
 
     private Point toScreenPoint(int x, int y, int z)

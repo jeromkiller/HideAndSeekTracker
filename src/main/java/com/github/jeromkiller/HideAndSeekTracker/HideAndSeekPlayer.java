@@ -112,7 +112,7 @@ public class HideAndSeekPlayer {
                 return getHints();
             case 4:
                 return "+" + getScore();
-        };
+        }
         return null;
     }
 
