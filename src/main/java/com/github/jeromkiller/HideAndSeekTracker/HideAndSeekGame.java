@@ -1,8 +1,12 @@
 package com.github.jeromkiller.HideAndSeekTracker;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.*;
 
 public class HideAndSeekGame {
+    private static final Logger log = LoggerFactory.getLogger(HideAndSeekGame.class);
     LinkedHashMap<String, HideAndSeekPlayer> participants;
     int hintsGiven;
     int placementIndex;
@@ -16,12 +20,12 @@ public class HideAndSeekGame {
     {
         this.config = config;
 
-        participants = new LinkedHashMap<>();
-        hintsGiven = 0;
-        placementIndex = 0;
-        table = null;
-        leniencyTicks = 0;
-        sharedPlacementSpot = 0;
+        this.participants = new LinkedHashMap<>();
+        this.hintsGiven = 0;
+        this.placementIndex = 0;
+        this.table = null;
+        this.leniencyTicks = 0;
+        this.sharedPlacementSpot = 0;
     }
 
     public void newRound()
@@ -44,23 +48,24 @@ public class HideAndSeekGame {
 
     public String setPlayers(String[] playerNames)
     {
-        //participants.clear();
+        LinkedHashMap<String, HideAndSeekPlayer> newParticipants = new LinkedHashMap<>();
         for(String playerName : playerNames)
         {
-            addPlayer(playerName);
+            playerName = playerName.toLowerCase();
+
+            if(participants.containsKey(playerName)) {
+                // copy already existing players over
+                newParticipants.put(playerName, participants.get(playerName));
+            }
+            else {
+                // create new players if they don't exist yet
+                newParticipants.put(playerName, new HideAndSeekPlayer(playerName));
+            }
         }
+        participants.clear();
+        participants.putAll(newParticipants);
         table.update();
         return generateSyncString();
-    }
-
-    public void addPlayer(String playerName)
-    {
-        playerName = playerName.toLowerCase();
-
-        if(!participants.containsKey(playerName)) {
-            participants.put(playerName, new HideAndSeekPlayer(playerName));
-            table.update();
-        }
     }
 
     public void setTable(HideAndSeekTable table)
@@ -85,8 +90,9 @@ public class HideAndSeekGame {
             return;
         }
 
-        if(player.hasPlaced())
+        if(player.hasPlaced()) {
             return;
+        }
 
         if(leniencyTicks == 0)
         {

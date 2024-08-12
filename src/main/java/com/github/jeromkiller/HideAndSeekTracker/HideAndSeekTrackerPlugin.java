@@ -8,17 +8,18 @@ import net.runelite.api.events.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.util.ImageUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @PluginDescriptor(
@@ -44,6 +45,7 @@ public class HideAndSeekTrackerPlugin extends Plugin
 	@Inject
 	private ClientToolbar clientToolbar;
 
+	private HideAndSeekTrackerPanel panel;
     private NavigationButton navButton;
 
 	public HideAndSeekGame game;
@@ -54,7 +56,7 @@ public class HideAndSeekTrackerPlugin extends Plugin
 		overlayManager.add(sceneOverlay);
 
 		game = new HideAndSeekGame(config);
-        HideAndSeekTrackerPanel panel = new HideAndSeekTrackerPanel(this);
+        panel = new HideAndSeekTrackerPanel(this);
 		final BufferedImage icon = ImageUtil.loadImageResource(getClass(), "HnS_icon.png");
 		navButton = NavigationButton.builder()
 				.tooltip("Hide and Seek")
@@ -63,7 +65,9 @@ public class HideAndSeekTrackerPlugin extends Plugin
 				.icon(icon)
 				.build();
 		clientToolbar.addNavigation(navButton);
+
 		game.setTable(panel.getTable());
+		loadStartingPlayers();
 
 		log.info("HideAndSeekTracker started!");
 	}
@@ -87,6 +91,15 @@ public class HideAndSeekTrackerPlugin extends Plugin
 	{
 		checkPlayersInRange();
 		game.tick();
+	}
+
+	@Subscribe
+	public void onConfigChanged(ConfigChanged event)
+	{
+		if(Objects.equals(event.getKey(), "HaS_PlayerNames"))
+		{
+			loadStartingPlayers();
+		}
 	}
 
 	private void checkPlayersInRange()
@@ -128,9 +141,24 @@ public class HideAndSeekTrackerPlugin extends Plugin
 		return inRange;
 	}
 
-	public String loadStartingPlayers()
+	public void loadStartingPlayers()
 	{
-		String[] playerNames = config.participantNames().split("\n");
-        return game.setPlayers(playerNames);
+		String[] playerNames = config.participantNames().replace("\r", "").split("\n");
+        String syncString = game.setPlayers(playerNames);
+		panel.setSyncString(syncString);
+	}
+
+	public List<String> getInRangePlayers()
+	{
+		List<String> inRangePlayers = new ArrayList<>();
+		List<? extends  Player> playersList = client.getPlayers();
+		for(Player player : playersList)
+		{
+			if(isInHiderRange(player))
+			{
+				inRangePlayers.add(player.getName());
+			}
+		}
+		return inRangePlayers;
 	}
 }

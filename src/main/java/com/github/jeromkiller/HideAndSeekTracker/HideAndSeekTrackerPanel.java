@@ -7,13 +7,14 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
+import java.util.List;
 
 public class HideAndSeekTrackerPanel extends PluginPanel {
     private final HideAndSeekTrackerPlugin plugin;
 
     private JLabel lbl_syncCode;
     private final JSpinner spn_hintCount;
-    private final HideAndSeekTable tbl_resultTable;
+    private HideAndSeekTable tbl_resultTable;
 
     public HideAndSeekTrackerPanel(HideAndSeekTrackerPlugin plugin)
     {
@@ -34,12 +35,12 @@ public class HideAndSeekTrackerPanel extends PluginPanel {
         txt_title.setHorizontalAlignment(SwingConstants.LEFT);
         add(txt_title, gbc);
 
-        // Add the sync button
+        // Copy placers in range to clipboard
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.gridwidth = 2;
-        JButton btn_loadPlayers = new JButton("Load Player List");
-        btn_loadPlayers.addActionListener(e -> syncPlayers());
+        JButton btn_loadPlayers = new JButton("Copy In Range Player Names");
+        btn_loadPlayers.addActionListener(e -> exportPlayerNames());
         add(btn_loadPlayers, gbc);
 
         gbc.gridx = 0;
@@ -115,9 +116,8 @@ public class HideAndSeekTrackerPanel extends PluginPanel {
         plugin.game.setHintsGiven((Integer) spn_hintCount.getValue());
     }
 
-    private void syncPlayers()
+    public void setSyncString(String syncString)
     {
-        String syncString = plugin.loadStartingPlayers();
         lbl_syncCode.setText(syncString);
         tbl_resultTable.update();
     }
@@ -134,6 +134,15 @@ public class HideAndSeekTrackerPanel extends PluginPanel {
     {
         plugin.game.newRound();
         spn_hintCount.setValue(1);
+    }
+
+    private void exportPlayerNames()
+    {
+        List<String> inRangePlayers = plugin.getInRangePlayers();
+        String exportString = String.join("\n", inRangePlayers);
+        final StringSelection selection = new StringSelection(exportString);
+        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        clipboard.setContents(selection, selection);
     }
 
     public HideAndSeekTable getTable()
