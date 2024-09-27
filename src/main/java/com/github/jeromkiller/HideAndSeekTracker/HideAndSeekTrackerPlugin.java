@@ -68,8 +68,6 @@ public class HideAndSeekTrackerPlugin extends Plugin
 
 		game.setTable(panel.getTable());
 		loadStartingPlayers();
-
-		log.info("HideAndSeekTracker started!");
 	}
 
 	@Override
@@ -77,7 +75,6 @@ public class HideAndSeekTrackerPlugin extends Plugin
 	{
 		overlayManager.remove(sceneOverlay);
 		clientToolbar.removeNavigation(navButton);
-		log.info("HideAndSeekTracker stopped!");
 	}
 
 	@Provides
