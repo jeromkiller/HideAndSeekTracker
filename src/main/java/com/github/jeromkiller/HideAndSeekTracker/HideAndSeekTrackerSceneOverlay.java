@@ -10,16 +10,12 @@ import net.runelite.api.Client;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.util.ColorUtil;
-import net.runelite.client.util.ImageUtil;
 
 import javax.inject.Inject;
-import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Area;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 
 
 public class HideAndSeekTrackerSceneOverlay extends Overlay
@@ -31,7 +27,6 @@ public class HideAndSeekTrackerSceneOverlay extends Overlay
     private final Client client;
     private final HideAndSeekTrackerPlugin plugin;
 
-    private Point firstPoint;
     private boolean pointDrawn;
 
     @Inject
@@ -135,10 +130,10 @@ public class HideAndSeekTrackerSceneOverlay extends Overlay
             LocalPoint localPoint = LocalPoint.fromWorld(client, areaCenter.getX(), areaCenter.getY());
             if (localPoint != null) {
                 if (captureArea.getWidth() % 2 == 0) {
-                    localPoint = localPoint.dx(-64);
+                    localPoint = localPoint.dx(-LOCAL_TILE_SIZE / 2);
                 }
                 if (captureArea.getHeight() % 2 == 0) {
-                    localPoint = localPoint.dy(-64);
+                    localPoint = localPoint.dy(-LOCAL_TILE_SIZE / 2);
                 }
                 graphics.setClip(fullScreen);
                 graphics.setColor(ColorUtil.colorWithAlpha(inside_border, 255));
@@ -157,61 +152,110 @@ public class HideAndSeekTrackerSceneOverlay extends Overlay
         GeneralPath path = new GeneralPath();
 
         pointDrawn = false;
-        firstPoint = null;
-        drawLine(path, 0, 0, 0, height, origin);
-        drawLine(path, 0, height, width, height, origin);
-        drawLine(path, width, height, width, 0, origin);
-        drawLine(path, width, 0, 0, 0, origin);
+        drawWestLine(path, height, origin);
+        drawNorthLine(path, width, origin.dy(height));
+        drawEastLine(path, height, origin.dx(width).dy(height));
+        drawSouthLine(path, width, origin.dx(width));
 
+        if(pointDrawn) {
+            path.closePath();
+        }
         return path;
     }
 
-    private boolean drawLine(GeneralPath path, int fromX, int fromY, int toX, int toY, WorldPoint worldPoint)
+    private void drawWestLine(GeneralPath path, int length, WorldPoint worldPoint)
     {
-        int x_step = fromX >= toX ? -1 : 1;
-        int y_step = fromY >= toY ? -1 : 1;
-
-        int worldX = worldPoint.getX();
-        int worldY = worldPoint.getY();
+        int x = worldPoint.getX();
+        int y = worldPoint.getY();
         int z = worldPoint.getPlane();
-
-        for(int x_offset = fromX; true; x_offset += x_step)
-        {
-            for(int y_offset = fromY; true; y_offset += y_step)
-            {
-                final int x = worldX + x_offset;
-                final int y = worldY + y_offset;
-                Point screenPoint = toScreenPoint(x, y, z);
-                if(screenPoint != null)
-                {
-                    if (pointDrawn) {
-                        path.lineTo(screenPoint.getX(), screenPoint.getY());
-                    } else {
-                        path.moveTo(screenPoint.getX(), screenPoint.getY());
-                        pointDrawn = true;
-                        if(firstPoint == null) {
-                            firstPoint = screenPoint;
-                        }
-                    }
-                }
-                if (y_offset == toY)
-                    break;
+        for (int y_offset = 0; y_offset < length; y_offset++) {
+            LocalPoint startPoint = LocalPoint.fromWorld(client, x, y + y_offset);
+            if(startPoint == null) {
+                continue;
             }
-            if (x_offset == toX)
-                break;
+            LocalPoint endPoint = startPoint.dy(LOCAL_TILE_SIZE -1);
+            if(y_offset != 0) {
+                paintPoint(path, startPoint, z);
+            }
+            paintPoint(path, endPoint, z);
         }
-        return pointDrawn;
     }
 
-    private Point toScreenPoint(int x, int y, int z)
+    private void drawNorthLine(GeneralPath path, int length, WorldPoint worldPoint)
     {
-        LocalPoint localPoint = LocalPoint.fromWorld(client, x, y);
-
-        if (localPoint == null)
-        {
-            return null;
+        int x = worldPoint.getX();
+        int y = worldPoint.getY();
+        int z = worldPoint.getPlane();
+        for (int x_offset = 0; x_offset < length; x_offset++) {
+            LocalPoint startPoint = LocalPoint.fromWorld(client, x + x_offset, y);
+            if(startPoint == null) {
+                continue;
+            }
+            startPoint = startPoint.dy(-1);
+            LocalPoint endPoint = startPoint.dx(LOCAL_TILE_SIZE -1);
+            if(x_offset != 0) {
+                paintPoint(path, startPoint, z);
+            }
+            paintPoint(path, endPoint, z);
         }
+    }
 
+    private void drawEastLine(GeneralPath path, int length, WorldPoint worldPoint)
+    {
+        int x = worldPoint.getX();
+        int y = worldPoint.getY();
+        int z = worldPoint.getPlane();
+        for (int y_offset = 0; y_offset < length; y_offset++) {
+            LocalPoint startPoint = LocalPoint.fromWorld(client, x, y - y_offset);
+            if(startPoint == null) {
+                continue;
+            }
+            startPoint = startPoint.dy(-1);
+            startPoint = startPoint.dx(-1);
+            LocalPoint endPoint = startPoint.dy(-(LOCAL_TILE_SIZE -1));
+            if(y_offset != 0) {
+                paintPoint(path, startPoint, z);
+            }
+            paintPoint(path, endPoint, z);
+        }
+    }
+
+    private void drawSouthLine(GeneralPath path, int length, WorldPoint worldPoint)
+    {
+        int x = worldPoint.getX();
+        int y = worldPoint.getY();
+        int z = worldPoint.getPlane();
+        for (int x_offset = 0; x_offset < length; x_offset++) {
+            LocalPoint startPoint = LocalPoint.fromWorld(client, x - x_offset, y);
+            if(startPoint == null) {
+                continue;
+            }
+            startPoint = startPoint.dx(-1);
+            LocalPoint endPoint = startPoint.dx(-(LOCAL_TILE_SIZE -1));
+            if(x_offset != 0) {
+                paintPoint(path, startPoint, z);
+            }
+            paintPoint(path, endPoint, z);
+        }
+    }
+
+    private void paintPoint(GeneralPath path, LocalPoint localPoint, int z){
+        if (localPoint == null)
+            return;
+
+        Point canvasPoint = toCanvasPoint(localPoint, z);
+        if(canvasPoint == null)
+            return;
+
+        if (pointDrawn) {
+            path.lineTo(canvasPoint.getX(), canvasPoint.getY());
+        } else {
+            path.moveTo(canvasPoint.getX(), canvasPoint.getY());
+            pointDrawn = true;
+        }
+    }
+
+    private Point toCanvasPoint(LocalPoint localPoint, int z) {
         return Perspective.localToCanvas(
                 client,
                 new LocalPoint(localPoint.getX() - LOCAL_TILE_SIZE / 2, localPoint.getY() - LOCAL_TILE_SIZE / 2),
