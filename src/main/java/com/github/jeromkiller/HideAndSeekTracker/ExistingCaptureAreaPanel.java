@@ -271,14 +271,14 @@ public class ExistingCaptureAreaPanel extends CaptureAreaPanel
         });
 
         deleteLabel.setIcon(DELETE_ICON);
-        deleteLabel.setToolTipText("Delete screen marker");
+        deleteLabel.setToolTipText("Delete capture area");
         deleteLabel.addMouseListener(new MouseAdapter()
         {
             @Override
             public void mousePressed(MouseEvent mouseEvent)
             {
                 int confirm = JOptionPane.showConfirmDialog(ExistingCaptureAreaPanel.this,
-                        "Are you sure you want to permanently delete this screen marker?",
+                        "Are you sure you want to permanently delete this capture area?",
                         "Warning", JOptionPane.OK_CANCEL_OPTION);
 
                 if (confirm == 0)
