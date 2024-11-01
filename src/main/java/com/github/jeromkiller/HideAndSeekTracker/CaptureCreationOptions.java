@@ -1,6 +1,5 @@
 package com.github.jeromkiller.HideAndSeekTracker;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import net.runelite.client.util.ColorUtil;

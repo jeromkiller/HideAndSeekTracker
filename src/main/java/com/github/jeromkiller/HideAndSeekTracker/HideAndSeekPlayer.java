@@ -1,5 +1,7 @@
 package com.github.jeromkiller.HideAndSeekTracker;
 
+import lombok.Getter;
+
 public class HideAndSeekPlayer {
 
     public enum Placement {
@@ -45,24 +47,19 @@ public class HideAndSeekPlayer {
         }
     }
 
+    @Getter
     private final String  name;
-    private int internal_placement;
+    @Getter
+    private int internalPlacement;
     private Placement placement;
+    @Getter
     private int hints;
 
     public HideAndSeekPlayer(String name) {
         this.name = name;
-        this.internal_placement = 0;
+        this.internalPlacement = 0;
         this.placement = Placement.DNF;
         this.hints = 0;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public int getInternalPlacement() {
-        return internal_placement;
     }
 
     public String getPlacementExportString()
@@ -75,25 +72,21 @@ public class HideAndSeekPlayer {
         return placement;
     }
 
-    public int getHints() {
-        return hints;
-    }
-
     public void setStats(int internal_placement, int placement, int hints)
     {
-        this.internal_placement = internal_placement;
+        this.internalPlacement = internal_placement;
         this.placement = Placement.fromValue(placement);
         this.hints = hints;
     }
 
     public boolean hasPlaced()
     {
-        return internal_placement > 0;
+        return internalPlacement > 0;
     }
 
     public void reset()
     {
-        internal_placement = 0;
+        internalPlacement = 0;
         placement = Placement.DNF;
         hints = 0;
     }

@@ -3,7 +3,6 @@ package com.github.jeromkiller.HideAndSeekTracker;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import net.runelite.api.Player;
 import net.runelite.api.coords.WorldPoint;
 
 import javax.annotation.Nullable;
@@ -37,13 +36,13 @@ public class CaptureArea {
         this.labelVisible = labelVisible;
     }
 
-    public boolean isWorthChecking(WorldPoint playerLoc)
+    public boolean notWorthChecking(WorldPoint playerLoc)
     {
         boolean notWorth = false;
         notWorth |= !areaVisible;
         notWorth |= playerLoc.getPlane() != worldPoint.getPlane();
         notWorth |= playerLoc.distanceTo(worldPoint) > MAX_RENDER_DISTANCE;
-        return !notWorth;
+        return notWorth;
     }
 
     public boolean playerInArea(WorldPoint playerLoc)

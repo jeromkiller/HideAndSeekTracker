@@ -22,7 +22,6 @@ public class HideAndSeekTrackerSceneOverlay extends Overlay
 {
     private static final int LOCAL_TILE_SIZE = Perspective.LOCAL_TILE_SIZE;
     private static final int ENTITY_RENDER_LIMIT = 15;
-    private static final int MAX_RENDER_DISTANCE = 50;
 
     private final Client client;
     private final HideAndSeekTrackerPlugin plugin;
@@ -51,12 +50,11 @@ public class HideAndSeekTrackerSceneOverlay extends Overlay
         }
 
         for(CaptureArea area : plugin.getCaptureAreas()) {
-            if(!area.isWorthChecking(playerLoc)) {
+            if(area.notWorthChecking(playerLoc)) {
                 continue;
             }
             drawBox(graphics, area, playerLoc);
         }
-
 
         return null;
     }
@@ -64,8 +62,8 @@ public class HideAndSeekTrackerSceneOverlay extends Overlay
     private void drawRenderDist(Graphics2D graphics, WorldPoint PlayerLocation) {
         Canvas screen = client.getCanvas();
         final Rectangle2D fullScreen = new Rectangle2D.Float(0, 0, screen.getWidth(), screen.getHeight());
-        WorldPoint entitryRenderOrigin = PlayerLocation.dx(-ENTITY_RENDER_LIMIT).dy(-ENTITY_RENDER_LIMIT);
-        GeneralPath clippingSquare = createFloorBox(entitryRenderOrigin, ENTITY_RENDER_LIMIT * 2 + 1, ENTITY_RENDER_LIMIT * 2+ 1);  // simple clipping area
+        WorldPoint entityRenderOrigin = PlayerLocation.dx(-ENTITY_RENDER_LIMIT).dy(-ENTITY_RENDER_LIMIT);
+        GeneralPath clippingSquare = createFloorBox(entityRenderOrigin, ENTITY_RENDER_LIMIT * 2 + 1, ENTITY_RENDER_LIMIT * 2+ 1);  // simple clipping area
 
         // draw the clipping area
         graphics.setStroke(new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{5, 2}, 0));
@@ -94,8 +92,8 @@ public class HideAndSeekTrackerSceneOverlay extends Overlay
     {
         //capture area tile
         GeneralPath outerSquare = createFloorBox(captureArea.getWorldPoint(), captureArea.getWidth(), captureArea.getHeight());
-        WorldPoint entitryRenderOrigin = PlayerLocation.dx(-ENTITY_RENDER_LIMIT).dy(-ENTITY_RENDER_LIMIT);
-        GeneralPath clippingSquare = createFloorBox(entitryRenderOrigin, ENTITY_RENDER_LIMIT * 2 + 1, ENTITY_RENDER_LIMIT * 2+ 1);  // simple clipping area
+        WorldPoint entityRenderOrigin = PlayerLocation.dx(-ENTITY_RENDER_LIMIT).dy(-ENTITY_RENDER_LIMIT);
+        GeneralPath clippingSquare = createFloorBox(entityRenderOrigin, ENTITY_RENDER_LIMIT * 2 + 1, ENTITY_RENDER_LIMIT * 2+ 1);  // simple clipping area
 
         Canvas screen = client.getCanvas();
         final Rectangle2D fullScreen = new Rectangle2D.Float(0, 0, screen.getWidth(), screen.getHeight());
@@ -124,27 +122,8 @@ public class HideAndSeekTrackerSceneOverlay extends Overlay
         graphics.setColor(outside_fillColor);
         graphics.draw(outerSquare);
 
-        if(captureArea.isLabelVisible()) {
-            //draw the label in the middle of the capture area
-            WorldPoint areaCenter = captureArea.getWorldPoint().dx(captureArea.getWidth() / 2).dy(captureArea.getHeight() / 2);
-            LocalPoint localPoint = LocalPoint.fromWorld(client, areaCenter.getX(), areaCenter.getY());
-            if (localPoint != null) {
-                if (captureArea.getWidth() % 2 == 0) {
-                    localPoint = localPoint.dx(-LOCAL_TILE_SIZE / 2);
-                }
-                if (captureArea.getHeight() % 2 == 0) {
-                    localPoint = localPoint.dy(-LOCAL_TILE_SIZE / 2);
-                }
-                graphics.setClip(fullScreen);
-                graphics.setColor(ColorUtil.colorWithAlpha(inside_border, 255));
-                graphics.setFont(FontManager.getRunescapeFont());
-                Point textLoc = Perspective.getCanvasTextLocation(client, graphics, localPoint, captureArea.getLabel(), 0);
-                if (textLoc != null) {
-                    graphics.drawString(captureArea.getLabel(), textLoc.getX(), textLoc.getY());
-                }
-            }
-        }
-
+        graphics.setClip(fullScreen);
+        paintText(graphics, captureArea, inside_border);
     }
 
     private GeneralPath createFloorBox(WorldPoint origin, int width, int height)
@@ -169,7 +148,7 @@ public class HideAndSeekTrackerSceneOverlay extends Overlay
         int y = worldPoint.getY();
         int z = worldPoint.getPlane();
         for (int y_offset = 0; y_offset < length; y_offset++) {
-            LocalPoint startPoint = LocalPoint.fromWorld(client, x, y + y_offset);
+            LocalPoint startPoint = toLocalPoint( x, y + y_offset);
             if(startPoint == null) {
                 continue;
             }
@@ -187,7 +166,7 @@ public class HideAndSeekTrackerSceneOverlay extends Overlay
         int y = worldPoint.getY();
         int z = worldPoint.getPlane();
         for (int x_offset = 0; x_offset < length; x_offset++) {
-            LocalPoint startPoint = LocalPoint.fromWorld(client, x + x_offset, y);
+            LocalPoint startPoint = toLocalPoint(x + x_offset, y);
             if(startPoint == null) {
                 continue;
             }
@@ -206,7 +185,7 @@ public class HideAndSeekTrackerSceneOverlay extends Overlay
         int y = worldPoint.getY();
         int z = worldPoint.getPlane();
         for (int y_offset = 0; y_offset < length; y_offset++) {
-            LocalPoint startPoint = LocalPoint.fromWorld(client, x, y - y_offset);
+            LocalPoint startPoint = toLocalPoint(x, y - y_offset);
             if(startPoint == null) {
                 continue;
             }
@@ -226,7 +205,7 @@ public class HideAndSeekTrackerSceneOverlay extends Overlay
         int y = worldPoint.getY();
         int z = worldPoint.getPlane();
         for (int x_offset = 0; x_offset < length; x_offset++) {
-            LocalPoint startPoint = LocalPoint.fromWorld(client, x - x_offset, y);
+            LocalPoint startPoint = toLocalPoint(x - x_offset, y);
             if(startPoint == null) {
                 continue;
             }
@@ -236,6 +215,29 @@ public class HideAndSeekTrackerSceneOverlay extends Overlay
                 paintPoint(path, startPoint, z);
             }
             paintPoint(path, endPoint, z);
+        }
+    }
+
+    private void paintText(Graphics2D graphics, CaptureArea captureArea, Color color) {
+        if(captureArea.isLabelVisible()) {
+            //draw the label in the middle of the capture area
+            WorldPoint areaCenter = captureArea.getWorldPoint().dx(captureArea.getWidth() / 2).dy(captureArea.getHeight() / 2);
+            LocalPoint localPoint = toLocalPoint(areaCenter.getX(), areaCenter.getY(), true);
+            if (localPoint != null) {
+                if (captureArea.getWidth() % 2 == 0) {
+                    localPoint = localPoint.dx(-LOCAL_TILE_SIZE / 2);
+                }
+                if (captureArea.getHeight() % 2 == 0) {
+                    localPoint = localPoint.dy(-LOCAL_TILE_SIZE / 2);
+                }
+
+                graphics.setColor(ColorUtil.colorWithAlpha(color, 255));
+                graphics.setFont(FontManager.getRunescapeFont());
+                Point textLoc = Perspective.getCanvasTextLocation(client, graphics, localPoint, captureArea.getLabel(), 0);
+                if (textLoc != null) {
+                    graphics.drawString(captureArea.getLabel(), textLoc.getX(), textLoc.getY());
+                }
+            }
         }
     }
 
@@ -255,10 +257,28 @@ public class HideAndSeekTrackerSceneOverlay extends Overlay
         }
     }
 
+    private LocalPoint toLocalPoint(int x, int y)
+    {
+        return toLocalPoint(x, y, false);
+    }
+
+    private LocalPoint toLocalPoint(int x, int y, boolean getCenter)
+    {
+        LocalPoint localPointCenter = LocalPoint.fromWorld(client.getTopLevelWorldView(), x, y);
+        if(localPointCenter == null) {
+            return null;
+        }
+        if (getCenter) {
+            return localPointCenter;
+        }
+        return localPointCenter.plus(- LOCAL_TILE_SIZE / 2, - LOCAL_TILE_SIZE / 2);
+    }
+
     private Point toCanvasPoint(LocalPoint localPoint, int z) {
         return Perspective.localToCanvas(
                 client,
-                new LocalPoint(localPoint.getX() - LOCAL_TILE_SIZE / 2, localPoint.getY() - LOCAL_TILE_SIZE / 2),
+                localPoint,
+                //new LocalPoint(localPoint.getX() - LOCAL_TILE_SIZE / 2, localPoint.getY() - LOCAL_TILE_SIZE / 2),
                 z);
     }
 

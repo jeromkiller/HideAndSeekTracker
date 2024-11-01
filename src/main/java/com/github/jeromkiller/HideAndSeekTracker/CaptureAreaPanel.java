@@ -9,8 +9,6 @@ import javax.swing.border.CompoundBorder;
 import java.awt.image.BufferedImage;
 
 public class CaptureAreaPanel extends JPanel{
-    protected static final int DEFAULT_FILL_OPACITY = 50;
-
     protected static final Border NAME_BOTTOM_BORDER = new CompoundBorder(
             BorderFactory.createMatteBorder(0, 0, 1, 0, ColorScheme.DARK_GRAY_COLOR),
             BorderFactory.createLineBorder(ColorScheme.DARKER_GRAY_COLOR));

@@ -10,8 +10,6 @@ import net.runelite.client.util.ImageUtil;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -33,7 +31,6 @@ public class CaptureCreationPanel extends CaptureAreaPanel
     private final JLabel saveName = new JLabel("Save");
     private final JLabel cancelName = new JLabel("Cancel");
     private final JLabel rename = new JLabel("Rename");
-    private final JLabel compass = new JLabel();
     private final JSpinner northSpinner = new JSpinner();
     private final JSpinner eastSpinner = new JSpinner();
     private final JSpinner southSpinner = new JSpinner();
@@ -190,41 +187,31 @@ public class CaptureCreationPanel extends CaptureAreaPanel
         final int MAX_VALUE = CaptureCreationOptions.MAX_AREA_SIZE;
         final int MIN_VALUE = 0;
         northSpinner.setModel(new SpinnerNumberModel(captureOptions.getNorth(), MIN_VALUE, MAX_VALUE, 1));
-        northSpinner.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                final int val = (int) northSpinner.getValue();
-                captureOptions.setNorth(val);
-                validateArea();
-            }
-        });
+        northSpinner.addChangeListener(e -> {
+            final int val = (int) northSpinner.getValue();
+            captureOptions.setNorth(val);
+            validateArea();
+        }
+        );
         southSpinner.setModel(new SpinnerNumberModel(captureOptions.getSouth(), MIN_VALUE, MAX_VALUE, 1));
-        southSpinner.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
+        southSpinner.addChangeListener(e -> {
                 final int val = (int) southSpinner.getValue();
                 captureOptions.setSouth(val);
                 validateArea();
-            }
         });
         eastSpinner.setModel(new SpinnerNumberModel(captureOptions.getEast(), MIN_VALUE, MAX_VALUE, 1));
-        eastSpinner.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
+        eastSpinner.addChangeListener(e -> {
                 final int val = (int) eastSpinner.getValue();
                 captureOptions.setEast(val);
                 validateArea();
-            }
         });
         westSpinner.setModel(new SpinnerNumberModel(captureOptions.getWest(), MIN_VALUE, MAX_VALUE, 1));
-        westSpinner.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
+        westSpinner.addChangeListener(e -> {
                 final int val = (int) westSpinner.getValue();
                 captureOptions.setWest(val);
                 validateArea();
-            }
         });
+        JLabel compass = new JLabel();
         compass.setIcon(COMPASS_ICON);
         centerConstraints.gridx = 1;
         centerConstraints.gridy = 0;

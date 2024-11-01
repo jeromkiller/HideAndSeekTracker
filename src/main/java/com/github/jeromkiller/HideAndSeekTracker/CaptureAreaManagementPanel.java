@@ -4,15 +4,10 @@ import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.components.PluginErrorPanel;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 public class CaptureAreaManagementPanel extends JPanel {
 
-    private static final Color DEFAULT_AREA_COLOR = new Color(0, 255, 0, 50);
-    private static final Color DEFAULT_OUTSIDE_AREA_COLOR = new Color(255, 0, 0, 50);
-
-    private final JLabel title = new JLabel();
     private final PluginErrorPanel noAreasPanel = new PluginErrorPanel();
     private final JPanel areaView = new JPanel(new GridBagLayout());
     private final JButton newArea = new JButton("New Area");
@@ -27,9 +22,6 @@ public class CaptureAreaManagementPanel extends JPanel {
         this.plugin = plugin;
 
         setLayout(new BorderLayout());
-
-        //JPanel centerPanel = new JPanel(new BorderLayout());
-        //centerPanel.setBackground(ColorScheme.DARK_GRAY_COLOR);
 
         areaView.setBackground(ColorScheme.DARK_GRAY_COLOR);
 
@@ -80,13 +72,12 @@ public class CaptureAreaManagementPanel extends JPanel {
         if(plugin.getCaptureCreationOptions().isCurrentlyCreating())
         {
             areaView.add(new CaptureCreationPanel(plugin), constraints);
-            constraints.gridy++;
         }
         else
         {
             areaView.add(newArea, constraints);
-            constraints.gridy++;
         }
+        constraints.gridy++;
         addSpacer(constraints);
 
         areaView.add(importArea, constraints);
@@ -115,7 +106,7 @@ public class CaptureAreaManagementPanel extends JPanel {
     {
         plugin.copyVisibleCaptureAreasToClip();
         copyStatusLabel.setVisible(true);
-        Timer hideStatusTimer = new Timer(1000, e -> {copyStatusLabel.setVisible(false);});
+        Timer hideStatusTimer = new Timer(1000, e -> copyStatusLabel.setVisible(false));
         hideStatusTimer.setRepeats(false);
         hideStatusTimer.start();
     }

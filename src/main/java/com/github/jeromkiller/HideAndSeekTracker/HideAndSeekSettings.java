@@ -24,7 +24,7 @@ public class HideAndSeekSettings {
     @Inject
     private Gson gson;
 
-    private void setValue(String group, String key, Object value)
+    private void setValue(String key, Object value)
     {
         boolean isEmpty = false;
         if(value instanceof Collection)
@@ -38,12 +38,12 @@ public class HideAndSeekSettings {
 
         if(isEmpty)
         {
-            configManager.unsetConfiguration(group, key);
+            configManager.unsetConfiguration(CONFIG_GROUP, key);
             return;
         }
 
         final String json = gson.toJson(value);
-        configManager.setConfiguration(group, key, json);
+        configManager.setConfiguration(CONFIG_GROUP, key, json);
     }
 
     public int getTickLenience() {
@@ -55,7 +55,7 @@ public class HideAndSeekSettings {
     }
 
     public void setTickLenience(int ticks) {
-        setValue(CONFIG_GROUP, TICK_LENIENCY_KEY, ticks);
+        setValue(TICK_LENIENCY_KEY, ticks);
     }
 
     public List<String> getPlayerNames() {
@@ -67,7 +67,7 @@ public class HideAndSeekSettings {
     }
 
     public void setPlayerNames(List<String> playerNames) {
-        setValue(CONFIG_GROUP, PLAYER_NAMES_KEY, playerNames);
+        setValue(PLAYER_NAMES_KEY, playerNames);
     }
 
     public List<CaptureArea> getCaptureAreas() {
@@ -79,7 +79,7 @@ public class HideAndSeekSettings {
     }
 
     public void setCaptureAreas(List<CaptureArea> captureAreas) {
-        setValue(CONFIG_GROUP, CAPTURE_AREA_KEY, captureAreas);
+        setValue(CAPTURE_AREA_KEY, captureAreas);
     }
 
     public boolean getShowRenderDist() {
@@ -91,7 +91,7 @@ public class HideAndSeekSettings {
     }
 
     public void setShowRenderDist(boolean show) {
-        setValue(CONFIG_GROUP, SHOW_RENDER_DIST, show);
+        setValue(SHOW_RENDER_DIST, show);
     }
 
 }

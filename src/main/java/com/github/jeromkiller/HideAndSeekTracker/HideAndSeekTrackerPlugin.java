@@ -160,7 +160,7 @@ public class HideAndSeekTrackerPlugin extends Plugin
 				return new ArrayList<>();
 			}
 
-			if(!area.isWorthChecking(playerLoc)) {
+			if(area.notWorthChecking(playerLoc)) {
 				continue;
 			}
 			for(Player player : playersList)
@@ -189,8 +189,7 @@ public class HideAndSeekTrackerPlugin extends Plugin
 
 	public List<String> getInRangePlayers()
 	{
-		List<String> inRangePlayers = findPlayersInRange();
-		return inRangePlayers;
+        return findPlayersInRange();
 	}
 
 	public void startCaptureAreaCreation()

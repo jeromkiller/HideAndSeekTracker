@@ -13,9 +13,6 @@ public class GamePanel extends JPanel {
 
     private final JSpinner hintCount;
     private final HideAndSeekTable resultTable;
-    private final JButton exportDirect = new JButton("Export Direct");
-    private final JButton exportDiscord = new JButton("Export Discord");
-    private final JButton resetGame = new JButton("Reset");
     private final JLabel numFinished = new JLabel("999/999 Finished");
 
     GamePanel(HideAndSeekTrackerPlugin plugin)
@@ -35,10 +32,12 @@ public class GamePanel extends JPanel {
         constraints.gridx = 0;
         constraints.gridy = 0;
 
+        JButton exportDirect = new JButton("Export Direct");
         exportDirect.addActionListener(e -> export(false));
         contents.add(exportDirect, constraints);
 
         constraints.gridx = 1;
+        JButton exportDiscord = new JButton("Export Discord");
         exportDiscord.addActionListener(e -> export(true));
         contents.add(exportDiscord, constraints);
         constraints.gridy++;
@@ -70,6 +69,7 @@ public class GamePanel extends JPanel {
         contents.add(numFinished, constraints);
 
         constraints.gridx = 1;
+        JButton resetGame = new JButton("Reset");
         resetGame.addActionListener(e -> reset());
         contents.add(resetGame, constraints);
         constraints.gridx = 0;
@@ -99,19 +99,18 @@ public class GamePanel extends JPanel {
 
     public void updatePlacements()
     {
-        SwingUtilities.invokeLater(new Runnable(){public void run(){
+        SwingUtilities.invokeLater(() -> {
             resultTable.update();
             updateNumFinished();
-        }});
+        });
     }
 
     private void updateNumFinished()
     {
-        StringBuilder numPlacedBuilder = new StringBuilder();
-        numPlacedBuilder.append(plugin.game.getNumPlaced());
-        numPlacedBuilder.append(" / ");
-        numPlacedBuilder.append(plugin.game.getNumParticipants());
-        numPlacedBuilder.append(" Finished");
-        numFinished.setText(numPlacedBuilder.toString());
+        String numPlaced = plugin.game.getNumPlaced() +
+                " / " +
+                plugin.game.getNumParticipants() +
+                " Finished";
+        numFinished.setText(numPlaced);
     }
 }

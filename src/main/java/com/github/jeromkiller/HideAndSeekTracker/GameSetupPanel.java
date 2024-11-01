@@ -16,7 +16,6 @@ import java.util.List;
 public class GameSetupPanel extends JPanel {
     private final JSpinner tickLeniency = new JSpinner(new SpinnerNumberModel(2, 0, 100, 1));
     private final JTextArea playerNames = new JTextArea();
-    private final JButton copyPlayerNames = new JButton("Copy Player Names In Area(s)");
     private final JLabel playerNamesHash = new JLabel();
     private final JCheckBox showRenderDist = new JCheckBox();
     private final JLabel copyStatus = new JLabel();
@@ -100,6 +99,7 @@ public class GameSetupPanel extends JPanel {
         constraints.weighty = 0;
         constraints.fill = GridBagConstraints.HORIZONTAL;
 
+        JButton copyPlayerNames = new JButton("Copy Player Names In Area(s)");
         copyPlayerNames.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
