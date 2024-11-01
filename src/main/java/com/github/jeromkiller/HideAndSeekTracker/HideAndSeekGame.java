@@ -1,30 +1,30 @@
 package com.github.jeromkiller.HideAndSeekTracker;
 
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.util.*;
 
 public class HideAndSeekGame {
     private static final Logger log = LoggerFactory.getLogger(HideAndSeekGame.class);
-    LinkedHashMap<String, HideAndSeekPlayer> participants;
-    int hintsGiven;
-    int placementIndex;
-    HideAndSeekTable table;
-    int leniencyTicks;
-    int sharedPlacementSpot;
+    private final LinkedHashMap<String, HideAndSeekPlayer> participants;
 
-    private final HideAndSeekTrackerConfig config;
+    private int hintsGiven;
+    private int placementIndex;
+    private int leniencyCounter;
+    private int sharedPlacementSpot;
 
-    HideAndSeekGame(HideAndSeekTrackerConfig config)
+    private final HideAndSeekTrackerPlugin plugin;
+
+    HideAndSeekGame(HideAndSeekTrackerPlugin plugin)
     {
-        this.config = config;
-
-        this.participants = new LinkedHashMap<>();
+        this.plugin = plugin;
+        this.participants = plugin.getParticipants();
         this.hintsGiven = 0;
         this.placementIndex = 0;
-        this.table = null;
-        this.leniencyTicks = 0;
+        this.leniencyCounter = 0;
         this.sharedPlacementSpot = 0;
     }
 
@@ -32,13 +32,14 @@ public class HideAndSeekGame {
     {
         hintsGiven = 1;
         placementIndex = 0;
+        leniencyCounter = 0;
         sharedPlacementSpot = 0;
 
         for(HideAndSeekPlayer player : participants.values())
         {
             player.reset();
         }
-        table.update();
+        plugin.getPanel().getGamePanel().updatePlacements();
     }
 
     public void setHintsGiven(int hint)
@@ -46,7 +47,7 @@ public class HideAndSeekGame {
         hintsGiven = hint;
     }
 
-    public String setPlayers(String[] playerNames)
+    public String setPlayers(List<String> playerNames)
     {
         LinkedHashMap<String, HideAndSeekPlayer> newParticipants = new LinkedHashMap<>();
         for(String playerName : playerNames)
@@ -64,20 +65,15 @@ public class HideAndSeekGame {
         }
         participants.clear();
         participants.putAll(newParticipants);
-        table.update();
+        plugin.getPanel().getGamePanel().updatePlacements();
         return generateSyncString();
-    }
-
-    public void setTable(HideAndSeekTable table)
-    {
-        this.table = table;
     }
 
     public void tick()
     {
-        if(leniencyTicks > 0)
+        if(leniencyCounter > 0)
         {
-            leniencyTicks -= 1;
+            leniencyCounter -= 1;
         }
     }
 
@@ -94,15 +90,15 @@ public class HideAndSeekGame {
             return;
         }
 
-        if(leniencyTicks == 0)
+        if(leniencyCounter == 0)
         {
             sharedPlacementSpot += 1;
-            leniencyTicks = config.tickLeniency();
+            leniencyCounter = plugin.getSettings().getTickLenience();
         }
 
         placementIndex += 1;
         participants.get(playerName).setStats(placementIndex, sharedPlacementSpot, hintsGiven);
-        table.update();
+        plugin.getPanel().getGamePanel().updatePlacements();
     }
 
     private String generateSyncString()
@@ -130,5 +126,20 @@ public class HideAndSeekGame {
             exportString = "```\n" + exportString + "\n```";
         }
         return exportString;
+    }
+
+    public int getNumPlaced()
+    {
+        int num = 0;
+        for(HideAndSeekPlayer player : participants.values())
+        {
+            num += player.getInternalPlacement() > 0 ? 1 : 0;
+        }
+        return num;
+    }
+
+    public int getNumParticipants()
+    {
+        return participants.size();
     }
 }

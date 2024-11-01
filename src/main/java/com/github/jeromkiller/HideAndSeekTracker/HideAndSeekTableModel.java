@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 public class HideAndSeekTableModel extends AbstractTableModel {
-    private final String[] columnNames = {"#", "Name", "Place", "Hints", "pts" };
+    private final String[] columnNames = {"#", "Name", "Place", "Hints"};
     private final LinkedHashMap<String, HideAndSeekPlayer> data;
 
     HideAndSeekTableModel(LinkedHashMap<String, HideAndSeekPlayer> data)
