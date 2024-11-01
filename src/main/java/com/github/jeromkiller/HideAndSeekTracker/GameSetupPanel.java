@@ -39,7 +39,7 @@ public class GameSetupPanel extends JPanel {
         constraints.gridx = 0;
         constraints.gridy = 0;
         constraints.weightx = 1;
-        final JLabel leniencyLabel = new JLabel("Placement Leniency");
+        final JLabel leniencyLabel = new JLabel("Placement Leniency Ticks");
         constraints.anchor = GridBagConstraints.WEST;
         constraints.gridwidth = 1;
         contents.add(leniencyLabel, constraints);

@@ -16,11 +16,11 @@ public class HideAndSeekTrackerPanel extends PluginPanel {
     {
         JTabbedPane tabPane = new JTabbedPane();
 
-        setupPanel = new GameSetupPanel(plugin);
-        tabPane.add("Setup", setupPanel);
-
         areaPanel = new CaptureAreaManagementPanel(plugin);
         tabPane.add("Areas", areaPanel);
+
+        setupPanel = new GameSetupPanel(plugin);
+        tabPane.add("Setup", setupPanel);
 
         gamePanel = new GamePanel(plugin);
         tabPane.add("Game", gamePanel);

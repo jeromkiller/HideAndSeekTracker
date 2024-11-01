@@ -22,7 +22,7 @@ public class HideAndSeekGame {
     {
         this.plugin = plugin;
         this.participants = plugin.getParticipants();
-        this.hintsGiven = 0;
+        this.hintsGiven = 1;
         this.placementIndex = 0;
         this.leniencyCounter = 0;
         this.sharedPlacementSpot = 0;
