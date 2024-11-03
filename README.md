@@ -16,7 +16,7 @@ A player tracker for the hide and seek (GieliGuessr) events hosted in the offici
 To track whoever reaches you first we'll first need to create a 'Capture Area'
 These can be created from the 'Area' tab in the hide and seek side panel.
 This will give you a new area creation panel to define an area around your character. Resize the area to your liking and click the 'Tick' button to place the capture area in the world. Now its ready to track players entering the area.
-##### note: do not make the capture areas smaller than two tiles wide or long, these can be skipped over when a player runs over it
+##### note: do not make the capture areas smaller than two tiles in width or height, these can be skipped over when a player runs across it
 
 ![CreateCapture.png](images/CreateCapture.png)
 
@@ -34,7 +34,7 @@ If there are a lot of participants you can also place down a capture area and co
 
 ![Settings](images/SettingsPanel.png)
 
-The 'Placement Leniency Ticks' option changes within how many ticks two players have to finnish in order to share a position.
+The 'Placement Leniency Ticks' option changes within how many ticks two players have to finnish in order to share a position on the leaderboard.
 We recommend setting this to 2 ticks at its lowest as that's most reliable.
 
 ###### note: at 0 ticks players entering the area on the same tick will not share a spot, the player whose name comes first in the alphabet will be placed first
