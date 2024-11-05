@@ -47,7 +47,24 @@ public class HideAndSeekGame {
         hintsGiven = hint;
     }
 
-    public String setPlayers(List<String> playerNames)
+    public List<String> setPlayers(List<String> playerNames)
+    {
+        LinkedHashMap<String, HideAndSeekPlayer> newParticipants = buildParticipantMap(playerNames);
+        participants.clear();
+        participants.putAll(newParticipants);
+        plugin.getPanel().getGamePanel().updatePlacements();
+        return new ArrayList<>(participants.keySet());
+    }
+
+    public List<String> addPlayerNames(List<String> playerNames)
+    {
+        LinkedHashMap<String, HideAndSeekPlayer> newParticipants = buildParticipantMap(playerNames);
+        participants.putAll(newParticipants);
+        plugin.getPanel().getGamePanel().updatePlacements();
+        return new ArrayList<>(participants.keySet());
+    }
+
+    private LinkedHashMap<String, HideAndSeekPlayer> buildParticipantMap(List<String> playerNames)
     {
         LinkedHashMap<String, HideAndSeekPlayer> newParticipants = new LinkedHashMap<>();
         for(String playerName : playerNames)
@@ -63,10 +80,7 @@ public class HideAndSeekGame {
                 newParticipants.put(playerName, new HideAndSeekPlayer(playerName));
             }
         }
-        participants.clear();
-        participants.putAll(newParticipants);
-        plugin.getPanel().getGamePanel().updatePlacements();
-        return generateSyncString();
+        return newParticipants;
     }
 
     public void tick()
@@ -99,12 +113,6 @@ public class HideAndSeekGame {
         placementIndex += 1;
         participants.get(playerName).setStats(placementIndex, sharedPlacementSpot, hintsGiven);
         plugin.getPanel().getGamePanel().updatePlacements();
-    }
-
-    private String generateSyncString()
-    {
-        int hashCode = Arrays.hashCode(participants.keySet().toArray());
-        return Integer.toHexString(hashCode);
     }
 
     public String export(boolean discordExport)

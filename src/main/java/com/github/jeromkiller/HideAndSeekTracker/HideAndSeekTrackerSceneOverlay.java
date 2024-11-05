@@ -50,7 +50,7 @@ public class HideAndSeekTrackerSceneOverlay extends Overlay
         }
 
         for(CaptureArea area : plugin.getCaptureAreas()) {
-            if(area.notWorthChecking(playerLoc)) {
+            if(area.notWorthPainting(playerLoc)) {
                 continue;
             }
             drawBox(graphics, area, playerLoc);

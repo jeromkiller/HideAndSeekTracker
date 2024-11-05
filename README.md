@@ -28,9 +28,10 @@ You may also hide any unused capture areas from the world, these will not be use
 
 ### Setting up Game rules
 After setting up the desired Capture Areas you can set up the participant list.
-Simply enter the character name of every player who wishes to participate.
+Simply enter the character name of every player who wishes to participate and click the 'Save Participant Names' button.
+Duplicate names will be automatically removed from the list.
 
-If there are a lot of participants you can also place down a capture area and copy the names of the players inside to your clipboard and paste it into the list.
+If there are a lot of participants you can also place down a capture area automatically add playernames of anyone inside it to the list using the 'Automatically Fill Names' option.
 
 ![Settings](images/SettingsPanel.png)
 

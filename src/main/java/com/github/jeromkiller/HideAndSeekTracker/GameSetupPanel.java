@@ -1,32 +1,61 @@
 package com.github.jeromkiller.HideAndSeekTracker;
 
 import joptsimple.internal.Strings;
+import net.runelite.client.util.ImageUtil;
+import net.runelite.client.util.SwingUtil;
+import net.runelite.client.ui.ColorScheme;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
 public class GameSetupPanel extends JPanel {
     private final JSpinner tickLeniency = new JSpinner(new SpinnerNumberModel(2, 0, 100, 1));
     private final JTextArea playerNames = new JTextArea();
-    private final JLabel playerNamesHash = new JLabel();
-    private final JCheckBox showRenderDist = new JCheckBox();
-    private final JLabel copyStatus = new JLabel();
+    private final JToggleButton showRenderDist = new JToggleButton(OFF_SWITCHER);
+    private final JToggleButton autoFillButton = new JToggleButton(OFF_SWITCHER);
+    private final JLabel notSavedWarning = new JLabel("Names not saved!");
+    private final JLabel statusLabel = new JLabel();
 
     private final HideAndSeekTrackerPlugin plugin;
     private final HideAndSeekSettings settings;
+    private boolean automaticUpdate;
+
+    private static final ImageIcon ON_SWITCHER;
+    private static final ImageIcon OFF_SWITCHER;
+
+    static
+    {
+        BufferedImage onSwitcher = ImageUtil.loadImageResource(HideAndSeekTrackerPlugin.class, "switcher_on.png");
+        ON_SWITCHER = new ImageIcon(onSwitcher);
+        OFF_SWITCHER = new ImageIcon(ImageUtil.flipImage(
+                ImageUtil.luminanceScale(
+                        ImageUtil.grayscaleImage(onSwitcher),
+                        0.61f
+                ),
+                true,
+                false
+        ));
+    }
 
     GameSetupPanel(HideAndSeekTrackerPlugin plugin)
     {
         this.plugin = plugin;
         this.settings = plugin.getSettings();
+        this.automaticUpdate = true;
 
         setLayout(new BorderLayout());
         setBorder(new EmptyBorder(5, 0, 10, 0));
@@ -63,12 +92,9 @@ public class GameSetupPanel extends JPanel {
         constraints.anchor = GridBagConstraints.EAST;
         constraints.gridx = 1;
         showRenderDist.setSelected(settings.getShowRenderDist());
-        showRenderDist.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                changeShowRenderDist();
-            }
-        });
+        showRenderDist.setSelectedIcon(ON_SWITCHER);
+        showRenderDist.addItemListener(e -> changeShowRenderDist());
+        SwingUtil.removeButtonDecorations(showRenderDist);
         contents.add(showRenderDist, constraints);
         constraints.gridy++;
         constraints.anchor = GridBagConstraints.WEST;
@@ -82,16 +108,24 @@ public class GameSetupPanel extends JPanel {
         constraints.fill = GridBagConstraints.BOTH;
         constraints.weighty = 1;
         playerNames.setRows(10);
-        playerNames.setMinimumSize(new Dimension(0, 200));
-        playerNames.addFocusListener(new FocusListener() {
+        Border border = BorderFactory.createLineBorder(ColorScheme.BORDER_COLOR );
+        playerNames.setBorder(BorderFactory.createCompoundBorder(border,
+                BorderFactory.createEmptyBorder(3, 5, 3, 5)));
+
+        playerNames.getDocument().addDocumentListener(new DocumentListener() {
             @Override
-            public void focusGained(FocusEvent e) {
-                // nothing
+            public void insertUpdate(DocumentEvent e) {
+                enableNotSavedWarning();
             }
 
             @Override
-            public void focusLost(FocusEvent e) {
-                changePlayerNames();
+            public void removeUpdate(DocumentEvent e) {
+                enableNotSavedWarning();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                // nothing
             }
         });
         contents.add(playerNames, constraints);
@@ -99,21 +133,41 @@ public class GameSetupPanel extends JPanel {
         constraints.weighty = 0;
         constraints.fill = GridBagConstraints.HORIZONTAL;
 
-        JButton copyPlayerNames = new JButton("Copy Player Names In Area(s)");
-        copyPlayerNames.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                getInAreaPlayers();
-            }
-        });
-        contents.add(copyPlayerNames, constraints);
+        final JButton saveNamesButton = new JButton("Save Participant Names");
+        saveNamesButton.addActionListener(e -> changePlayerNames());
+        contents.add(saveNamesButton, constraints);
         constraints.gridy++;
 
-        copyStatus.setVisible(false);
-        contents.add(copyStatus, constraints);
+        //contents.add(copyPlayerNames, constraints);
+        constraints.gridwidth = 1;
+        constraints.anchor = GridBagConstraints.WEST;
+        final JLabel autoFillLabel = new JLabel("Automatically Fill Names");
+        contents.add(autoFillLabel, constraints);
+
+        constraints.gridx = 1;
+        constraints.anchor = GridBagConstraints.EAST;
+        constraints.fill = GridBagConstraints.NONE;
+        autoFillButton.setSelectedIcon(ON_SWITCHER);
+        autoFillButton.addItemListener(e -> changeAutoFill());
+        SwingUtil.removeButtonDecorations(autoFillButton);
+        contents.add(autoFillButton, constraints);
+        constraints.gridwidth = 2;
+        constraints.gridx = 0;
+        constraints.gridy++;
+
+        constraints.anchor = GridBagConstraints.WEST;
+        statusLabel.setVisible(false);
+        contents.add(statusLabel, constraints);
+        constraints.gridy++;
+
+        notSavedWarning.setVisible(false);
+        contents.add(notSavedWarning, constraints);
+        constraints.gridy++;
 
         add(contents, BorderLayout.NORTH);
         loadSettings();
+
+        automaticUpdate = false;
     }
 
     private void changePlayerNames() {
@@ -127,7 +181,14 @@ public class GameSetupPanel extends JPanel {
                 nameList.clear();
             }
         }
-        settings.setPlayerNames(nameList);
+
+        final List<String> setNames = plugin.setPlayerNames(nameList);
+        final int numRemoved = nameList.size() - setNames.size();
+        if(numRemoved > 0) {
+            setStatusLabel(String.format("Removed %d duplicates", numRemoved));
+        }
+
+        notSavedWarning.setVisible(false);
     }
 
     private void changeTickLeniency() {
@@ -140,6 +201,16 @@ public class GameSetupPanel extends JPanel {
         settings.setShowRenderDist(show);
     }
 
+    private void changeAutoFill() {
+        if(notSavedWarning.isVisible())
+        {
+            changePlayerNames();
+        }
+        final boolean autofill = autoFillButton.isSelected();
+        plugin.setAutofillNames(autofill);
+        playerNames.setEditable(!autofill);
+    }
+
     public void loadSettings() {
         final int tickLeniencySetting = settings.getTickLenience();
         tickLeniency.setValue(tickLeniencySetting);
@@ -147,8 +218,7 @@ public class GameSetupPanel extends JPanel {
         final boolean showRenderDistSetting = settings.getShowRenderDist();
         showRenderDist.setSelected(showRenderDistSetting);
 
-        final String playerNameString = String.join(System.lineSeparator(), settings.getPlayerNames());
-        playerNames.setText(playerNameString);
+        loadPlayerNames(settings.getPlayerNames());
     }
 
     private void getInAreaPlayers()
@@ -156,16 +226,36 @@ public class GameSetupPanel extends JPanel {
         final List<String> inAreaPlayers = plugin.getInRangePlayers();
         final int numPlayers = inAreaPlayers.size();
         if(numPlayers == 0) {
-            copyStatus.setText("No players found in area(s)");
+            setStatusLabel("No players found in area(s)");
         } else {
             exportPlayerNames(inAreaPlayers);
-            copyStatus.setText(String.format("Copied %d names to clipboard", numPlayers));
+            setStatusLabel(String.format("Copied %d names to clipboard", numPlayers));
         }
+    }
 
-        copyStatus.setVisible(true);
-        Timer hideTimer = new Timer(1000, e -> {copyStatus.setVisible(false);});
+    private void enableNotSavedWarning()
+    {
+        if(!automaticUpdate) {
+            notSavedWarning.setVisible(true);
+        }
+    }
+
+    private void setStatusLabel(String statusText)
+    {
+        statusLabel.setText(statusText);
+        statusLabel.setVisible(true);
+        Timer hideTimer = new Timer(1000, e -> {
+            statusLabel.setVisible(false);});
         hideTimer.setRepeats(false);
         hideTimer.start();
+    }
+
+    public void loadPlayerNames(List<String> names)
+    {
+        automaticUpdate = true;
+        final String playerNameString = String.join(System.lineSeparator(), names);
+        playerNames.setText(playerNameString);
+        automaticUpdate = false;
     }
 
     private void exportPlayerNames(List<String> playerNames)

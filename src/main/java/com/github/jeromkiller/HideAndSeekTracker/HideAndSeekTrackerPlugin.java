@@ -7,7 +7,9 @@ import com.google.gson.reflect.TypeToken;
 import javax.inject.Inject;
 import javax.swing.*;
 
+import lombok.Data;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.events.*;
@@ -89,6 +91,10 @@ public class HideAndSeekTrackerPlugin extends Plugin
 	@Getter
 	private final CaptureCreationOptions captureCreationOptions = new CaptureCreationOptions();
 
+	@Getter
+	@Setter
+	public boolean autofillNames = false;
+
 	@Override
 	protected void startUp()
 	{
@@ -121,6 +127,10 @@ public class HideAndSeekTrackerPlugin extends Plugin
 	public void onGameTick(GameTick tick)
 	{
 		final List<String> inRangePlayers = findPlayersInRange();
+		if(autofillNames && !inRangePlayers.isEmpty()) {
+			final List<String> setNames = addPlayerNames(inRangePlayers);
+		}
+
 		for(String playerName : inRangePlayers) {
 			game.playerFound(playerName);
 		}
@@ -130,10 +140,10 @@ public class HideAndSeekTrackerPlugin extends Plugin
 	@Subscribe
 	public void onConfigChanged(ConfigChanged event)
 	{
-		if(Objects.equals(event.getKey(), HideAndSeekSettings.PLAYER_NAMES_KEY))
-		{
-			loadStartingPlayers();
-		}
+		//if(Objects.equals(event.getKey(), HideAndSeekSettings.PLAYER_NAMES_KEY))
+		//{
+		//	loadStartingPlayers();
+		//}
 	}
 
 	@Subscribe
@@ -180,11 +190,26 @@ public class HideAndSeekTrackerPlugin extends Plugin
 		return playerNames;
 	}
 
+	public List<String> setPlayerNames(List<String> nameList)
+	{
+		final List<String> setNames = game.setPlayers(nameList);
+		settings.setPlayerNames(setNames);
+		panel.getSetupPanel().loadPlayerNames(setNames);
+		return setNames;
+	}
+
+	public List<String> addPlayerNames(List<String> nameList)
+	{
+		final List<String> setNames = game.addPlayerNames(nameList);
+		settings.setPlayerNames(setNames);
+		panel.getSetupPanel().loadPlayerNames(setNames);
+		return setNames;
+	}
+
 	public void loadStartingPlayers()
 	{
 		List<String> playerNames = settings.getPlayerNames();
-        String syncString = game.setPlayers(playerNames);
-		//panel.setSyncString(syncString);
+        game.setPlayers(playerNames);
 	}
 
 	public List<String> getInRangePlayers()

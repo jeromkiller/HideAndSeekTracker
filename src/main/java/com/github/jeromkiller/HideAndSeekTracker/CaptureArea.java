@@ -23,6 +23,7 @@ public class CaptureArea {
     private String label;
     private Color color;
     private boolean areaVisible;
+    private boolean areaActive;
     private boolean labelVisible;
 
     public CaptureArea(WorldPoint worldPoint, int width, int height, Color color, @Nullable String label, boolean labelVisible) {
@@ -33,10 +34,20 @@ public class CaptureArea {
         this.label = Objects.requireNonNullElse(label, "");
         this.color = color;
         this.areaVisible = true;
+        this.areaActive = true;
         this.labelVisible = labelVisible;
     }
 
     public boolean notWorthChecking(WorldPoint playerLoc)
+    {
+        boolean notWorth = false;
+        notWorth |= !areaActive;
+        notWorth |= playerLoc.getPlane() != worldPoint.getPlane();
+        notWorth |= playerLoc.distanceTo(worldPoint) > MAX_RENDER_DISTANCE;
+        return notWorth;
+    }
+
+    public boolean notWorthPainting(WorldPoint playerLoc)
     {
         boolean notWorth = false;
         notWorth |= !areaVisible;

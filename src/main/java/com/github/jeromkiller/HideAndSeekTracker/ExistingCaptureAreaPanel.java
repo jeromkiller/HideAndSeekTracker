@@ -329,6 +329,7 @@ public class ExistingCaptureAreaPanel extends CaptureAreaPanel
     {
         visible = on;
         captureArea.setAreaVisible(on);
+        captureArea.setAreaActive(on);
         plugin.updateCaptureAreas();
         updateVisibility();
     }

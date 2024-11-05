@@ -28,9 +28,6 @@ public class CaptureCreationPanel extends CaptureAreaPanel
     private final JLabel colorIndicator = new JLabel();
     private final JLabel labelIndicator = new JLabel();
     private final FlatTextField nameInput = new FlatTextField();
-    private final JLabel saveName = new JLabel("Save");
-    private final JLabel cancelName = new JLabel("Cancel");
-    private final JLabel rename = new JLabel("Rename");
     private final JSpinner northSpinner = new JSpinner();
     private final JSpinner eastSpinner = new JSpinner();
     private final JSpinner southSpinner = new JSpinner();
@@ -76,104 +73,12 @@ public class CaptureCreationPanel extends CaptureAreaPanel
         nameActions.setBorder(new EmptyBorder(0, 0, 0, 8));
         nameActions.setBackground(ColorScheme.DARKER_GRAY_COLOR);
 
-        saveName.setVisible(false);
-        saveName.setFont(FontManager.getRunescapeSmallFont());
-        saveName.setForeground(ColorScheme.PROGRESS_COMPLETE_COLOR);
-        saveName.addMouseListener(new MouseAdapter()
-        {
-            @Override
-            public void mousePressed(MouseEvent mouseEvent)
-            {
-                saveName();
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent mouseEvent)
-            {
-                saveName.setForeground(ColorScheme.PROGRESS_COMPLETE_COLOR.darker());
-            }
-
-            @Override
-            public void mouseExited(MouseEvent mouseEvent)
-            {
-                saveName.setForeground(ColorScheme.PROGRESS_COMPLETE_COLOR);
-            }
-        });
-
-        cancelName.setVisible(false);
-        cancelName.setFont(FontManager.getRunescapeSmallFont());
-        cancelName.setForeground(ColorScheme.PROGRESS_ERROR_COLOR);
-        cancelName.addMouseListener(new MouseAdapter()
-        {
-            @Override
-            public void mousePressed(MouseEvent mouseEvent)
-            {
-                cancelName();
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent mouseEvent)
-            {
-                cancelName.setForeground(ColorScheme.PROGRESS_ERROR_COLOR.darker());
-            }
-
-            @Override
-            public void mouseExited(MouseEvent mouseEvent)
-            {
-                cancelName.setForeground(ColorScheme.PROGRESS_ERROR_COLOR);
-            }
-        });
-
-        rename.setFont(FontManager.getRunescapeSmallFont());
-        rename.setForeground(ColorScheme.LIGHT_GRAY_COLOR.darker());
-        rename.addMouseListener(new MouseAdapter()
-        {
-            @Override
-            public void mousePressed(MouseEvent mouseEvent)
-            {
-                nameInput.setEditable(true);
-                updateNameActions(true);
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent mouseEvent)
-            {
-                rename.setForeground(ColorScheme.LIGHT_GRAY_COLOR.darker().darker());
-            }
-
-            @Override
-            public void mouseExited(MouseEvent mouseEvent)
-            {
-                rename.setForeground(ColorScheme.LIGHT_GRAY_COLOR.darker());
-            }
-        });
-
-        nameActions.add(saveName, BorderLayout.EAST);
-        nameActions.add(cancelName, BorderLayout.WEST);
-        nameActions.add(rename, BorderLayout.CENTER);
-
         nameInput.setText(captureOptions.getLabel());
         nameInput.setBorder(null);
-        nameInput.setEditable(false);
         nameInput.setBackground(ColorScheme.DARKER_GRAY_COLOR);
         nameInput.setPreferredSize(new Dimension(0, 24));
         nameInput.getTextField().setForeground(Color.WHITE);
         nameInput.getTextField().setBorder(new EmptyBorder(0, 8, 0, 0));
-        nameInput.addKeyListener(new KeyAdapter()
-        {
-            @Override
-            public void keyPressed(KeyEvent e)
-            {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER)
-                {
-                    saveName();
-                }
-                else if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
-                {
-                    cancelName();
-                }
-            }
-        });
 
         nameWrapper.add(nameInput, BorderLayout.CENTER);
         nameWrapper.add(nameActions, BorderLayout.EAST);
@@ -291,6 +196,7 @@ public class CaptureCreationPanel extends CaptureAreaPanel
         saveArea.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
+                captureOptions.setLabel(nameInput.getText());
                 plugin.finishCaptureAreaCreation();
             }
 
@@ -345,37 +251,6 @@ public class CaptureCreationPanel extends CaptureAreaPanel
         captureOptions.setLabelVisible(on);
         plugin.updateCaptureAreas();
         updateLabelling();
-    }
-
-    private void saveName()
-    {
-        captureOptions.setLabel(nameInput.getText());
-        plugin.updateCaptureAreas();
-
-        nameInput.setEditable(false);
-        updateNameActions(false);
-        requestFocusInWindow();
-    }
-
-    private void cancelName()
-    {
-        nameInput.setEditable(false);
-        nameInput.setText(captureOptions.getLabel());
-        updateNameActions(false);
-        requestFocusInWindow();
-    }
-
-    private void updateNameActions(boolean saveAndCancel)
-    {
-        saveName.setVisible(saveAndCancel);
-        cancelName.setVisible(saveAndCancel);
-        rename.setVisible(!saveAndCancel);
-
-        if (saveAndCancel)
-        {
-            nameInput.getTextField().requestFocusInWindow();
-            nameInput.getTextField().selectAll();
-        }
     }
 
     private void updateLabelling()
