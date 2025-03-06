@@ -1,6 +1,7 @@
 package com.github.jeromkiller.HideAndSeekTracker;
 
 import joptsimple.internal.Strings;
+import lombok.Getter;
 import net.runelite.client.util.ImageUtil;
 import net.runelite.client.util.SwingUtil;
 import net.runelite.client.ui.ColorScheme;
@@ -8,8 +9,6 @@ import net.runelite.client.ui.ColorScheme;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
-import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
@@ -17,9 +16,9 @@ import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
-import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 public class GameSetupPanel extends JPanel {
@@ -30,9 +29,12 @@ public class GameSetupPanel extends JPanel {
     private final JLabel notSavedWarning = new JLabel("Names not saved!");
     private final JLabel statusLabel = new JLabel();
 
+    @Getter
+    private final LinkedHashSet<String> playerNameList = new LinkedHashSet<>();
+
     private final HideAndSeekTrackerPlugin plugin;
     private final HideAndSeekSettings settings;
-    private boolean automaticUpdate;
+    private boolean isAutomaticUpdate;
 
     private static final ImageIcon ON_SWITCHER;
     private static final ImageIcon OFF_SWITCHER;
@@ -55,7 +57,7 @@ public class GameSetupPanel extends JPanel {
     {
         this.plugin = plugin;
         this.settings = plugin.getSettings();
-        this.automaticUpdate = true;
+        this.isAutomaticUpdate = true;
 
         setLayout(new BorderLayout());
         setBorder(new EmptyBorder(5, 0, 10, 0));
@@ -167,7 +169,7 @@ public class GameSetupPanel extends JPanel {
         add(contents, BorderLayout.NORTH);
         loadSettings();
 
-        automaticUpdate = false;
+        isAutomaticUpdate = false;
     }
 
     private void changePlayerNames() {
@@ -182,7 +184,7 @@ public class GameSetupPanel extends JPanel {
             }
         }
 
-        final List<String> setNames = plugin.setPlayerNames(nameList);
+        final LinkedHashSet<String> setNames = plugin.setPlayerNames(nameList);
         final int numRemoved = nameList.size() - setNames.size();
         if(numRemoved > 0) {
             setStatusLabel(String.format("Removed %d duplicates", numRemoved));
@@ -235,7 +237,7 @@ public class GameSetupPanel extends JPanel {
 
     private void enableNotSavedWarning()
     {
-        if(!automaticUpdate) {
+        if(!isAutomaticUpdate) {
             notSavedWarning.setVisible(true);
         }
     }
@@ -250,12 +252,27 @@ public class GameSetupPanel extends JPanel {
         hideTimer.start();
     }
 
-    public void loadPlayerNames(List<String> names)
+    public void loadPlayerNames(LinkedHashSet<String> names)
     {
-        automaticUpdate = true;
-        final String playerNameString = String.join(System.lineSeparator(), names);
+        isAutomaticUpdate = true;
+        playerNameList.clear();
+        playerNameList.addAll(names);
+        final String playerNameString = String.join(System.lineSeparator(), playerNameList);
         playerNames.setText(playerNameString);
-        automaticUpdate = false;
+        isAutomaticUpdate = false;
+
+        settings.setPlayerNames(playerNameList);
+    }
+
+    public void addPlayerNames(LinkedHashSet<String> names)
+    {
+        isAutomaticUpdate = true;
+        playerNameList.addAll(names);
+        final String playerNameString = String.join(System.lineSeparator(), playerNameList);
+        playerNames.setText(playerNameString);
+        isAutomaticUpdate = false;
+
+        settings.setPlayerNames(playerNameList);
     }
 
     private void exportPlayerNames(List<String> playerNames)

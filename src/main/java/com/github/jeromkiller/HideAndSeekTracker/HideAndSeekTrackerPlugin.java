@@ -35,10 +35,8 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Objects;
 
 @Slf4j
 @PluginDescriptor(
@@ -82,8 +80,6 @@ public class HideAndSeekTrackerPlugin extends Plugin
     private NavigationButton navButton;
 
 	public HideAndSeekGame game;
-	@Getter
-	private final LinkedHashMap<String, HideAndSeekPlayer> participants = new LinkedHashMap<>();
 
 	@Getter
 	private final List<CaptureArea> captureAreas = new ArrayList<>();
@@ -99,6 +95,7 @@ public class HideAndSeekTrackerPlugin extends Plugin
 	protected void startUp()
 	{
 		overlayManager.add(sceneOverlay);
+		game = new HideAndSeekGame(this);
         panel = new HideAndSeekTrackerPanel(this);
 		final BufferedImage icon = ImageUtil.loadImageResource(getClass(), "HnS_icon.png");
 		navButton = NavigationButton.builder()
@@ -110,10 +107,9 @@ public class HideAndSeekTrackerPlugin extends Plugin
 		clientToolbar.addNavigation(navButton);
 
 		loadCaptureAreas(settings.getCaptureAreas());
-		game = new HideAndSeekGame(this);
+
 		loadStartingPlayers();
 		panel.getAreaPanel().rebuild();
-		//panel.reset();
 	}
 
 	@Override
@@ -128,7 +124,7 @@ public class HideAndSeekTrackerPlugin extends Plugin
 	{
 		final List<String> inRangePlayers = findPlayersInRange();
 		if(autofillNames && !inRangePlayers.isEmpty()) {
-			final List<String> setNames = addPlayerNames(inRangePlayers);
+			addPlayerNames(inRangePlayers);
 		}
 
 		for(String playerName : inRangePlayers) {
@@ -190,25 +186,22 @@ public class HideAndSeekTrackerPlugin extends Plugin
 		return playerNames;
 	}
 
-	public List<String> setPlayerNames(List<String> nameList)
+	public LinkedHashSet<String> setPlayerNames(List<String> nameList)
 	{
-		final List<String> setNames = game.setPlayers(nameList);
-		settings.setPlayerNames(setNames);
+		final LinkedHashSet<String> setNames = game.setPlayers(nameList);
 		panel.getSetupPanel().loadPlayerNames(setNames);
 		return setNames;
 	}
 
-	public List<String> addPlayerNames(List<String> nameList)
+	public void addPlayerNames(List<String> nameList)
 	{
-		final List<String> setNames = game.addPlayerNames(nameList);
-		settings.setPlayerNames(setNames);
-		panel.getSetupPanel().loadPlayerNames(setNames);
-		return setNames;
+		final LinkedHashSet<String> addNames = game.addPlayerNames(nameList);
+		panel.getSetupPanel().addPlayerNames(addNames);
 	}
 
 	public void loadStartingPlayers()
 	{
-		List<String> playerNames = settings.getPlayerNames();
+		List<String> playerNames = new ArrayList<>(settings.getPlayerNames());
         game.setPlayers(playerNames);
 	}
 

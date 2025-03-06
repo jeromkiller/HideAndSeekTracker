@@ -1,153 +1,70 @@
 package com.github.jeromkiller.HideAndSeekTracker;
 
-import lombok.Setter;
+import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
 import java.util.*;
 
+@Data
 public class HideAndSeekGame {
     private static final Logger log = LoggerFactory.getLogger(HideAndSeekGame.class);
-    private final LinkedHashMap<String, HideAndSeekPlayer> participants;
 
-    private int hintsGiven;
-    private int placementIndex;
-    private int leniencyCounter;
-    private int sharedPlacementSpot;
-
+    private HideAndSeekRound activeRound;
+    private ArrayList<HideAndSeekRound> pastRounds;
     private final HideAndSeekTrackerPlugin plugin;
 
     HideAndSeekGame(HideAndSeekTrackerPlugin plugin)
     {
         this.plugin = plugin;
-        this.participants = plugin.getParticipants();
-        this.hintsGiven = 1;
-        this.placementIndex = 0;
-        this.leniencyCounter = 0;
-        this.sharedPlacementSpot = 0;
+        this.activeRound = new HideAndSeekRound(plugin);
+        this.pastRounds = new ArrayList<>();
     }
 
-    public void newRound()
+    public int newRound()
     {
-        hintsGiven = 1;
-        placementIndex = 0;
-        leniencyCounter = 0;
-        sharedPlacementSpot = 0;
+        pastRounds.add(activeRound);
+        ArrayList<String> previousPlayers = new ArrayList<>(activeRound.getParticipants().keySet());
+        activeRound = new HideAndSeekRound(plugin);
+        activeRound.setPlayers(previousPlayers);
+        final int savedRoundIndex = pastRounds.size() -1;
+        return savedRoundIndex;
+    }
 
-        for(HideAndSeekPlayer player : participants.values())
-        {
-            player.reset();
-        }
+    public LinkedHashSet<String> setPlayers(List<String> playerNames)
+    {
+        final LinkedHashSet<String> parsedNames = activeRound.setPlayers(playerNames);
         plugin.getPanel().getGamePanel().updatePlacements();
+        return parsedNames;
     }
 
-    public void setHintsGiven(int hint)
+    public LinkedHashSet<String> addPlayerNames(List<String> playerNames)
     {
-        hintsGiven = hint;
-    }
-
-    public List<String> setPlayers(List<String> playerNames)
-    {
-        LinkedHashMap<String, HideAndSeekPlayer> newParticipants = buildParticipantMap(playerNames);
-        participants.clear();
-        participants.putAll(newParticipants);
+        final LinkedHashSet<String> parsedNames = activeRound.addPlayers(playerNames);
         plugin.getPanel().getGamePanel().updatePlacements();
-        return new ArrayList<>(participants.keySet());
-    }
-
-    public List<String> addPlayerNames(List<String> playerNames)
-    {
-        LinkedHashMap<String, HideAndSeekPlayer> newParticipants = buildParticipantMap(playerNames);
-        participants.putAll(newParticipants);
-        plugin.getPanel().getGamePanel().updatePlacements();
-        return new ArrayList<>(participants.keySet());
-    }
-
-    private LinkedHashMap<String, HideAndSeekPlayer> buildParticipantMap(List<String> playerNames)
-    {
-        LinkedHashMap<String, HideAndSeekPlayer> newParticipants = new LinkedHashMap<>();
-        for(String playerName : playerNames)
-        {
-            playerName = playerName.toLowerCase();
-
-            if(participants.containsKey(playerName)) {
-                // copy already existing players over
-                newParticipants.put(playerName, participants.get(playerName));
-            }
-            else {
-                // create new players if they don't exist yet
-                newParticipants.put(playerName, new HideAndSeekPlayer(playerName));
-            }
-        }
-        return newParticipants;
+        return parsedNames;
     }
 
     public void tick()
     {
-        if(leniencyCounter > 0)
-        {
-            leniencyCounter -= 1;
-        }
+        activeRound.tick();
     }
 
     public void playerFound(String playerName)
     {
-        playerName = playerName.toLowerCase();
-
-        HideAndSeekPlayer player = participants.get(playerName);
-        if(player == null) {
-            return;
-        }
-
-        if(player.hasPlaced()) {
-            return;
-        }
-
-        if(leniencyCounter == 0)
-        {
-            sharedPlacementSpot += 1;
-            leniencyCounter = plugin.getSettings().getTickLenience();
-        }
-
-        placementIndex += 1;
-        participants.get(playerName).setStats(placementIndex, sharedPlacementSpot, hintsGiven);
-        plugin.getPanel().getGamePanel().updatePlacements();
+        activeRound.playerFound(playerName);
     }
 
-    public String export(boolean discordExport)
+    public String export(int round, boolean discordExport)
     {
-        List<String> exportLines = new ArrayList<>();
-        final String seperator = discordExport ? ", " : "\t";
-
-
-        for(HideAndSeekPlayer player :  participants.values())
-        {
-            String hints = player.getHints() > 0 ? Integer.toString(player.getHints()) : "DNF";
-            String placement = player.getPlacementExportString();
-            String newLine = hints + seperator + placement;
-            exportLines.add(newLine);
+        if(round >= pastRounds.size()) {
+            return "";
         }
-        String exportString = String.join("\n", exportLines);
-        if(discordExport)
-        {
-            exportString = "```\n" + exportString + "\n```";
-        }
-        return exportString;
-    }
 
-    public int getNumPlaced()
-    {
-        int num = 0;
-        for(HideAndSeekPlayer player : participants.values())
-        {
-            num += player.getInternalPlacement() > 0 ? 1 : 0;
+        if(round < 0) {
+            return activeRound.export(discordExport);
         }
-        return num;
-    }
 
-    public int getNumParticipants()
-    {
-        return participants.size();
+        return pastRounds.get(round).export(discordExport);
     }
 }

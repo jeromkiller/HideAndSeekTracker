@@ -6,10 +6,7 @@ import joptsimple.internal.Strings;
 import net.runelite.client.config.ConfigManager;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class HideAndSeekSettings {
 
@@ -58,15 +55,15 @@ public class HideAndSeekSettings {
         setValue(TICK_LENIENCY_KEY, ticks);
     }
 
-    public List<String> getPlayerNames() {
+    public LinkedHashSet<String> getPlayerNames() {
         final String json = configManager.getConfiguration(CONFIG_GROUP, PLAYER_NAMES_KEY);
         if(Strings.isNullOrEmpty(json)){
-            return new ArrayList<>();
+            return new LinkedHashSet<>();
         }
-        return gson.fromJson(json, new TypeToken<ArrayList<String>>(){}.getType());
+        return gson.fromJson(json, new TypeToken<LinkedHashSet<String>>(){}.getType());
     }
 
-    public void setPlayerNames(List<String> playerNames) {
+    public void setPlayerNames(LinkedHashSet<String> playerNames) {
         setValue(PLAYER_NAMES_KEY, playerNames);
     }
 

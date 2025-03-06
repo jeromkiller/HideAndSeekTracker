@@ -2,10 +2,10 @@ package com.github.jeromkiller.HideAndSeekTracker;
 
 import javax.swing.*;
 import javax.swing.table.TableRowSorter;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 
 public class HideAndSeekTable extends JTable {
-    HideAndSeekTable(LinkedHashMap<String, HideAndSeekPlayer> data)
+    HideAndSeekTable(HashMap<String, HideAndSeekPlayer> data)
     {
         super(new HideAndSeekTableModel(data));
         RowFilter<HideAndSeekTableModel, Object> filter = RowFilter.numberFilter(RowFilter.ComparisonType.NOT_EQUAL, 0,0, 1);

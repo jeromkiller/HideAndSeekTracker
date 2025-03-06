@@ -2,13 +2,13 @@ package com.github.jeromkiller.HideAndSeekTracker;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 
 public class HideAndSeekTableModel extends AbstractTableModel {
     private final String[] columnNames = {"#", "Name", "Place", "Hints"};
-    private final LinkedHashMap<String, HideAndSeekPlayer> data;
+    private final HashMap<String, HideAndSeekPlayer> data;
 
-    HideAndSeekTableModel(LinkedHashMap<String, HideAndSeekPlayer> data)
+    HideAndSeekTableModel(HashMap<String, HideAndSeekPlayer> data)
     {
         this.data = data;
     }
