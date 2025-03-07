@@ -54,17 +54,4 @@ public class HideAndSeekGame {
     {
         activeRound.playerFound(playerName);
     }
-
-    public String export(int round, boolean discordExport)
-    {
-        if(round >= pastRounds.size()) {
-            return "";
-        }
-
-        if(round < 0) {
-            return activeRound.export(discordExport);
-        }
-
-        return pastRounds.get(round).export(discordExport);
-    }
 }

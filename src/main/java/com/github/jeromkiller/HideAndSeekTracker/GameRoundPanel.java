@@ -43,13 +43,13 @@ public class GameRoundPanel extends JPanel {
         constraints.gridy++;
 
 
-        JButton exportDirect = new JButton("Export Direct");
-        exportDirect.addActionListener(e -> export(false));
+        JButton exportDirect = new JButton("Export Text");
+        exportDirect.addActionListener(e -> plainTextExport());
         contents.add(exportDirect, constraints);
 
         constraints.gridx = 1;
-        JButton exportDiscord = new JButton("Export Discord");
-        exportDiscord.addActionListener(e -> export(true));
+        JButton exportDiscord = new JButton("Dev Export");
+        exportDiscord.addActionListener(e -> devExport(true));
         contents.add(exportDiscord, constraints);
         constraints.gridy++;
 
@@ -83,9 +83,16 @@ public class GameRoundPanel extends JPanel {
         updatePlacements();
     }
 
-    private void export(boolean discordExport)
+    private void plainTextExport() {
+        final String exportString = gameRound.plainTextExport();
+        final StringSelection selection = new StringSelection(exportString);
+        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        clipboard.setContents(selection, selection);
+    }
+
+    private void devExport(boolean discordExport)
     {
-        final String exportString = gameRound.export(discordExport);
+        final String exportString = gameRound.devExport(discordExport);
         final StringSelection selection = new StringSelection(exportString);
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         clipboard.setContents(selection, selection);

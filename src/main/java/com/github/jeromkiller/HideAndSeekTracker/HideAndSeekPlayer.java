@@ -5,11 +5,11 @@ import lombok.Getter;
 public class HideAndSeekPlayer {
 
     public enum Placement {
-        DNF("DNF", 0),    // no points
-        FIRST("First", 1),  // all the points
-        SECOND("Second", 2), // 2 points
-        THIRD("Third", 3),  // 1 point
-        OTHER("Other", 4);   // no points
+        DNF("DNF", 0),
+        FIRST("First", 1),
+        SECOND("Second", 2),
+        THIRD("Third", 3),
+        OTHER("Other", 4);
 
         final String name;
         final int val;
@@ -51,13 +51,16 @@ public class HideAndSeekPlayer {
     private final String  name;
     @Getter
     private int internalPlacement;
+    @Getter
+    private int placementValue;
     private Placement placement;
     @Getter
     private int hints;
 
     public HideAndSeekPlayer(String name) {
         this.name = name;
-        this.internalPlacement = 0;
+        this.internalPlacement = Integer.MAX_VALUE; // used for sorting order
+        this.placementValue = 0;
         this.placement = Placement.DNF;
         this.hints = 0;
     }
@@ -75,13 +78,14 @@ public class HideAndSeekPlayer {
     public void setStats(int internal_placement, int placement, int hints)
     {
         this.internalPlacement = internal_placement;
+        this.placementValue = placement;
         this.placement = Placement.fromValue(placement);
         this.hints = hints;
     }
 
     public boolean hasPlaced()
     {
-        return internalPlacement > 0;
+        return internalPlacement < Integer.MAX_VALUE;
     }
 
     public void reset()
@@ -126,40 +130,3 @@ public class HideAndSeekPlayer {
 
     }
 }
-
-//== Hints ==
-//DNF
-//DNF
-//DNF
-//DNF
-//DNF
-//DNF
-//DNF
-//DNF
-//1
-//DNF
-//DNF
-//DNF
-//DNF
-//DNF
-//1
-//1
-//== placement ==
-//DNF
-//DNF
-//DNF
-//DNF
-//DNF
-//DNF
-//DNF
-//DNF
-//FIRST
-//DNF
-//DNF
-//DNF
-//DNF
-//DNF
-//SECOND
-//SECOND
-//== END ==
-

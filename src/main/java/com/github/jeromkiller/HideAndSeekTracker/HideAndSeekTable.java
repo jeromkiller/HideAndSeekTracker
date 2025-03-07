@@ -8,7 +8,7 @@ public class HideAndSeekTable extends JTable {
     HideAndSeekTable(HashMap<String, HideAndSeekPlayer> data)
     {
         super(new HideAndSeekTableModel(data));
-        RowFilter<HideAndSeekTableModel, Object> filter = RowFilter.numberFilter(RowFilter.ComparisonType.NOT_EQUAL, 0,0, 1);
+        RowFilter<HideAndSeekTableModel, Object> filter = RowFilter.numberFilter(RowFilter.ComparisonType.NOT_EQUAL, Integer.MAX_VALUE,0, 1);
         TableRowSorter<HideAndSeekTableModel> sorter = new TableRowSorter<>(model());
         setRowSorter(sorter);
         sorter.setRowFilter(filter);
@@ -19,8 +19,8 @@ public class HideAndSeekTable extends JTable {
     {
         HideAndSeekTableModel model = model();
         model.update();
-        getColumnModel().getColumn(0).setMinWidth(20);
-        getColumnModel().getColumn(0).setMaxWidth(20);
+        getColumnModel().getColumn(0).setMinWidth(1);
+        getColumnModel().getColumn(0).setMaxWidth(1);
         getColumnModel().getColumn(1).setMinWidth(90);
         this.getRowSorter().toggleSortOrder(0);
     }

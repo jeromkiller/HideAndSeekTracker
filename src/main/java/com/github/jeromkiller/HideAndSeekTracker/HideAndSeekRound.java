@@ -80,12 +80,28 @@ public class HideAndSeekRound {
             leniencyCounter = plugin.getSettings().getTickLenience();
         }
 
-        placementIndex += 1;
         participants.get(playerName).setStats(placementIndex, sharedPlacementSpot, hintsGiven);
+        placementIndex += 1;
         plugin.getPanel().getGamePanel().updatePlacements();
     }
 
-    public String export(boolean discordExport)
+    public String plainTextExport() {
+        List<HideAndSeekPlayer> playerList = new ArrayList<>(participants.values());
+        playerList.sort(Comparator.comparingInt(HideAndSeekPlayer::getInternalPlacement));
+
+        StringBuilder exportString = new StringBuilder();
+        for(final HideAndSeekPlayer player: playerList) {
+            if(exportString.length() != 0) {
+                exportString.append("\n");
+            }
+            exportString.append(getPlacementText(player.getPlacementValue()));
+            exportString.append(" - ");
+            exportString.append(player.getName());
+        }
+        return exportString.toString();
+    }
+
+    public String devExport(boolean discordExport)
     {
         List<String> exportLines = new ArrayList<>();
         final String seperator = discordExport ? ", " : "\t";
@@ -114,7 +130,7 @@ public class HideAndSeekRound {
         int num = 0;
         for(final HideAndSeekPlayer player : participants.values())
         {
-            num += player.getInternalPlacement() > 0 ? 1 : 0;
+            num += player.getInternalPlacement() < Integer.MAX_VALUE ? 1 : 0;
         }
         return num;
     }
@@ -124,4 +140,27 @@ public class HideAndSeekRound {
         return participants.size();
     }
 
+    private String getPlacementText(int placement) {
+        // speclial cases
+        switch(placement) {
+            case 0:
+                return "DNF\t\t\t";
+            case 11:
+            case 12:
+            case 13:
+                return placement + "th Place\t";
+        }
+
+        // follow the pattern
+        int lastDigit = placement % 10;
+        switch (lastDigit) {
+            case 1:
+                return placement + "st Place\t";
+            case 2:
+                return placement + "nd Place\t";
+            case 3:
+                return placement + "rd Place\t";
+        }
+        return placement + "th Place\t";
+    }
 }
