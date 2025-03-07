@@ -11,6 +11,8 @@ import java.awt.datatransfer.StringSelection;
 
 public class GameRoundPanel extends JPanel {
     private final JLabel roundTitle;
+    private final JButton btnDevExportDiscord;
+    private final JButton btnDevExportDirect;
     private final JSpinner hintCount;
     private final HideAndSeekTable resultTable;
     private final JLabel numFinished = new JLabel("999/999 Finished");
@@ -22,6 +24,8 @@ public class GameRoundPanel extends JPanel {
     GameRoundPanel(HideAndSeekTrackerPlugin plugin) {
         this.plugin = plugin;
         this.gameRound = plugin.game.getActiveRound();
+
+        final HideAndSeekTrackerConfig config = plugin.getConfig();
 
         setLayout(new BorderLayout());
         setBorder(new EmptyBorder(5, 0, 10, 0));
@@ -37,7 +41,7 @@ public class GameRoundPanel extends JPanel {
         constraints.gridy = 0;
         constraints.gridwidth = 2;
 
-        roundTitle = new JLabel("Active Round");
+        roundTitle = new JLabel("Round " + gameRound.getRoundNumber() + " (Active)");
         contents.add(roundTitle, constraints);
         constraints.gridwidth = 1;
         constraints.gridy++;
@@ -46,12 +50,22 @@ public class GameRoundPanel extends JPanel {
         JButton exportDirect = new JButton("Export Text");
         exportDirect.addActionListener(e -> plainTextExport());
         contents.add(exportDirect, constraints);
+        constraints.gridy++;
+
+        btnDevExportDirect = new JButton("Export (dev)");
+        btnDevExportDirect.addActionListener(e -> devExport(false));
+        contents.add(btnDevExportDirect, constraints);
 
         constraints.gridx = 1;
-        JButton exportDiscord = new JButton("Dev Export");
-        exportDiscord.addActionListener(e -> devExport(true));
-        contents.add(exportDiscord, constraints);
+        btnDevExportDiscord = new JButton("Export Discord");
+        btnDevExportDiscord.addActionListener(e -> devExport(true));
+        contents.add(btnDevExportDiscord, constraints);
         constraints.gridy++;
+
+        if(!config.DevMode()) {
+            btnDevExportDiscord.setVisible(false);
+            btnDevExportDirect.setVisible(false);
+        }
 
         constraints.gridx = 0;
         JLabel txt_hints = new JLabel("Hints Given:");
@@ -113,15 +127,35 @@ public class GameRoundPanel extends JPanel {
 
     private void updateNumFinished()
     {
-        String numPlaced = gameRound.getNumPlaced() +
+        final int numPlaced = gameRound.getNumPlaced();
+        final int numPlayers = gameRound.getNumParticipants();
+
+        int roundFinishedPercentage = 0;
+        if(numPlayers > 0) {
+            roundFinishedPercentage = (int) (((double)numPlaced / (double)numPlayers) * 100);
+        }
+        String placedString = gameRound.getNumPlaced() +
                 " / " +
                 gameRound.getNumParticipants() +
-                " Finished";
-        numFinished.setText(numPlaced);
+                " Finished (" +
+                roundFinishedPercentage +
+                "%)";
+        numFinished.setText(placedString);
     }
 
     public void roundFinished(String RoundName) {
         roundTitle.setText(RoundName);
         hintCount.setEnabled(false);
+    }
+
+    public void updateDevMode() {
+        final boolean enable = plugin.getConfig().DevMode();
+        btnDevExportDiscord.setVisible(enable);
+        btnDevExportDirect.setVisible(enable);
+    }
+
+    public void updateHidePlayers() {
+        final boolean hide = plugin.getConfig().hideUnfinishedPlayers();
+        resultTable.enableHidenPlayerFilter(hide);
     }
 }

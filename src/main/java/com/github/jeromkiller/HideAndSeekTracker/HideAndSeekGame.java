@@ -17,7 +17,7 @@ public class HideAndSeekGame {
     HideAndSeekGame(HideAndSeekTrackerPlugin plugin)
     {
         this.plugin = plugin;
-        this.activeRound = new HideAndSeekRound(plugin);
+        this.activeRound = new HideAndSeekRound(plugin, 1);
         this.pastRounds = new ArrayList<>();
     }
 
@@ -25,7 +25,7 @@ public class HideAndSeekGame {
     {
         pastRounds.add(activeRound);
         ArrayList<String> previousPlayers = new ArrayList<>(activeRound.getParticipants().keySet());
-        activeRound = new HideAndSeekRound(plugin);
+        activeRound = new HideAndSeekRound(plugin, activeRound.getRoundNumber() + 1);
         activeRound.setPlayers(previousPlayers);
         final int savedRoundIndex = pastRounds.size() -1;
         return savedRoundIndex;

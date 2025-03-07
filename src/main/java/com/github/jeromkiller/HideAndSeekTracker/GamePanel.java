@@ -6,15 +6,16 @@ import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.util.LinkedList;
 
 public class GamePanel extends JPanel {
     private final HideAndSeekTrackerPlugin plugin;
 
     private int currentCardIndex;
-    private int numCards;
 
     private final JPanel cardsPanel;
     private final CardLayout roundCards;
+    private final LinkedList<GameRoundPanel> roundPanels;
     private final JButton prevTableButton;
     private final JButton activeGameButton;
     private final JButton nextTableButton;
@@ -25,7 +26,7 @@ public class GamePanel extends JPanel {
     {
         this.plugin = plugin;
         this.currentCardIndex = 0;
-        this.numCards = 0;
+        this.roundPanels = new LinkedList<>();
 
         setLayout(new GridBagLayout());
         setBorder(new EmptyBorder(5, 0, 10, 0));
@@ -67,7 +68,7 @@ public class GamePanel extends JPanel {
                 BorderFactory.createMatteBorder(0, 1, 1, 1, ColorScheme.BORDER_COLOR)));
 
         activeRoundPanel = new GameRoundPanel(plugin);
-        cardsPanel.add(activeRoundPanel);
+        addRoundPanel(activeRoundPanel);
 
         constraints.fill = GridBagConstraints.BOTH;
         constraints.weighty = 1;
@@ -82,6 +83,11 @@ public class GamePanel extends JPanel {
         updateCardFlipButtons();
     }
 
+    private void addRoundPanel(GameRoundPanel panel) {
+        cardsPanel.add(activeRoundPanel);
+        roundPanels.add(activeRoundPanel);
+    }
+
     private void prevRound() {
         roundCards.previous(cardsPanel);
         currentCardIndex -= 1;
@@ -90,7 +96,7 @@ public class GamePanel extends JPanel {
 
     private void activeRound() {
         roundCards.last(cardsPanel);
-        currentCardIndex = numCards;
+        currentCardIndex = roundPanels.size() - 1;
         updateCardFlipButtons();
     }
 
@@ -104,17 +110,28 @@ public class GamePanel extends JPanel {
         final int savedRoundIndex = plugin.game.newRound();
         activeRoundPanel.roundFinished("Round: " + (savedRoundIndex + 1));
         activeRoundPanel = new GameRoundPanel(plugin);
-        cardsPanel.add(activeRoundPanel);
-        numCards++;
+        addRoundPanel(activeRoundPanel);
         activeRound();
     }
 
     private void updateCardFlipButtons(){
         prevTableButton.setEnabled(currentCardIndex > 0);
-        nextTableButton.setEnabled(currentCardIndex < numCards);
+        nextTableButton.setEnabled(currentCardIndex < roundPanels.size() - 1);
     }
 
     public void updatePlacements() {
         activeRoundPanel.updatePlacements();
+    }
+
+    public void updateDevModeSetting() {
+        for(GameRoundPanel panel : roundPanels){
+            panel.updateDevMode();
+        }
+    }
+
+    public void updateHidePlayerSetting() {
+        for(GameRoundPanel panel : roundPanels){
+            panel.updateHidePlayers();
+        }
     }
 }

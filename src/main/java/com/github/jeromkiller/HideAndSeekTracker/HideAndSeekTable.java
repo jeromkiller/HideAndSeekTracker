@@ -5,14 +5,15 @@ import javax.swing.table.TableRowSorter;
 import java.util.HashMap;
 
 public class HideAndSeekTable extends JTable {
+    final TableRowSorter<HideAndSeekTableModel> sorter;
+
     HideAndSeekTable(HashMap<String, HideAndSeekPlayer> data)
     {
         super(new HideAndSeekTableModel(data));
-        RowFilter<HideAndSeekTableModel, Object> filter = RowFilter.numberFilter(RowFilter.ComparisonType.NOT_EQUAL, Integer.MAX_VALUE,0, 1);
-        TableRowSorter<HideAndSeekTableModel> sorter = new TableRowSorter<>(model());
+        sorter = new TableRowSorter<>(model());
         setRowSorter(sorter);
-        sorter.setRowFilter(filter);
         setDefaultRenderer(HideAndSeekPlayer.Placement.class, new HideAndSeekPlacementRenderer() );
+        setFillsViewportHeight(true);
     }
 
     public void update()
@@ -28,5 +29,15 @@ public class HideAndSeekTable extends JTable {
     public HideAndSeekTableModel model()
     {
         return (HideAndSeekTableModel) getModel();
+    }
+
+    public void enableHidenPlayerFilter(boolean enable) {
+        if(enable) {
+            RowFilter<HideAndSeekTableModel, Object> filter = RowFilter.numberFilter(RowFilter.ComparisonType.NOT_EQUAL, Integer.MAX_VALUE, 0, 1);
+            sorter.setRowFilter(filter);
+        } else {
+            sorter.setRowFilter(null);
+        }
+        update();
     }
 }

@@ -7,6 +7,7 @@ import com.google.gson.reflect.TypeToken;
 import javax.inject.Inject;
 import javax.swing.*;
 
+import com.google.inject.Provides;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -53,6 +54,10 @@ public class HideAndSeekTrackerPlugin extends Plugin
 	private HideAndSeekTrackerSceneOverlay sceneOverlay;
 
 	@Inject
+	@Getter
+	private HideAndSeekTrackerConfig config;
+
+	@Inject
 	private OverlayManager overlayManager;
 
 	@Inject
@@ -90,6 +95,12 @@ public class HideAndSeekTrackerPlugin extends Plugin
 	@Getter
 	@Setter
 	public boolean autofillNames = false;
+
+	@Provides
+	HideAndSeekTrackerConfig provideConfig(ConfigManager configManager)
+	{
+		return configManager.getConfig(HideAndSeekTrackerConfig.class);
+	}
 
 	@Override
 	protected void startUp()
@@ -136,10 +147,12 @@ public class HideAndSeekTrackerPlugin extends Plugin
 	@Subscribe
 	public void onConfigChanged(ConfigChanged event)
 	{
-		//if(Objects.equals(event.getKey(), HideAndSeekSettings.PLAYER_NAMES_KEY))
-		//{
-		//	loadStartingPlayers();
-		//}
+		if(Objects.equals(event.getKey(), HideAndSeekTrackerConfig.DEV_MODE_KEY)) {
+			panel.getGamePanel().updateDevModeSetting();
+		}
+		if(Objects.equals(event.getKey(), HideAndSeekTrackerConfig.HIDE_UNFINISHED_KEY)) {
+			panel.getGamePanel().updateHidePlayerSetting();
+		}
 	}
 
 	@Subscribe

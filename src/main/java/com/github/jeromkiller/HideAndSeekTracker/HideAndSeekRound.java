@@ -10,16 +10,18 @@ public class HideAndSeekRound {
     private int placementIndex;
     private int leniencyCounter;
     private int sharedPlacementSpot;
+    private int roundNumber;
     private final HashMap<String, HideAndSeekPlayer> participants;
 
     private final HideAndSeekTrackerPlugin plugin;
 
-    HideAndSeekRound(HideAndSeekTrackerPlugin plugin) {
+    HideAndSeekRound(HideAndSeekTrackerPlugin plugin, int roundNumber) {
+
         this.hintsGiven = 1;
         this.placementIndex = 0;
         this.leniencyCounter = 0;
         this.sharedPlacementSpot = 0;
-
+        this.roundNumber = roundNumber;
         this.participants = new HashMap<>();
         this.plugin = plugin;
     }
@@ -90,10 +92,10 @@ public class HideAndSeekRound {
         playerList.sort(Comparator.comparingInt(HideAndSeekPlayer::getInternalPlacement));
 
         StringBuilder exportString = new StringBuilder();
+        exportString.append("Round ").append(getRoundNumber()).append(": ");
+
         for(final HideAndSeekPlayer player: playerList) {
-            if(exportString.length() != 0) {
-                exportString.append("\n");
-            }
+            exportString.append("\n");
             exportString.append(getPlacementText(player.getPlacementValue()));
             exportString.append(" - ");
             exportString.append(player.getName());
