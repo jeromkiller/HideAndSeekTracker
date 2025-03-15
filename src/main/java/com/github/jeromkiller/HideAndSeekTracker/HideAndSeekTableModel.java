@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class HideAndSeekTableModel extends AbstractTableModel {
-    private final String[] columnNames = {"#", "Name", "Place", "Hints"};
+    private final String[] columnNames = {"#", "Name", "Place", "Points"};
     private final HashMap<String, HideAndSeekPlayer> data;
 
     HideAndSeekTableModel(HashMap<String, HideAndSeekPlayer> data)

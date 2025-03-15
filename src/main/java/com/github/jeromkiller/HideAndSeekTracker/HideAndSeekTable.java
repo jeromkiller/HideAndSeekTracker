@@ -12,7 +12,7 @@ public class HideAndSeekTable extends JTable {
         super(new HideAndSeekTableModel(data));
         sorter = new TableRowSorter<>(model());
         setRowSorter(sorter);
-        setDefaultRenderer(HideAndSeekPlayer.Placement.class, new HideAndSeekPlacementRenderer() );
+        setDefaultRenderer(String.class, new HideAndSeekPlacementRenderer() );
         setFillsViewportHeight(true);
     }
 

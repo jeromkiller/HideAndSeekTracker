@@ -1,11 +1,15 @@
 package com.github.jeromkiller.HideAndSeekTracker;
 
 import net.runelite.client.ui.ColorScheme;
+import net.runelite.client.util.ImageUtil;
 
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.util.LinkedList;
 
 public class GamePanel extends JPanel {
@@ -16,11 +20,31 @@ public class GamePanel extends JPanel {
     private final JPanel cardsPanel;
     private final CardLayout roundCards;
     private final LinkedList<GameRoundPanel> roundPanels;
-    private final JButton prevTableButton;
-    private final JButton activeGameButton;
-    private final JButton nextTableButton;
+    private final JLabel prevTableButton;
+    private final JLabel nextTableButton;
+    private final JButton activeRoundButton;
+    private final JButton scoreTotalButton;
 
     private GameRoundPanel activeRoundPanel;
+    private final GameTotalPanel scoreTotalPanel;
+
+    private static final ImageIcon ARROW_LEFT_ICON;
+    private static final ImageIcon ARROW_LEFT_HOVER_ICON;
+    private static final ImageIcon ARROW_RIGHT_ICON;
+    private static final ImageIcon ARROW_RIGHT_HOVER_ICON;
+
+    static {
+        final BufferedImage arrowLeftImg = ImageUtil.loadImageResource(HideAndSeekTrackerPlugin.class, "arrow_left_icon.png");
+        final BufferedImage arrowLeftImgHover = ImageUtil.luminanceOffset(arrowLeftImg, -150);
+        ARROW_LEFT_ICON = new ImageIcon(arrowLeftImg);
+        ARROW_LEFT_HOVER_ICON = new ImageIcon(arrowLeftImgHover);
+
+        final BufferedImage arrowRightImg = ImageUtil.flipImage(arrowLeftImg, true, false);
+        final BufferedImage arrowRightImgHover = ImageUtil.flipImage(arrowLeftImgHover, true, false);
+        ARROW_RIGHT_ICON = new ImageIcon(arrowRightImg);
+        ARROW_RIGHT_HOVER_ICON = new ImageIcon(arrowRightImgHover);
+    }
+
 
     GamePanel(HideAndSeekTrackerPlugin plugin)
     {
@@ -42,20 +66,63 @@ public class GamePanel extends JPanel {
         GridBagConstraints topButtonConstraints = new GridBagConstraints();
         topButtonConstraints.fill = GridBagConstraints.NONE;
 
-        prevTableButton = new JButton("<-");
-        prevTableButton.addActionListener(e -> prevRound());
+        prevTableButton = new JLabel(ARROW_LEFT_ICON);
+        prevTableButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if(prevTableButton.isEnabled()) {
+                prevRound();
+                }
+            }
 
-        activeGameButton = new JButton("Active Game");
-        activeGameButton.addActionListener(e -> activeRound());
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                prevTableButton.setIcon(ARROW_LEFT_HOVER_ICON);
+            }
 
-        nextTableButton = new JButton("->");
-        nextTableButton.addActionListener(e -> nextRound());
+            @Override
+            public void mouseExited(MouseEvent e) {
+                prevTableButton.setIcon(ARROW_LEFT_ICON);
+            }
+        });
 
+        activeRoundButton = new JButton("Active Round");
+        activeRoundButton.addActionListener(e -> activeRound());
+
+        scoreTotalButton = new JButton("Score Total");
+        scoreTotalButton.addActionListener(e -> scoreTotal());
+
+        nextTableButton = new JLabel(ARROW_RIGHT_ICON);
+        nextTableButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if(nextTableButton.isEnabled()) {
+                    nextRound();
+                }
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                nextTableButton.setIcon(ARROW_RIGHT_HOVER_ICON);
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                nextTableButton.setIcon(ARROW_RIGHT_ICON);
+            }
+        });
+
+        topButtonConstraints.fill = GridBagConstraints.NONE;
+        topButtonConstraints.weightx = 0;
         topButtons.add(prevTableButton, topButtonConstraints);
         topButtonConstraints.gridx = 1;
         topButtonConstraints.fill = GridBagConstraints.HORIZONTAL;
-        topButtons.add(activeGameButton, topButtonConstraints);
+        topButtonConstraints.weightx = 1;
+        topButtons.add(activeRoundButton, topButtonConstraints);
         topButtonConstraints.gridx = 2;
+        topButtons.add(scoreTotalButton, topButtonConstraints);
+        topButtonConstraints.gridx = 3;
+        topButtonConstraints.weightx = 0;
         topButtonConstraints.fill = GridBagConstraints.NONE;
         topButtons.add(nextTableButton, topButtonConstraints);
         this.add(topButtons, constraints);
@@ -65,7 +132,10 @@ public class GamePanel extends JPanel {
         cardsPanel = new JPanel(roundCards);
         cardsPanel.setBorder(new CompoundBorder(
                 BorderFactory.createMatteBorder(0, 0, 2, 0, ColorScheme.DARK_GRAY_COLOR),
-                BorderFactory.createMatteBorder(0, 1, 1, 1, ColorScheme.BORDER_COLOR)));
+                BorderFactory.createMatteBorder(1, 1, 1, 1, ColorScheme.BORDER_COLOR)));
+
+        scoreTotalPanel = new GameTotalPanel(plugin);
+        cardsPanel.add(scoreTotalPanel);
 
         activeRoundPanel = new GameRoundPanel(plugin);
         addRoundPanel(activeRoundPanel);
@@ -80,11 +150,11 @@ public class GamePanel extends JPanel {
         newRoundButton.addActionListener(e -> newRound());
         this.add(newRoundButton, constraints);
 
-        updateCardFlipButtons();
+        activeRound();
     }
 
-    private void addRoundPanel(GameRoundPanel panel) {
-        cardsPanel.add(activeRoundPanel);
+    private void addRoundPanel(JPanel panel) {
+        cardsPanel.add(activeRoundPanel, cardsPanel.getComponentCount() - 1);
         roundPanels.add(activeRoundPanel);
     }
 
@@ -96,7 +166,14 @@ public class GamePanel extends JPanel {
 
     private void activeRound() {
         roundCards.last(cardsPanel);
-        currentCardIndex = roundPanels.size() - 1;
+        roundCards.previous(cardsPanel);
+        currentCardIndex = cardsPanel.getComponentCount() - 2;
+        updateCardFlipButtons();
+    }
+
+    private void scoreTotal() {
+        roundCards.last(cardsPanel);
+        currentCardIndex = cardsPanel.getComponentCount() - 1;
         updateCardFlipButtons();
     }
 
@@ -115,12 +192,25 @@ public class GamePanel extends JPanel {
     }
 
     private void updateCardFlipButtons(){
-        prevTableButton.setEnabled(currentCardIndex > 0);
-        nextTableButton.setEnabled(currentCardIndex < roundPanels.size() - 1);
+        final boolean notAtFirst = currentCardIndex > 0;
+        final boolean notAtLast = currentCardIndex < cardsPanel.getComponentCount() - 1;
+        final boolean notAtSecondToLast = currentCardIndex != cardsPanel.getComponentCount() - 2;
+        prevTableButton.setEnabled(notAtFirst);
+        nextTableButton.setEnabled(notAtLast);
+        activeRoundButton.setEnabled(notAtSecondToLast);
+        scoreTotalButton.setEnabled(notAtLast);
     }
 
     public void updatePlacements() {
         activeRoundPanel.updatePlacements();
+        scoreTotalPanel.updatePlacements();
+    }
+
+    public void updateAllPlacements() {
+        updatePlacements();
+        for(GameRoundPanel panel : roundPanels) {
+            panel.updatePlacements();
+        }
     }
 
     public void updateDevModeSetting() {

@@ -1,6 +1,7 @@
 package com.github.jeromkiller.HideAndSeekTracker;
 
 import lombok.Getter;
+import lombok.Setter;
 
 public class HideAndSeekPlayer {
 
@@ -56,6 +57,9 @@ public class HideAndSeekPlayer {
     private Placement placement;
     @Getter
     private int hints;
+    @Getter
+    @Setter
+    private int score;
 
     public HideAndSeekPlayer(String name) {
         this.name = name;
@@ -70,9 +74,33 @@ public class HideAndSeekPlayer {
         return placement.toString();
     }
 
-    public Placement getPlacementTableString()
+    public String getPlacementTableString()
     {
-        return placement;
+        String printString;
+
+        switch (placement) {
+            case FIRST: {
+                printString = "🥇";
+                break;
+            }
+            case SECOND: {
+                printString = "🥈";
+                break;
+            }
+            case THIRD: {
+                printString = "🥉";
+                break;
+            }
+            case OTHER: {
+                printString = "🏁";
+                break;
+            }
+            default: {
+                printString = "";
+            }
+        }
+        printString += " " + getPlacementText();
+        return printString;
     }
 
     public void setStats(int internal_placement, int placement, int hints)
@@ -106,27 +134,34 @@ public class HideAndSeekPlayer {
             case 2:
                 return getPlacementTableString();
             case 3:
-                return getHints();
+                return getScore();
             case 4:
                 return "+" + getScore();
         }
         return null;
     }
 
-    private int getScore()
-    {
-        if (hints == 0 || placement == Placement.DNF)
-            return 0;
-
-        int placementValue = placement.getValue();
-
-        int hintScore = 4 - hints;
-        int placementScore = 1;
-        if (placementValue <= 3)
-        {
-            placementScore = 5 - placementValue;
+    public String getPlacementText() {
+        // special cases
+        switch(placementValue) {
+            case 0:
+                return "DNF";
+            case 11:
+            case 12:
+            case 13:
+                return placementValue + "th";
         }
-        return hintScore + placementScore;
 
+        // follow the pattern
+        int lastDigit = placementValue % 10;
+        switch (lastDigit) {
+            case 1:
+                return placementValue + "st";
+            case 2:
+                return placementValue + "nd";
+            case 3:
+                return placementValue + "rd";
+        }
+        return placementValue + "th";
     }
 }

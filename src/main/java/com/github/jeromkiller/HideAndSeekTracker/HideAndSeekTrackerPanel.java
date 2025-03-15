@@ -14,6 +14,7 @@ public class HideAndSeekTrackerPanel extends PluginPanel {
     private final CaptureAreaManagementPanel areaPanel;
     private final GameSetupPanel setupPanel;
     private final GamePanel gamePanel;
+    private final ScoringPanel scorePanel;
 
     public HideAndSeekTrackerPanel(HideAndSeekTrackerPlugin plugin)
     {
@@ -35,6 +36,9 @@ public class HideAndSeekTrackerPanel extends PluginPanel {
 
         gamePanel = new GamePanel(plugin);
         tabPane.addTab("Game", gamePanel);
+
+        scorePanel = new ScoringPanel(plugin);
+        tabPane.add("Score", new JScrollPane(scorePanel));
 
         add(tabPane);
     }

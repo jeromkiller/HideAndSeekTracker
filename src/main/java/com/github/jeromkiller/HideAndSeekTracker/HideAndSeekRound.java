@@ -83,6 +83,8 @@ public class HideAndSeekRound {
         }
 
         participants.get(playerName).setStats(placementIndex, sharedPlacementSpot, hintsGiven);
+        final int points = plugin.getScoreRules().scorePlayer(player, this);
+        participants.get(playerName).setScore(points);
         placementIndex += 1;
         plugin.getPanel().getGamePanel().updatePlacements();
     }
@@ -95,10 +97,32 @@ public class HideAndSeekRound {
         exportString.append("Round ").append(getRoundNumber()).append(": ");
 
         for(final HideAndSeekPlayer player: playerList) {
+            StringBuilder exportLine = new StringBuilder();
+            final String placementText = player.getPlacementText();
+            exportLine.append(placementText);
+            if(!Objects.equals(placementText, "DNF")) {
+                exportLine.append(" Place");
+            }
+            int spacing = 12 - exportLine.length();
+            if(spacing > 0) {
+                exportLine.append(" ".repeat(spacing));
+            } else {
+                exportLine.append(" ");
+            }
+            exportLine.append(" - ");
+            exportLine.append(player.getName());
+
+            spacing = 32 - exportLine.length();
+            if(spacing > 0) {
+                exportLine.append(" ".repeat(spacing));
+            } else {
+                exportLine.append(" ");
+            }
+            exportLine.append(player.getScore());
+            exportLine.append(" points");
+
             exportString.append("\n");
-            exportString.append(getPlacementText(player.getPlacementValue()));
-            exportString.append(" - ");
-            exportString.append(player.getName());
+            exportString.append(exportLine);
         }
         return exportString.toString();
     }
@@ -142,27 +166,11 @@ public class HideAndSeekRound {
         return participants.size();
     }
 
-    private String getPlacementText(int placement) {
-        // speclial cases
-        switch(placement) {
-            case 0:
-                return "DNF\t\t\t";
-            case 11:
-            case 12:
-            case 13:
-                return placement + "th Place\t";
+    public void recalculateScores()
+    {
+        for(final HideAndSeekPlayer player : participants.values()) {
+            final int score = plugin.getScoreRules().scorePlayer(player, this);
+            player.setScore(score);
         }
-
-        // follow the pattern
-        int lastDigit = placement % 10;
-        switch (lastDigit) {
-            case 1:
-                return placement + "st Place\t";
-            case 2:
-                return placement + "nd Place\t";
-            case 3:
-                return placement + "rd Place\t";
-        }
-        return placement + "th Place\t";
     }
 }

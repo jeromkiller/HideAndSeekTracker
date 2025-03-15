@@ -41,7 +41,7 @@ public class GameRoundPanel extends JPanel {
         constraints.gridy = 0;
         constraints.gridwidth = 2;
 
-        roundTitle = new JLabel("Round " + gameRound.getRoundNumber() + " (Active)");
+        roundTitle = new JLabel("Round: " + gameRound.getRoundNumber() + " (Active)");
         contents.add(roundTitle, constraints);
         constraints.gridwidth = 1;
         constraints.gridy++;
@@ -94,6 +94,7 @@ public class GameRoundPanel extends JPanel {
         contents.add(numFinished, constraints);
 
         add(contents);
+        updateHidePlayers();
         updatePlacements();
     }
 

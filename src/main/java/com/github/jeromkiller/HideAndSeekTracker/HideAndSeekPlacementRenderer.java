@@ -12,39 +12,18 @@ public class HideAndSeekPlacementRenderer extends DefaultTableCellRenderer {
     }
 
     public void setValue(Object value) {
-        final String printString;
+        String text = (String)value;
         Color printColor = defaultColor;
-        switch ((HideAndSeekPlayer.Placement) value)
-        {
-            case DNF: {
-                printString = "DNF";
-                break;
-            }
-            case FIRST: {
-                printString = "🥇";
-                printColor = Color.ORANGE;
-                break;
-            }
-            case SECOND: {
-                printString = "🥈";
-                printColor = Color.LIGHT_GRAY;
-                break;
-            }
-            case THIRD: {
-                printString = "🥉";
-                printColor = new Color(205, 127, 50);
-                break;
-            }
-            case OTHER: {
-                printString = "🏁";
-                break;
-            }
-            default: {
-                printString = "";
-            }
+
+        if(text.contains("🥇")) {
+            printColor = Color.ORANGE;
+        } else if (text.contains("🥈")) {
+            printColor = Color.LIGHT_GRAY;
+        } else if (text.contains("🥉")) {
+            printColor = new Color(205, 127, 50);
         }
 
         setForeground(printColor);
-        setText(printString);
+        setText(text);
     }
 }

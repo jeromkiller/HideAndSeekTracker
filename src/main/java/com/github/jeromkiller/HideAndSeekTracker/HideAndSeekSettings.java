@@ -1,9 +1,15 @@
 package com.github.jeromkiller.HideAndSeekTracker;
 
+import com.github.jeromkiller.HideAndSeekTracker.Scoring.HintScoring;
+import com.github.jeromkiller.HideAndSeekTracker.Scoring.PointSystem;
+import com.github.jeromkiller.HideAndSeekTracker.Scoring.PositionScoring;
+import com.github.jeromkiller.HideAndSeekTracker.Scoring.ScoreRules;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import joptsimple.internal.Strings;
 import net.runelite.client.config.ConfigManager;
+import net.runelite.client.util.RuntimeTypeAdapterFactory;
 
 import javax.inject.Inject;
 import java.util.*;
@@ -15,6 +21,7 @@ public class HideAndSeekSettings {
     public static final String TICK_LENIENCY_KEY = "HaS_TickLeniency";
     public static final String PLAYER_NAMES_KEY = "HaS_PlayerNames";
     public static final String SHOW_RENDER_DIST = "HaS_ShowRenderDist";
+    public static final String SCORERULES_KEY = "HaS_ScoreRules";
 
     @Inject
     private ConfigManager configManager;
@@ -89,6 +96,34 @@ public class HideAndSeekSettings {
 
     public void setShowRenderDist(boolean show) {
         setValue(SHOW_RENDER_DIST, show);
+    }
+
+    public ScoreRules getScoreRules() {
+        final RuntimeTypeAdapterFactory<PointSystem> typeFactory = RuntimeTypeAdapterFactory
+                .of(PointSystem.class)
+                .registerSubtype(PositionScoring.class)
+                .registerSubtype(HintScoring.class);
+
+        final Gson scoreRulesGson = new GsonBuilder().registerTypeAdapterFactory(
+                typeFactory).create();
+
+
+        final String json = configManager.getConfiguration(CONFIG_GROUP, SCORERULES_KEY);
+        final ScoreRules newRules = scoreRulesGson.fromJson(json, new TypeToken<ScoreRules>(){}.getType());
+        return newRules;
+    }
+
+    public void setScoreRules(ScoreRules rules) {
+        final RuntimeTypeAdapterFactory<PointSystem> typeFactory = RuntimeTypeAdapterFactory
+                .of(PointSystem.class)
+                .registerSubtype(PositionScoring.class)
+                .registerSubtype(HintScoring.class);
+
+        final Gson scoreRulesGson = new GsonBuilder().registerTypeAdapterFactory(
+                typeFactory).create();
+
+        final String json = scoreRulesGson.toJson(rules);
+        configManager.setConfiguration(CONFIG_GROUP, SCORERULES_KEY, json);
     }
 
 }

@@ -1,5 +1,6 @@
 package com.github.jeromkiller.HideAndSeekTracker;
 
+import com.github.jeromkiller.HideAndSeekTracker.Scoring.ScoreRules;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
@@ -8,7 +9,6 @@ import javax.inject.Inject;
 import javax.swing.*;
 
 import com.google.inject.Provides;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -90,6 +90,9 @@ public class HideAndSeekTrackerPlugin extends Plugin
 	private final List<CaptureArea> captureAreas = new ArrayList<>();
 
 	@Getter
+	private final ScoreRules scoreRules = new ScoreRules();
+
+	@Getter
 	private final CaptureCreationOptions captureCreationOptions = new CaptureCreationOptions();
 
 	@Getter
@@ -117,10 +120,10 @@ public class HideAndSeekTrackerPlugin extends Plugin
 				.build();
 		clientToolbar.addNavigation(navButton);
 
-		loadCaptureAreas(settings.getCaptureAreas());
+		loadSettings();
 
-		loadStartingPlayers();
 		panel.getAreaPanel().rebuild();
+		panel.getScorePanel().rebuild();
 	}
 
 	@Override
@@ -158,9 +161,10 @@ public class HideAndSeekTrackerPlugin extends Plugin
 	@Subscribe
 	public void onProfileChanged(ProfileChanged profileChanged)
 	{
-		loadCaptureAreas(settings.getCaptureAreas());
+		loadSettings();
 		SwingUtilities.invokeLater(panel.getAreaPanel()::rebuild);
 		SwingUtilities.invokeLater(panel.getSetupPanel()::loadSettings);
+		SwingUtilities.invokeLater(panel.getScorePanel()::rebuild);
 	}
 
 	private List<String> findPlayersInRange()
@@ -210,12 +214,6 @@ public class HideAndSeekTrackerPlugin extends Plugin
 	{
 		final LinkedHashSet<String> addNames = game.addPlayerNames(nameList);
 		panel.getSetupPanel().addPlayerNames(addNames);
-	}
-
-	public void loadStartingPlayers()
-	{
-		List<String> playerNames = new ArrayList<>(settings.getPlayerNames());
-        game.setPlayers(playerNames);
 	}
 
 	public List<String> getInRangePlayers()
@@ -275,10 +273,28 @@ public class HideAndSeekTrackerPlugin extends Plugin
 		settings.setCaptureAreas(captureAreas);
 	}
 
-	public void loadCaptureAreas(List<CaptureArea> areas)
+	public void updateScoreRules()
 	{
+		settings.setScoreRules(scoreRules);
+		game.recalculateAllScores();
+		panel.getGamePanel().updateAllPlacements();
+	}
+
+	public void loadSettings()
+	{
+		List<CaptureArea> areas = settings.getCaptureAreas();
 		captureAreas.clear();
 		captureAreas.addAll(areas);
+
+		List<String> playerNames = new ArrayList<>(settings.getPlayerNames());
+		game.setPlayers(playerNames);
+
+		ScoreRules loadedRules = settings.getScoreRules();
+		if(loadedRules == null) {
+			loadedRules = ScoreRules.getDefaultRules();
+			settings.setScoreRules(loadedRules);
+		}
+		scoreRules.load(loadedRules);
 	}
 
 	public void copyCaptureAreaToClip(CaptureArea area)
