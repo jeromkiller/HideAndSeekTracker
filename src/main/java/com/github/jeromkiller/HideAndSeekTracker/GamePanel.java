@@ -34,7 +34,7 @@ public class GamePanel extends JPanel {
     private static final ImageIcon ARROW_RIGHT_HOVER_ICON;
 
     static {
-        final BufferedImage arrowLeftImg = ImageUtil.loadImageResource(HideAndSeekTrackerPlugin.class, "arrow_left_icon.png");
+        final BufferedImage arrowLeftImg = ImageUtil.loadImageResource(HideAndSeekTrackerPlugin.class, "config_back_icon.png");
         final BufferedImage arrowLeftImgHover = ImageUtil.luminanceOffset(arrowLeftImg, -150);
         ARROW_LEFT_ICON = new ImageIcon(arrowLeftImg);
         ARROW_LEFT_HOVER_ICON = new ImageIcon(arrowLeftImgHover);

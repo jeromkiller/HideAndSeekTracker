@@ -14,11 +14,11 @@ public class GameTotalPanel extends JPanel {
 
     @Getter
     private final HideAndSeekTrackerPlugin plugin;
+    private final HideAndSeekSettings settings;
 
     GameTotalPanel(HideAndSeekTrackerPlugin plugin) {
         this.plugin = plugin;
-
-        final HideAndSeekTrackerConfig config = plugin.getConfig();
+        this.settings = plugin.getSettings();
 
         setLayout(new BorderLayout());
         setBorder(new EmptyBorder(5, 0, 10, 0));
@@ -78,7 +78,7 @@ public class GameTotalPanel extends JPanel {
     }
 
     public void updateHidePlayers() {
-        final boolean hide = plugin.getConfig().hideUnfinishedPlayers();
+        final boolean hide = settings.getHideUnfinished();
         resultTable.enableHidenPlayerFilter(hide);
     }
 }

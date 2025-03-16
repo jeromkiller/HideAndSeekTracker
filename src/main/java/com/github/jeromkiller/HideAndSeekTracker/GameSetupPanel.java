@@ -22,10 +22,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 
 public class GameSetupPanel extends JPanel {
-    private final JSpinner tickLeniency = new JSpinner(new SpinnerNumberModel(2, 0, 100, 1));
-    private final JTextArea playerNames = new JTextArea();
-    private final JToggleButton showRenderDist = new JToggleButton(OFF_SWITCHER);
     private final JToggleButton autoFillButton = new JToggleButton(OFF_SWITCHER);
+    private final JTextArea playerNames = new JTextArea();
     private final JLabel notSavedWarning = new JLabel("Names not saved!");
     private final JLabel statusLabel = new JLabel();
 
@@ -66,39 +64,8 @@ public class GameSetupPanel extends JPanel {
         contents.setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.insets = new Insets(0, 2, 5, 2);
-
-        constraints.gridx = 0;
         constraints.gridy = 0;
         constraints.weightx = 1;
-        final JLabel leniencyLabel = new JLabel("Placement Leniency Ticks");
-        constraints.anchor = GridBagConstraints.WEST;
-        constraints.gridwidth = 1;
-        contents.add(leniencyLabel, constraints);
-
-        constraints.anchor = GridBagConstraints.EAST;
-        constraints.gridx = 1;
-        tickLeniency.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                changeTickLeniency();
-            }
-        });
-        contents.add(tickLeniency, constraints);
-        constraints.gridy++;
-
-        constraints.anchor = GridBagConstraints.WEST;
-        constraints.gridx = 0;
-        final JLabel showRenderDistLabel = new JLabel("Show Render Distance");
-        contents.add(showRenderDistLabel, constraints);
-
-        constraints.anchor = GridBagConstraints.EAST;
-        constraints.gridx = 1;
-        showRenderDist.setSelected(settings.getShowRenderDist());
-        showRenderDist.setSelectedIcon(ON_SWITCHER);
-        showRenderDist.addItemListener(e -> changeShowRenderDist());
-        SwingUtil.removeButtonDecorations(showRenderDist);
-        contents.add(showRenderDist, constraints);
-        constraints.gridy++;
         constraints.anchor = GridBagConstraints.WEST;
         constraints.gridx = 0;
         constraints.gridwidth = 2;
@@ -193,15 +160,6 @@ public class GameSetupPanel extends JPanel {
         notSavedWarning.setVisible(false);
     }
 
-    private void changeTickLeniency() {
-        final int tickLeniencySetting = (int) tickLeniency.getValue();
-        settings.setTickLenience(tickLeniencySetting);
-    }
-
-    private void changeShowRenderDist() {
-        final boolean show = showRenderDist.isSelected();
-        settings.setShowRenderDist(show);
-    }
 
     private void changeAutoFill() {
         if(notSavedWarning.isVisible())
@@ -214,12 +172,6 @@ public class GameSetupPanel extends JPanel {
     }
 
     public void loadSettings() {
-        final int tickLeniencySetting = settings.getTickLenience();
-        tickLeniency.setValue(tickLeniencySetting);
-
-        final boolean showRenderDistSetting = settings.getShowRenderDist();
-        showRenderDist.setSelected(showRenderDistSetting);
-
         loadPlayerNames(settings.getPlayerNames());
     }
 

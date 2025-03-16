@@ -3,10 +3,12 @@ package com.github.jeromkiller.HideAndSeekTracker;
 import lombok.Getter;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
+import net.runelite.client.util.ImageUtil;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 
 @Getter
 public class HideAndSeekTrackerPanel extends PluginPanel {
@@ -15,6 +17,14 @@ public class HideAndSeekTrackerPanel extends PluginPanel {
     private final GameSetupPanel setupPanel;
     private final GamePanel gamePanel;
     private final ScoringPanel scorePanel;
+    private final SettingsPanel settingsPanel;
+
+    private static final ImageIcon COG_ICON;
+
+    static {
+        BufferedImage cogIcon = ImageUtil.loadImageResource(HideAndSeekTrackerPlugin.class, "config_edit_icon.png");
+        COG_ICON = new ImageIcon(cogIcon);
+    }
 
     public HideAndSeekTrackerPanel(HideAndSeekTrackerPlugin plugin)
     {
@@ -25,20 +35,24 @@ public class HideAndSeekTrackerPanel extends PluginPanel {
         setLayout(new BorderLayout());
         setBackground(ColorScheme.DARK_GRAY_COLOR);
 
-        JTabbedPane tabPane = new JTabbedPane();
+        JTabbedPane tabPane = new JTabbedPane(JTabbedPane.TOP, JTabbedPane.SCROLL_TAB_LAYOUT);
+
+        // maybe replace the text with icons
+        setupPanel = new GameSetupPanel(plugin);
+        tabPane.addTab("Players", new JScrollPane(setupPanel));
 
         areaPanel = new CaptureAreaManagementPanel(plugin);
         tabPane.addTab("Areas", new JScrollPane(areaPanel));
 
-
-        setupPanel = new GameSetupPanel(plugin);
-        tabPane.addTab("Setup", new JScrollPane(setupPanel));
+        scorePanel = new ScoringPanel(plugin);
+        tabPane.add("Score", new JScrollPane(scorePanel));
 
         gamePanel = new GamePanel(plugin);
         tabPane.addTab("Game", gamePanel);
 
-        scorePanel = new ScoringPanel(plugin);
-        tabPane.add("Score", new JScrollPane(scorePanel));
+        settingsPanel = new SettingsPanel(plugin);
+        tabPane.addTab("Settings", COG_ICON, settingsPanel, "Change Plugin Settings");
+        tabPane.setTabComponentAt(4, new JLabel(COG_ICON));
 
         add(tabPane);
     }
