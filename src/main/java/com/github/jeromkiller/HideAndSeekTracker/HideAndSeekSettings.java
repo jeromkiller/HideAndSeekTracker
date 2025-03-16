@@ -22,6 +22,8 @@ public class HideAndSeekSettings {
     public static final String PLAYER_NAMES_KEY = "HaS_PlayerNames";
     public static final String SHOW_RENDER_DIST = "HaS_ShowRenderDist";
     public static final String SCORERULES_KEY = "HaS_ScoreRules";
+    public static final String HIDE_UNFINISHED_KEY = "HaS_HideUnfinishedPlayers";
+    public static final String DEV_MODE_KEY = "HaS_DevMode";
 
     @Inject
     private ConfigManager configManager;
@@ -109,6 +111,10 @@ public class HideAndSeekSettings {
 
 
         final String json = configManager.getConfiguration(CONFIG_GROUP, SCORERULES_KEY);
+        if(Strings.isNullOrEmpty(json)){
+            return ScoreRules.getDefaultRules();
+        }
+
         final ScoreRules newRules = scoreRulesGson.fromJson(json, new TypeToken<ScoreRules>(){}.getType());
         return newRules;
     }
@@ -124,6 +130,30 @@ public class HideAndSeekSettings {
 
         final String json = scoreRulesGson.toJson(rules);
         configManager.setConfiguration(CONFIG_GROUP, SCORERULES_KEY, json);
+    }
+
+    public void setHideUnfinished(boolean show) {
+        setValue(HIDE_UNFINISHED_KEY, show);
+    }
+
+    public boolean getHideUnfinished() {
+        final String json = configManager.getConfiguration(CONFIG_GROUP, HIDE_UNFINISHED_KEY);
+        if(Strings.isNullOrEmpty(json)){
+            return false;
+        }
+        return gson.fromJson(json, new TypeToken<Boolean>(){}.getType());
+    }
+
+    public void setDevMode(boolean show) {
+        setValue(DEV_MODE_KEY, show);
+    }
+
+    public boolean getDevMode() {
+        final String json = configManager.getConfiguration(CONFIG_GROUP, DEV_MODE_KEY);
+        if(Strings.isNullOrEmpty(json)){
+            return false;
+        }
+        return gson.fromJson(json, new TypeToken<Boolean>(){}.getType());
     }
 
 }

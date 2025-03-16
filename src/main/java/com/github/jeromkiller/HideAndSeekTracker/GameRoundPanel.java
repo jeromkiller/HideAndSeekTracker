@@ -20,12 +20,12 @@ public class GameRoundPanel extends JPanel {
     @Getter
     private final HideAndSeekRound gameRound;
     private final HideAndSeekTrackerPlugin plugin;
+    private final HideAndSeekSettings settings;
 
     GameRoundPanel(HideAndSeekTrackerPlugin plugin) {
         this.plugin = plugin;
         this.gameRound = plugin.game.getActiveRound();
-
-        final HideAndSeekTrackerConfig config = plugin.getConfig();
+        this.settings = plugin.getSettings();
 
         setLayout(new BorderLayout());
         setBorder(new EmptyBorder(5, 0, 10, 0));
@@ -43,13 +43,13 @@ public class GameRoundPanel extends JPanel {
 
         roundTitle = new JLabel("Round: " + gameRound.getRoundNumber() + " (Active)");
         contents.add(roundTitle, constraints);
-        constraints.gridwidth = 1;
         constraints.gridy++;
 
 
         JButton exportDirect = new JButton("Export Text");
         exportDirect.addActionListener(e -> plainTextExport());
         contents.add(exportDirect, constraints);
+        constraints.gridwidth = 1;
         constraints.gridy++;
 
         btnDevExportDirect = new JButton("Export (dev)");
@@ -62,7 +62,7 @@ public class GameRoundPanel extends JPanel {
         contents.add(btnDevExportDiscord, constraints);
         constraints.gridy++;
 
-        if(!config.DevMode()) {
+        if(!settings.getDevMode()) {
             btnDevExportDiscord.setVisible(false);
             btnDevExportDirect.setVisible(false);
         }
@@ -150,13 +150,13 @@ public class GameRoundPanel extends JPanel {
     }
 
     public void updateDevMode() {
-        final boolean enable = plugin.getConfig().DevMode();
+        final boolean enable = settings.getDevMode();
         btnDevExportDiscord.setVisible(enable);
         btnDevExportDirect.setVisible(enable);
     }
 
     public void updateHidePlayers() {
-        final boolean hide = plugin.getConfig().hideUnfinishedPlayers();
+        final boolean hide = settings.getHideUnfinished();
         resultTable.enableHidenPlayerFilter(hide);
     }
 }

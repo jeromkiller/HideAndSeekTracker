@@ -54,10 +54,6 @@ public class HideAndSeekTrackerPlugin extends Plugin
 	private HideAndSeekTrackerSceneOverlay sceneOverlay;
 
 	@Inject
-	@Getter
-	private HideAndSeekTrackerConfig config;
-
-	@Inject
 	private OverlayManager overlayManager;
 
 	@Inject
@@ -98,12 +94,6 @@ public class HideAndSeekTrackerPlugin extends Plugin
 	@Getter
 	@Setter
 	public boolean autofillNames = false;
-
-	@Provides
-	HideAndSeekTrackerConfig provideConfig(ConfigManager configManager)
-	{
-		return configManager.getConfig(HideAndSeekTrackerConfig.class);
-	}
 
 	@Override
 	protected void startUp()
@@ -150,10 +140,10 @@ public class HideAndSeekTrackerPlugin extends Plugin
 	@Subscribe
 	public void onConfigChanged(ConfigChanged event)
 	{
-		if(Objects.equals(event.getKey(), HideAndSeekTrackerConfig.DEV_MODE_KEY)) {
+		if(Objects.equals(event.getKey(), HideAndSeekSettings.DEV_MODE_KEY)) {
 			panel.getGamePanel().updateDevModeSetting();
 		}
-		if(Objects.equals(event.getKey(), HideAndSeekTrackerConfig.HIDE_UNFINISHED_KEY)) {
+		if(Objects.equals(event.getKey(), HideAndSeekSettings.HIDE_UNFINISHED_KEY)) {
 			panel.getGamePanel().updateHidePlayerSetting();
 		}
 	}
@@ -290,10 +280,6 @@ public class HideAndSeekTrackerPlugin extends Plugin
 		game.setPlayers(playerNames);
 
 		ScoreRules loadedRules = settings.getScoreRules();
-		if(loadedRules == null) {
-			loadedRules = ScoreRules.getDefaultRules();
-			settings.setScoreRules(loadedRules);
-		}
 		scoreRules.load(loadedRules);
 	}
 
