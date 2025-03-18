@@ -29,6 +29,9 @@ public class GameRoundPanel extends BasePanel {
     private final GamePanel parentPanel;
     private final HideAndSeekSettings settings;
 
+    @Getter
+    private boolean roundFinished = false;
+
     GameRoundPanel(HideAndSeekTrackerPlugin plugin, GamePanel parentPanel) {
         this.plugin = plugin;
         this.gameRound = plugin.game.getActiveRound();
@@ -48,13 +51,13 @@ public class GameRoundPanel extends BasePanel {
         constraints.gridy = 0;
         constraints.gridwidth = 1;
 
-        roundTitle = new JLabel("Round: " + gameRound.getRoundNumber() + " (Active)");
+        roundTitle = new JLabel();
         contents.add(roundTitle, constraints);
 
         JPanel roundButtonPanel = new JPanel(new GridBagLayout());
         GridBagConstraints roundButtonConstraints = new GridBagConstraints();
 
-        setupImageIcon(deleteRoundButton, "Delete this round", DELETE_ROUND_ICON, DELETE_ROUND_ICON_HOVER, () -> System.out.println("TODO implement me"));
+        setupImageIcon(deleteRoundButton, "Delete this round", DELETE_ROUND_ICON, DELETE_ROUND_ICON_HOVER, this::deleteRound);
         setupImageIcon(newRoundButton, "Start new round",NEW_ROUND_ICON, NEW_ROUND_ICON_HOVER, parentPanel::newRound);
         roundButtonConstraints.anchor = GridBagConstraints.EAST;
         roundButtonConstraints.gridx = 0;
@@ -147,6 +150,7 @@ public class GameRoundPanel extends BasePanel {
         add(contents);
         updateHidePlayers();
         updatePlacements();
+        updateRoundLabel();
     }
 
     private void plainTextExport() {
@@ -167,7 +171,6 @@ public class GameRoundPanel extends BasePanel {
     }
 
     private void showCopiedText() {
-        plugin.copyVisibleCaptureAreasToClip();
         statusLabel.setText("Copied to clipboard!");
         Timer hideStatusTimer = new Timer(1000, e -> statusLabel.setText(" "));
         hideStatusTimer.setRepeats(false);
@@ -205,8 +208,17 @@ public class GameRoundPanel extends BasePanel {
         numFinished.setText(placedString);
     }
 
-    public void roundFinished(String RoundName) {
-        roundTitle.setText(RoundName);
+    public void updateRoundLabel() {
+        String roundText = "Round: " + gameRound.getRoundNumber();
+        if(!roundFinished) {
+            roundText += " (Active)";
+        }
+        roundTitle.setText(roundText);
+    }
+
+    public void roundFinished() {
+        roundFinished = true;
+        updateRoundLabel();
         hintCount.setEnabled(false);
         deleteRoundButton.setVisible(true);
     }
@@ -220,5 +232,12 @@ public class GameRoundPanel extends BasePanel {
     public void updateHidePlayers() {
         final boolean hide = settings.getHideUnfinished();
         resultTable.enableHidenPlayerFilter(hide);
+    }
+
+    public void deleteRound() {
+        final int roundNumber = gameRound.getRoundNumber() - 1;
+        plugin.game.deleteRound(roundNumber);
+        parentPanel.deleteRound(roundNumber);
+        parentPanel.relabelRounds();
     }
 }

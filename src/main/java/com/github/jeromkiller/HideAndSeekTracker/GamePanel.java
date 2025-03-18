@@ -97,6 +97,24 @@ public class GamePanel extends BasePanel {
         roundPanels.add(activeRoundPanel);
     }
 
+    private void firstRound() {
+        roundCards.first(cardsPanel);
+        currentCardIndex = 0;
+        updateCardFlipButtons();
+    }
+
+    private void navTo(int index) {
+        if(index >= cardsPanel.getComponentCount()) {
+            return;
+        }
+
+        firstRound();
+        for(int i = 0; i < index; i++) {
+            roundCards.next(cardsPanel);
+            currentCardIndex++;
+        }
+    }
+
     private void prevRound() {
         roundCards.previous(cardsPanel);
         currentCardIndex -= 1;
@@ -123,8 +141,8 @@ public class GamePanel extends BasePanel {
     }
 
     public void newRound() {
-        final int savedRoundIndex = plugin.game.newRound();
-        activeRoundPanel.roundFinished("Round: " + (savedRoundIndex + 1));
+        plugin.game.newRound();
+        activeRoundPanel.roundFinished();
         activeRoundPanel = new GameRoundPanel(plugin, this);
         addRoundPanel(activeRoundPanel);
         activeRound();
@@ -161,6 +179,20 @@ public class GamePanel extends BasePanel {
     public void updateHidePlayerSetting() {
         for(GameRoundPanel panel : roundPanels){
             panel.updateHidePlayers();
+        }
+    }
+
+    public void deleteRound(int index) {
+        roundPanels.remove(index);
+        cardsPanel.remove(index);
+        navTo(index);
+        invalidate();
+        repaint();
+    }
+
+    public void relabelRounds() {
+        for(GameRoundPanel panel : roundPanels) {
+            panel.updateRoundLabel();
         }
     }
 }

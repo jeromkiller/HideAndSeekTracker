@@ -163,4 +163,19 @@ public class HideAndSeekGame {
         }
         return exportString.toString();
     }
+
+    public void deleteRound(int index) {
+        if(index >= pastRounds.size()) {
+            return;
+        }
+        pastRounds.remove(index);
+
+        // renumber the other rounds
+        int roundNumber = 1;
+        for(HideAndSeekRound round : pastRounds) {
+            round.setRoundNumber(roundNumber);
+            roundNumber++;
+        }
+        activeRound.setRoundNumber(roundNumber);
+    }
 }

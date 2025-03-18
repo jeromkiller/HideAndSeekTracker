@@ -106,7 +106,6 @@ public class GameTotalPanel extends BasePanel {
     }
 
     private void showCopiedText() {
-        plugin.copyVisibleCaptureAreasToClip();
         statusLabel.setText("Copied to clipboard!");
         Timer hideStatusTimer = new Timer(1000, e -> statusLabel.setText(" "));
         hideStatusTimer.setRepeats(false);
