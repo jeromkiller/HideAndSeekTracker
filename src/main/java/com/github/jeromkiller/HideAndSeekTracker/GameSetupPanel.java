@@ -3,14 +3,11 @@ package com.github.jeromkiller.HideAndSeekTracker;
 import joptsimple.internal.Strings;
 import lombok.Getter;
 import net.runelite.client.util.ImageUtil;
-import net.runelite.client.util.SwingUtil;
 import net.runelite.client.ui.ColorScheme;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
@@ -22,7 +19,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 
 public class GameSetupPanel extends JPanel {
-    private final JToggleButton autoFillButton = new JToggleButton(OFF_SWITCHER);
+    private final BlinklessToggleButton autoFillButton;
     private final JTextArea playerNames = new JTextArea();
     private final JLabel notSavedWarning = new JLabel("Names not saved!");
     private final JLabel statusLabel = new JLabel();
@@ -116,9 +113,8 @@ public class GameSetupPanel extends JPanel {
         constraints.gridx = 1;
         constraints.anchor = GridBagConstraints.EAST;
         constraints.fill = GridBagConstraints.NONE;
-        autoFillButton.setSelectedIcon(ON_SWITCHER);
-        autoFillButton.addItemListener(e -> changeAutoFill());
-        SwingUtil.removeButtonDecorations(autoFillButton);
+        autoFillButton = new BlinklessToggleButton("Automatically add players to the participant list");
+        autoFillButton.addItemListener(this::changeAutoFill);
         contents.add(autoFillButton, constraints);
         constraints.gridwidth = 2;
         constraints.gridx = 0;

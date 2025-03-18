@@ -1,38 +1,17 @@
 package com.github.jeromkiller.HideAndSeekTracker;
 
-import net.runelite.client.util.ImageUtil;
-import net.runelite.client.util.SwingUtil;
-
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.image.BufferedImage;
 
-public class SettingsPanel extends JPanel {
+public class SettingsPanel extends BasePanel {
     private final JSpinner tickLeniency = new JSpinner(new SpinnerNumberModel(2, 0, 100, 1));
-    private final JToggleButton showRenderDist = new JToggleButton(OFF_SWITCHER);
-    private final JToggleButton hideUnfinishedPlayers = new JToggleButton(OFF_SWITCHER);
-    private final JToggleButton useDevMode = new JToggleButton(OFF_SWITCHER);
+    private final BlinklessToggleButton showRenderDist;
+    private final BlinklessToggleButton hideUnfinishedPlayers;
+    private final BlinklessToggleButton useDevMode;
 
     private final HideAndSeekTrackerPlugin plugin;
     private final HideAndSeekSettings settings;
-
-    private static final ImageIcon ON_SWITCHER;
-    private static final ImageIcon OFF_SWITCHER;
-
-    static
-    {
-        BufferedImage onSwitcher = ImageUtil.loadImageResource(HideAndSeekTrackerPlugin.class, "switcher_on.png");
-        ON_SWITCHER = new ImageIcon(onSwitcher);
-        OFF_SWITCHER = new ImageIcon(ImageUtil.flipImage(
-                ImageUtil.luminanceScale(
-                        ImageUtil.grayscaleImage(onSwitcher),
-                        0.61f
-                ),
-                true,
-                false
-        ));
-    }
 
     SettingsPanel(HideAndSeekTrackerPlugin plugin)
     {
@@ -54,24 +33,20 @@ public class SettingsPanel extends JPanel {
         tickLeniency.addChangeListener(e -> settings.setTickLenience((int) tickLeniency.getValue()));
         addSettingRow("Placement Leniency Ticks", tickLeniency, contents, constraints);
 
+        showRenderDist = new BlinklessToggleButton("Show Render Distance");
         showRenderDist.setSelected(settings.getShowRenderDist());
-        showRenderDist.setSelectedIcon(ON_SWITCHER);
-        showRenderDist.addItemListener(e -> settings.setShowRenderDist(showRenderDist.isSelected()));
-        SwingUtil.removeButtonDecorations(showRenderDist);
+        showRenderDist.addItemListener(() -> settings.setShowRenderDist(showRenderDist.isSelected()));
         addSettingRow("Show Render Distance", showRenderDist, contents, constraints);
 
+        hideUnfinishedPlayers = new BlinklessToggleButton("Show Render Distance");
         hideUnfinishedPlayers.setSelected(settings.getHideUnfinished());
-        hideUnfinishedPlayers.setSelectedIcon(ON_SWITCHER);
-        hideUnfinishedPlayers.addItemListener(e -> settings.setHideUnfinished(hideUnfinishedPlayers.isSelected()));
-        SwingUtil.removeButtonDecorations(hideUnfinishedPlayers);
+        hideUnfinishedPlayers.addItemListener(() -> settings.setHideUnfinished(hideUnfinishedPlayers.isSelected()));
         addSettingRow("Hide Unfinished Players", hideUnfinishedPlayers, contents, constraints);
 
+        useDevMode = new BlinklessToggleButton("Use Dev Mode");
         useDevMode.setSelected(settings.getDevMode());
-        useDevMode.setSelectedIcon(ON_SWITCHER);
-        useDevMode.addItemListener(e -> settings.setDevMode(useDevMode.isSelected()));
-        SwingUtil.removeButtonDecorations(useDevMode);
+        useDevMode.addItemListener(() -> settings.setDevMode(useDevMode.isSelected()));
         addSettingRow("Use Dev Mode", useDevMode, contents, constraints);
-
 
         add(contents, BorderLayout.NORTH);
         loadSettings();

@@ -1,18 +1,12 @@
 package com.github.jeromkiller.HideAndSeekTracker;
 
-import net.runelite.client.ui.ColorScheme;
-import net.runelite.client.util.ImageUtil;
 
 import javax.swing.*;
-import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
 import java.util.LinkedList;
 
-public class GamePanel extends JPanel {
+public class GamePanel extends BasePanel {
     private final HideAndSeekTrackerPlugin plugin;
 
     private int currentCardIndex;
@@ -20,31 +14,13 @@ public class GamePanel extends JPanel {
     private final JPanel cardsPanel;
     private final CardLayout roundCards;
     private final LinkedList<GameRoundPanel> roundPanels;
-    private final JLabel prevTableButton;
-    private final JLabel nextTableButton;
+    private final JLabel prevTableButton = new JLabel();
+    private final JLabel nextTableButton = new JLabel();
     private final JButton activeRoundButton;
     private final JButton scoreTotalButton;
 
     private GameRoundPanel activeRoundPanel;
     private final GameTotalPanel scoreTotalPanel;
-
-    private static final ImageIcon ARROW_LEFT_ICON;
-    private static final ImageIcon ARROW_LEFT_HOVER_ICON;
-    private static final ImageIcon ARROW_RIGHT_ICON;
-    private static final ImageIcon ARROW_RIGHT_HOVER_ICON;
-
-    static {
-        final BufferedImage arrowLeftImg = ImageUtil.loadImageResource(HideAndSeekTrackerPlugin.class, "config_back_icon.png");
-        final BufferedImage arrowLeftImgHover = ImageUtil.luminanceOffset(arrowLeftImg, -150);
-        ARROW_LEFT_ICON = new ImageIcon(arrowLeftImg);
-        ARROW_LEFT_HOVER_ICON = new ImageIcon(arrowLeftImgHover);
-
-        final BufferedImage arrowRightImg = ImageUtil.flipImage(arrowLeftImg, true, false);
-        final BufferedImage arrowRightImgHover = ImageUtil.flipImage(arrowLeftImgHover, true, false);
-        ARROW_RIGHT_ICON = new ImageIcon(arrowRightImg);
-        ARROW_RIGHT_HOVER_ICON = new ImageIcon(arrowRightImgHover);
-    }
-
 
     GamePanel(HideAndSeekTrackerPlugin plugin)
     {
@@ -53,7 +29,7 @@ public class GamePanel extends JPanel {
         this.roundPanels = new LinkedList<>();
 
         setLayout(new GridBagLayout());
-        setBorder(new EmptyBorder(5, 0, 10, 0));
+        setBorder(new EmptyBorder(5, 0, 0, 0));
 
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.fill = GridBagConstraints.HORIZONTAL;
@@ -66,23 +42,9 @@ public class GamePanel extends JPanel {
         GridBagConstraints topButtonConstraints = new GridBagConstraints();
         topButtonConstraints.fill = GridBagConstraints.NONE;
 
-        prevTableButton = new JLabel(ARROW_LEFT_ICON);
-        prevTableButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                if(prevTableButton.isEnabled()) {
+        setupImageIcon(prevTableButton, "View previous round", ARROW_LEFT_ICON, ARROW_LEFT_HOVER_ICON, () -> {
+            if(prevTableButton.isEnabled()) {
                 prevRound();
-                }
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                prevTableButton.setIcon(ARROW_LEFT_HOVER_ICON);
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-                prevTableButton.setIcon(ARROW_LEFT_ICON);
             }
         });
 
@@ -92,23 +54,9 @@ public class GamePanel extends JPanel {
         scoreTotalButton = new JButton("Score Total");
         scoreTotalButton.addActionListener(e -> scoreTotal());
 
-        nextTableButton = new JLabel(ARROW_RIGHT_ICON);
-        nextTableButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                if(nextTableButton.isEnabled()) {
-                    nextRound();
-                }
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                nextTableButton.setIcon(ARROW_RIGHT_HOVER_ICON);
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-                nextTableButton.setIcon(ARROW_RIGHT_ICON);
+        setupImageIcon(nextTableButton, "View next round", ARROW_RIGHT_ICON, ARROW_RIGHT_HOVER_ICON, () -> {
+            if(nextTableButton.isEnabled()) {
+                nextRound();
             }
         });
 
@@ -130,25 +78,16 @@ public class GamePanel extends JPanel {
 
         roundCards = new CardLayout();
         cardsPanel = new JPanel(roundCards);
-        cardsPanel.setBorder(new CompoundBorder(
-                BorderFactory.createMatteBorder(0, 0, 2, 0, ColorScheme.DARK_GRAY_COLOR),
-                BorderFactory.createMatteBorder(1, 1, 1, 1, ColorScheme.BORDER_COLOR)));
 
-        scoreTotalPanel = new GameTotalPanel(plugin);
+        scoreTotalPanel = new GameTotalPanel(plugin, this);
         cardsPanel.add(scoreTotalPanel);
 
-        activeRoundPanel = new GameRoundPanel(plugin);
+        activeRoundPanel = new GameRoundPanel(plugin, this);
         addRoundPanel(activeRoundPanel);
 
         constraints.fill = GridBagConstraints.BOTH;
         constraints.weighty = 1;
         this.add(cardsPanel, constraints);
-
-        constraints.gridy++;
-        constraints.weighty = 0;
-        JButton newRoundButton = new JButton("New Round");
-        newRoundButton.addActionListener(e -> newRound());
-        this.add(newRoundButton, constraints);
 
         activeRound();
     }
@@ -183,10 +122,10 @@ public class GamePanel extends JPanel {
         updateCardFlipButtons();
     }
 
-    private void newRound() {
+    public void newRound() {
         final int savedRoundIndex = plugin.game.newRound();
         activeRoundPanel.roundFinished("Round: " + (savedRoundIndex + 1));
-        activeRoundPanel = new GameRoundPanel(plugin);
+        activeRoundPanel = new GameRoundPanel(plugin, this);
         addRoundPanel(activeRoundPanel);
         activeRound();
     }

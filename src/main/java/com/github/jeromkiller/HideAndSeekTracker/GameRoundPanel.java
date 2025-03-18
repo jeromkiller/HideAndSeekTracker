@@ -9,47 +9,69 @@ import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 
-public class GameRoundPanel extends JPanel {
+public class GameRoundPanel extends BasePanel {
     private final JLabel roundTitle;
     private final JButton btnDevExportDiscord;
     private final JButton btnDevExportDirect;
     private final JSpinner hintCount;
     private final HideAndSeekTable resultTable;
     private final JLabel numFinished = new JLabel("999/999 Finished");
+    private final JLabel copyResultButton = new JLabel();
+    private final JLabel importResultButton = new JLabel();
+    private final JLabel exportResultButton = new JLabel();
+    private final JLabel newRoundButton = new JLabel();
+    private final JLabel deleteRoundButton = new JLabel();
+    private final JLabel statusLabel = new JLabel(" ");
 
     @Getter
     private final HideAndSeekRound gameRound;
     private final HideAndSeekTrackerPlugin plugin;
+    private final GamePanel parentPanel;
     private final HideAndSeekSettings settings;
 
-    GameRoundPanel(HideAndSeekTrackerPlugin plugin) {
+    GameRoundPanel(HideAndSeekTrackerPlugin plugin, GamePanel parentPanel) {
         this.plugin = plugin;
         this.gameRound = plugin.game.getActiveRound();
+        this.parentPanel = parentPanel;
         this.settings = plugin.getSettings();
 
         setLayout(new BorderLayout());
-        setBorder(new EmptyBorder(5, 0, 10, 0));
+        setBorder(new EmptyBorder(5, 0, 0, 0));
 
         JPanel contents = new JPanel();
         contents.setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.insets = new Insets(0, 2, 5, 2);
         constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.anchor = GridBagConstraints.NORTHWEST;
-        constraints.weightx = 1;
+        constraints.anchor = GridBagConstraints.WEST;
         constraints.gridx = 0;
         constraints.gridy = 0;
-        constraints.gridwidth = 2;
+        constraints.gridwidth = 1;
 
         roundTitle = new JLabel("Round: " + gameRound.getRoundNumber() + " (Active)");
         contents.add(roundTitle, constraints);
-        constraints.gridy++;
 
+        JPanel roundButtonPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints roundButtonConstraints = new GridBagConstraints();
 
-        JButton exportDirect = new JButton("Export Text");
-        exportDirect.addActionListener(e -> plainTextExport());
-        contents.add(exportDirect, constraints);
-        constraints.gridwidth = 1;
+        setupImageIcon(deleteRoundButton, "Delete this round", DELETE_ROUND_ICON, DELETE_ROUND_ICON_HOVER, () -> System.out.println("TODO implement me"));
+        setupImageIcon(newRoundButton, "Start new round",NEW_ROUND_ICON, NEW_ROUND_ICON_HOVER, parentPanel::newRound);
+        roundButtonConstraints.anchor = GridBagConstraints.EAST;
+        roundButtonConstraints.gridx = 0;
+        roundButtonPanel.add(deleteRoundButton, roundButtonConstraints);
+        roundButtonConstraints.gridx = 1;
+        roundButtonPanel.add(newRoundButton, roundButtonConstraints);
+
+        deleteRoundButton.setVisible(false);
+
+        constraints.gridx = 1;
+        constraints.anchor = GridBagConstraints.EAST;
+        JPanel roundButtonPanelContainer = new JPanel(new BorderLayout());
+        roundButtonPanelContainer.add(roundButtonPanel, BorderLayout.LINE_END);
+        contents.add(roundButtonPanelContainer, constraints);
+
+        constraints.anchor = GridBagConstraints.WEST;
+        constraints.gridx = 0;
         constraints.gridy++;
 
         btnDevExportDirect = new JButton("Export (dev)");
@@ -93,6 +115,35 @@ public class GameRoundPanel extends JPanel {
 
         contents.add(numFinished, constraints);
 
+        JPanel bottomButtonPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints bottomConstraints = new GridBagConstraints();
+
+        setupImageIcon(copyResultButton, "Copy results to clipboard", COPY_ICON, COPY_ICON_HOVER, this::plainTextExport);
+        setupImageIcon(exportResultButton, "Export round data to clipboard", EXPORT_ICON, EXPORT_ICON_HOVER, () -> System.out.println("Implement in future"));
+        setupImageIcon(importResultButton, "Import round data from clipboard", IMPORT_ICON, IMPORT_ICON_HOVER, () -> System.out.println("Implement in future"));
+
+        bottomConstraints.gridx = 0;
+        bottomConstraints.ipadx = 4;
+        bottomButtonPanel.add(copyResultButton, bottomConstraints);
+        bottomConstraints.gridx = 1;
+        bottomButtonPanel.add(exportResultButton, bottomConstraints);
+        exportResultButton.setVisible(false);   // for future implementation
+        bottomConstraints.gridx = 2;
+        bottomButtonPanel.add(importResultButton, bottomConstraints);
+        importResultButton.setVisible(false);
+
+        JPanel bottomButtonWrapper = new JPanel(new BorderLayout());
+        bottomButtonWrapper.add(bottomButtonPanel, BorderLayout.LINE_END);
+        constraints.gridx = 1;
+        contents.add(bottomButtonWrapper, constraints);
+        constraints.gridy++;
+
+        constraints.gridx = 0;
+        constraints.gridwidth = 2;
+        constraints.insets = new Insets(0, 2, 0, 2);
+        contents.add(statusLabel, constraints);
+        statusLabel.setHorizontalAlignment(JLabel.RIGHT);
+
         add(contents);
         updateHidePlayers();
         updatePlacements();
@@ -103,6 +154,7 @@ public class GameRoundPanel extends JPanel {
         final StringSelection selection = new StringSelection(exportString);
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         clipboard.setContents(selection, selection);
+        showCopiedText();
     }
 
     private void devExport(boolean discordExport)
@@ -111,6 +163,15 @@ public class GameRoundPanel extends JPanel {
         final StringSelection selection = new StringSelection(exportString);
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         clipboard.setContents(selection, selection);
+        showCopiedText();
+    }
+
+    private void showCopiedText() {
+        plugin.copyVisibleCaptureAreasToClip();
+        statusLabel.setText("Copied to clipboard!");
+        Timer hideStatusTimer = new Timer(1000, e -> statusLabel.setText(" "));
+        hideStatusTimer.setRepeats(false);
+        hideStatusTimer.start();
     }
 
     private void updateHintCount()
@@ -147,6 +208,7 @@ public class GameRoundPanel extends JPanel {
     public void roundFinished(String RoundName) {
         roundTitle.setText(RoundName);
         hintCount.setEnabled(false);
+        deleteRoundButton.setVisible(true);
     }
 
     public void updateDevMode() {

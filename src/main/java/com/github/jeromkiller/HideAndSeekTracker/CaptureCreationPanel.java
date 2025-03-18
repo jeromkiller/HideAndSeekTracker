@@ -1,7 +1,6 @@
 package com.github.jeromkiller.HideAndSeekTracker;
 
 import net.runelite.client.ui.ColorScheme;
-import net.runelite.client.ui.FontManager;
 import net.runelite.client.ui.components.FlatTextField;
 import net.runelite.client.ui.components.colorpicker.RuneliteColorPicker;
 import net.runelite.client.util.ColorUtil;
@@ -11,14 +10,11 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 
-public class CaptureCreationPanel extends CaptureAreaPanel
-{
+public class CaptureCreationPanel extends BasePanel {
     protected static final ImageIcon CREATE_ICON;
     protected static final ImageIcon CREATE_HOVER_ICON;
     protected static final ImageIcon CANCEL_ICON;
@@ -144,27 +140,8 @@ public class CaptureCreationPanel extends CaptureAreaPanel
         JPanel leftActions = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         leftActions.setBackground(ColorScheme.DARKER_GRAY_COLOR);
 
-        colorIndicator.setToolTipText("Edit area color");
-        colorIndicator.addMouseListener(new MouseAdapter()
-        {
-            @Override
-            public void mousePressed(MouseEvent mouseEvent)
-            {
-                openBorderColorPicker();
-            }
+        setupImageIcon(colorIndicator, "Edit area color", COLOR_ICON, COLOR_HOVER_ICON, this::openBorderColorPicker);
 
-            @Override
-            public void mouseEntered(MouseEvent mouseEvent)
-            {
-                colorIndicator.setIcon(COLOR_HOVER_ICON);
-            }
-
-            @Override
-            public void mouseExited(MouseEvent mouseEvent)
-            {
-                colorIndicator.setIcon(COLOR_ICON);
-            }
-        });
 
         labelIndicator.addMouseListener(new MouseAdapter()
         {
@@ -192,43 +169,12 @@ public class CaptureCreationPanel extends CaptureAreaPanel
 
         JPanel rightActions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
         rightActions.setBackground(ColorScheme.DARKER_GRAY_COLOR);
-        saveArea.setIcon(CREATE_ICON);
-        saveArea.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                captureOptions.setLabel(nameInput.getText());
-                plugin.finishCaptureAreaCreation();
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                saveArea.setIcon(CREATE_HOVER_ICON);
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-                saveArea.setIcon(CREATE_ICON);
-            }
+        setupImageIcon(saveArea, "Save Area", CREATE_ICON, CREATE_HOVER_ICON, () -> {
+            captureOptions.setLabel(nameInput.getText());
+            plugin.finishCaptureAreaCreation();
         });
 
-        cancelArea.setIcon(CANCEL_ICON);
-        cancelArea.addMouseListener(new MouseAdapter()
-        {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                plugin.cancelCaptureAreaCreation();
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                cancelArea.setIcon(CANCEL_HOVER_ICON);
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-                cancelArea.setIcon(CANCEL_ICON);
-            }
-        });
+        setupImageIcon(cancelArea, "Cancel Area creation", CANCEL_ICON, CANCEL_HOVER_ICON, plugin::cancelCaptureAreaCreation);
 
         rightActions.add(saveArea);
         rightActions.add(cancelArea);

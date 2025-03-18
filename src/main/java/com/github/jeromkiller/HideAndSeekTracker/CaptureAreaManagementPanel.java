@@ -6,7 +6,7 @@ import net.runelite.client.ui.components.PluginErrorPanel;
 import javax.swing.*;
 import java.awt.*;
 
-public class CaptureAreaManagementPanel extends JPanel {
+public class CaptureAreaManagementPanel extends BasePanel {
 
     private final PluginErrorPanel noAreasPanel = new PluginErrorPanel();
     private final JPanel areaView = new JPanel(new GridBagLayout());

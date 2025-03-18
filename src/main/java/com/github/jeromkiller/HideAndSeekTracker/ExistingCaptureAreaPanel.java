@@ -15,15 +15,13 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-public class ExistingCaptureAreaPanel extends CaptureAreaPanel
-{
+public class ExistingCaptureAreaPanel extends BasePanel {
     private final JLabel colorIndicator = new JLabel();
-    //private final JLabel fillColorIndicator = new JLabel();
-    private final JLabel labelIndicator = new JLabel();
     private final JLabel statusLabel = new JLabel();
     private final JLabel shareLabel = new JLabel();
-    private final JLabel visibilityLabel = new JLabel();
     private final JLabel deleteLabel = new JLabel();
+    private final BlinklessToggleButton visibilityToggle;// = new JToggleButton(INVISIBLE_ICON);
+    private final BlinklessToggleButton labelToggle;// = new JToggleButton(NO_LABEL_ICON);
 
     private final FlatTextField nameInput = new FlatTextField();
     private final JLabel save = new JLabel("Save");
@@ -33,15 +31,10 @@ public class ExistingCaptureAreaPanel extends CaptureAreaPanel
     private final HideAndSeekTrackerPlugin plugin;
     private final CaptureArea captureArea;
 
-    private boolean visible;
-    private boolean showLabel;
-
     public ExistingCaptureAreaPanel(HideAndSeekTrackerPlugin plugin, CaptureArea captureArea)
     {
         this.plugin = plugin;
         this.captureArea = captureArea;
-        this.visible = captureArea.isAreaVisible();
-        this.showLabel = captureArea.isLabelVisible();
 
         setLayout(new BorderLayout());
         setBackground(ColorScheme.DARKER_GRAY_COLOR);
@@ -177,51 +170,16 @@ public class ExistingCaptureAreaPanel extends CaptureAreaPanel
         JPanel leftActions = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         leftActions.setBackground(ColorScheme.DARKER_GRAY_COLOR);
 
-        colorIndicator.setToolTipText("Edit area color");
-        colorIndicator.addMouseListener(new MouseAdapter()
-        {
-            @Override
-            public void mousePressed(MouseEvent mouseEvent)
-            {
-                openBorderColorPicker();
-            }
+        setupImageIcon(colorIndicator, "Edit area color", COLOR_ICON, COLOR_HOVER_ICON, this::openBorderColorPicker);
 
-            @Override
-            public void mouseEntered(MouseEvent mouseEvent)
-            {
-                colorIndicator.setIcon(COLOR_HOVER_ICON);
-            }
-
-            @Override
-            public void mouseExited(MouseEvent mouseEvent)
-            {
-                colorIndicator.setIcon(COLOR_ICON);
-            }
-        });
-
-        labelIndicator.addMouseListener(new MouseAdapter()
-        {
-            @Override
-            public void mousePressed(MouseEvent mouseEvent)
-            {
-                toggleLabelling(!showLabel);
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent mouseEvent)
-            {
-                labelIndicator.setIcon(showLabel ? LABEL_HOVER_ICON : NO_LABEL_HOVER_ICON);
-            }
-
-            @Override
-            public void mouseExited(MouseEvent mouseEvent)
-            {
-                labelIndicator.setIcon(showLabel ? LABEL_ICON : NO_LABEL_ICON);
-            }
-        });
+        labelToggle = new BlinklessToggleButton(LABEL_ICON, LABEL_HOVER_ICON,
+                NO_LABEL_ICON, NO_LABEL_HOVER_ICON,
+                "Hide Area Label", "Show Area Label");
+        labelToggle.setSelected(captureArea.isLabelVisible());
+        labelToggle.addItemListener(this::toggleLabelling);
 
         leftActions.add(colorIndicator);
-        leftActions.add(labelIndicator);
+        leftActions.add(labelToggle);
 
         JPanel rightActions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
         rightActions.setBackground(ColorScheme.DARKER_GRAY_COLOR);
@@ -229,80 +187,30 @@ public class ExistingCaptureAreaPanel extends CaptureAreaPanel
         statusLabel.setText("Copied!");
         statusLabel.setVisible(false);
 
-        shareLabel.setIcon(COPY_AREA_ICON);
-        shareLabel.setToolTipText("Copy area to clipboard");
-        shareLabel.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                plugin.copyCaptureAreaToClip(captureArea);
-                showCopiedStatus();
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                shareLabel.setIcon(COPY_AREA_HOVER_ICON);
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-                shareLabel.setIcon(COPY_AREA_ICON);
-            }
+        setupImageIcon(shareLabel, "Copy area to clipboard", COPY_ICON, COPY_ICON_HOVER, () -> {
+            plugin.copyCaptureAreaToClip(captureArea);
+            showCopiedStatus();
         });
 
-        visibilityLabel.addMouseListener(new MouseAdapter()
-        {
-            @Override
-            public void mousePressed(MouseEvent mouseEvent)
-            {
-                toggle(!visible);
-            }
+        visibilityToggle = new BlinklessToggleButton(VISIBLE_ICON, VISIBLE_HOVER_ICON,
+                INVISIBLE_ICON, INVISIBLE_HOVER_ICON, "Hide Area", "Show Area");
+        visibilityToggle.setSelected(captureArea.isAreaActive());
+        visibilityToggle.addItemListener(this::toggleVisibility);
 
-            @Override
-            public void mouseEntered(MouseEvent mouseEvent)
-            {
-                visibilityLabel.setIcon(visible ? VISIBLE_HOVER_ICON : INVISIBLE_HOVER_ICON);
-            }
+        setupImageIcon(deleteLabel, "Delete capture area", DELETE_ICON, DELETE_HOVER_ICON, () -> {
+            int confirm = JOptionPane.showConfirmDialog(ExistingCaptureAreaPanel.this,
+                    "Are you sure you want to permanently delete this capture area?",
+                    "Warning", JOptionPane.OK_CANCEL_OPTION);
 
-            @Override
-            public void mouseExited(MouseEvent mouseEvent)
+            if (confirm == 0)
             {
-                updateVisibility();
-            }
-        });
-
-        deleteLabel.setIcon(DELETE_ICON);
-        deleteLabel.setToolTipText("Delete capture area");
-        deleteLabel.addMouseListener(new MouseAdapter()
-        {
-            @Override
-            public void mousePressed(MouseEvent mouseEvent)
-            {
-                int confirm = JOptionPane.showConfirmDialog(ExistingCaptureAreaPanel.this,
-                        "Are you sure you want to permanently delete this capture area?",
-                        "Warning", JOptionPane.OK_CANCEL_OPTION);
-
-                if (confirm == 0)
-                {
-                    plugin.deleteCaptureArea(captureArea);
-                }
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent mouseEvent)
-            {
-                deleteLabel.setIcon(DELETE_HOVER_ICON);
-            }
-
-            @Override
-            public void mouseExited(MouseEvent mouseEvent)
-            {
-                deleteLabel.setIcon(DELETE_ICON);
+                plugin.deleteCaptureArea(captureArea);
             }
         });
 
         rightActions.add(statusLabel);
         rightActions.add(shareLabel);
-        rightActions.add(visibilityLabel);
+        rightActions.add(visibilityToggle);
         rightActions.add(deleteLabel);
 
         bottomContainer.add(leftActions, BorderLayout.WEST);
@@ -312,34 +220,30 @@ public class ExistingCaptureAreaPanel extends CaptureAreaPanel
         add(nameWrapper, BorderLayout.NORTH);
         add(bottomContainer, BorderLayout.CENTER);
 
-        updateVisibility();
         updateBorder();
-        updateLabelling();
     }
 
     private void preview(boolean on)
     {
-        if(visible) {
+        if(visibilityToggle.isSelected()) {
             return;
         }
         captureArea.setAreaVisible(on);
     }
 
-    private void toggle(boolean on)
+    private void toggleVisibility()
     {
-        visible = on;
-        captureArea.setAreaVisible(on);
-        captureArea.setAreaActive(on);
+        final boolean isVisible = visibilityToggle.isSelected();
+        captureArea.setAreaVisible(isVisible);
+        captureArea.setAreaActive(isVisible);
         plugin.updateCaptureAreas();
-        updateVisibility();
     }
 
-    private void toggleLabelling(boolean on)
+    private void toggleLabelling()
     {
-        showLabel = on;
-        captureArea.setLabelVisible(on);
+        final boolean showLabel = labelToggle.isSelected();
+        captureArea.setLabelVisible(showLabel);
         plugin.updateCaptureAreas();
-        updateLabelling();
     }
 
     private void save()
@@ -371,18 +275,6 @@ public class ExistingCaptureAreaPanel extends CaptureAreaPanel
             nameInput.getTextField().requestFocusInWindow();
             nameInput.getTextField().selectAll();
         }
-    }
-
-    private void updateVisibility()
-    {
-        visibilityLabel.setIcon(visible ? VISIBLE_ICON : INVISIBLE_ICON);
-        visibilityLabel.setToolTipText(visible ? "Hide capture area" : "Show capture area");
-    }
-
-    private void updateLabelling()
-    {
-        labelIndicator.setIcon(showLabel ? LABEL_ICON : NO_LABEL_ICON);
-        labelIndicator.setToolTipText(showLabel ? "Hide label" : "Show label");
     }
 
     private void updateBorder()

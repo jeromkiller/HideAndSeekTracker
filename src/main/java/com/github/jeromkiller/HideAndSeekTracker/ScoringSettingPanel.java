@@ -4,7 +4,6 @@ import com.github.jeromkiller.HideAndSeekTracker.Scoring.PointSystem;
 import com.github.jeromkiller.HideAndSeekTracker.Scoring.ScoringPair;
 import lombok.Data;
 import net.runelite.client.ui.ColorScheme;
-import net.runelite.client.util.ImageUtil;
 
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
@@ -13,18 +12,13 @@ import javax.swing.border.LineBorder;
 import javax.swing.text.NumberFormatter;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.image.BufferedImage;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ScoringSettingPanel extends JPanel {
+public class ScoringSettingPanel extends BasePanel {
 
     private static final NumberFormatter pointsFormatter;
-    protected static final ImageIcon DELETE_ICON;
-    protected static final ImageIcon DELETE_HOVER_ICON;
-    protected static final ImageIcon REMOVE_ICON;
-    protected static final ImageIcon REMOVE_HOVER_ICON;
 
     static {
         pointsFormatter = new NumberFormatter(NumberFormat.getInstance());
@@ -33,14 +27,6 @@ public class ScoringSettingPanel extends JPanel {
         pointsFormatter.setMaximum(100);
         pointsFormatter.setAllowsInvalid(true);
         pointsFormatter.setCommitsOnValidEdit(true);
-
-        final BufferedImage deleteImg = ImageUtil.loadImageResource(HideAndSeekTrackerPlugin.class, "delete_icon.png");
-        DELETE_ICON = new ImageIcon(deleteImg);
-        DELETE_HOVER_ICON = new ImageIcon(ImageUtil.alphaOffset(deleteImg, -100));
-
-        final BufferedImage removeImg = ImageUtil.loadImageResource(HideAndSeekTrackerPlugin.class, "minus_icon.png");
-        REMOVE_ICON = new ImageIcon(removeImg);
-        REMOVE_HOVER_ICON = new ImageIcon(ImageUtil.alphaOffset(removeImg, -100));
     }
 
     private static void selectText(FocusEvent e) {
@@ -105,27 +91,10 @@ public class ScoringSettingPanel extends JPanel {
                 }
             });
 
-            deleteLabel.setIcon(REMOVE_ICON);
-            deleteLabel.setToolTipText("Remove Line");
-            deleteLabel.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mousePressed(MouseEvent e) {
-                    pointSystem.deleteSetting(index);
-                    rebuild();
-                    plugin.updateScoreRules();
-                }
-
-                @Override
-                public void mouseEntered(MouseEvent mouseEvent)
-                {
-                    deleteLabel.setIcon(REMOVE_HOVER_ICON);
-                }
-
-                @Override
-                public void mouseExited(MouseEvent mouseEvent)
-                {
-                    deleteLabel.setIcon(REMOVE_ICON);
-                }
+            setupImageIcon(deleteLabel, "Remove Line", MINUS_ICON, MINUS_HOVER_ICON, () -> {
+                pointSystem.deleteSetting(index);
+                rebuild();
+                plugin.updateScoreRules();
             });
 
             constraints.gridx = 0;
@@ -182,32 +151,16 @@ public class ScoringSettingPanel extends JPanel {
         content.add(scoreTypes, constraints);
         scoreTypes.setEnabled(false); // Disabled until more rule types are implemented
 
-        JLabel deleteSystem = new JLabel(DELETE_ICON);
-        deleteSystem.setToolTipText("Delete Rule");
-        deleteSystem.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                int confirm = JOptionPane.showConfirmDialog(ScoringSettingPanel.this,
-                        "Are you sure you want to permanently delete this scoring rule",
-                        "Warning", JOptionPane.OK_CANCEL_OPTION);
+        JLabel deleteSystem = new JLabel();
+        setupImageIcon(deleteSystem, "Delete Rule", DELETE_ICON, DELETE_HOVER_ICON, () -> {
+            int confirm = JOptionPane.showConfirmDialog(ScoringSettingPanel.this,
+                    "Are you sure you want to permanently delete this scoring rule",
+                    "Warning", JOptionPane.OK_CANCEL_OPTION);
 
-                if(confirm == 0) {
-                    plugin.getScoreRules().deleteSystem(pointSystem);
-                    plugin.getPanel().getScorePanel().rebuild();
-                    plugin.updateScoreRules();
-                }
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent mouseEvent)
-            {
-                deleteSystem.setIcon(DELETE_HOVER_ICON);
-            }
-
-            @Override
-            public void mouseExited(MouseEvent mouseEvent)
-            {
-                deleteSystem.setIcon(DELETE_ICON);
+            if(confirm == 0) {
+                plugin.getScoreRules().deleteSystem(pointSystem);
+                plugin.getPanel().getScorePanel().rebuild();
+                plugin.updateScoreRules();
             }
         });
         constraints.gridx = 2;
