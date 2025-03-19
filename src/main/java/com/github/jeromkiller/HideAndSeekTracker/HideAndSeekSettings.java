@@ -106,7 +106,7 @@ public class HideAndSeekSettings {
                 .registerSubtype(PositionScoring.class)
                 .registerSubtype(HintScoring.class);
 
-        final Gson scoreRulesGson = new GsonBuilder().registerTypeAdapterFactory(
+        final Gson scoreRulesGson = gson.newBuilder().registerTypeAdapterFactory(
                 typeFactory).create();
 
 
@@ -125,7 +125,7 @@ public class HideAndSeekSettings {
                 .registerSubtype(PositionScoring.class)
                 .registerSubtype(HintScoring.class);
 
-        final Gson scoreRulesGson = new GsonBuilder().registerTypeAdapterFactory(
+        final Gson scoreRulesGson = gson.newBuilder().registerTypeAdapterFactory(
                 typeFactory).create();
 
         final String json = scoreRulesGson.toJson(rules);
