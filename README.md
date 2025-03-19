@@ -101,7 +101,7 @@ If you run a different type of event this plugin can also be used to count atten
 To do this: 
  - Create a capture area in a location where players attending the event will definitely pass through.
 Such as a doorway or the lobby area of a minigame. 
- - Toggle on 'Automatically Fill Names' in the players tab so everyone passing through the area will be added to the participant list.
+ - Toggle on 'Automatically Fill Names' in the players tab so everyone passing through the area while it is within render distance will be added to the participant list.
 
 The amount of players who have passed through the capture area will be shown on the scoreboard 
 and the number of players who have participated will be shown at the bottom of the scoreboard.
