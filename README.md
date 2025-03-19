@@ -15,14 +15,14 @@ A player tracker for the hide and seek (GieliGuessr) events hosted in the offici
   - Customizable score system.
   - Capture Area import and export function for easy sharing between hosts.
   - Easy copying of results to clipboard.
+  - Easy [attendance counting](#attendance-counting) for other events
 
 ## Setting up a game
-
 ### Creating Capture Areas
 To track whoever reaches you first we'll first need to create a 'Capture Area'
 These can be created from the 'Area' tab in the hide and seek side panel.
 This will give you a new area creation panel to define an area around your character. Resize the area to your liking and click the 'Tick' button to place the capture area in the world. Now its ready to track players entering the area.
-##### note: do not make the capture areas smaller than two tiles in width or height, these can be skipped over when a player runs across it
+##### Note: do not make the capture areas smaller than two tiles in width or height, these can be skipped over when a player runs across it
 
 ![CreateCapture.png](images/CreateCapture.png)
 
@@ -79,12 +79,12 @@ You can navigate between the results of past round by using the arrows at the to
 You can copy the results of each round to your clipboard by pressing the clipboard icon at the bottom. 
 
 ## Other settings
-### placement Leniency
+### Placement Leniency
 The 'Placement Leniency Ticks' option changes within how many ticks two players have to finish in order to share a position on the leaderboard.
 We recommend setting this to 2 ticks at its lowest as that's most reliable.
 
-###### note: at 0 ticks players entering the area on the same tick will not share a spot, the player whose name comes first in the alphabet will be placed first
-###### note: at 1 tick players running one tile behind each other may or may not get to share a placement depending on what tile they enter the area on.
+###### Note: at 0 ticks players entering the area on the same tick will not share a spot, the player whose name comes first in the alphabet will be placed first
+###### Note: at 1 tick players running one tile behind each other may or may not get to share a placement depending on what tile they enter the area on.
 
 ### Developer Mode
 When you run an event where multiple hosts take turns hiding you'll probably want to Collate the round data of the hosts.
@@ -92,7 +92,7 @@ If you flip on 'Use Dev mode' you'll get the button to export placement and hint
 These results can be pasted into a spreadsheet, a template can be found [here](https://docs.google.com/spreadsheets/d/1leeNCB7a1NIevrRDJqrV6-WJg6XdybvjVIjme-y32zE/edit?usp=sharing).
 
 Make sure each host has an exact copy of the player names list, as this will be the order the data is copied out as.
-###### note: round scores aren't copied out, if you use different score rules you'll have to set those in the spreadsheet. We hope to improve on this in a future update.
+###### Note: round scores aren't copied out, if you use different score rules you'll have to set those in the spreadsheet. We hope to improve on this in a future update.
 
 ## Other use cases
 ### Attendance counting
