@@ -39,7 +39,7 @@ public class GameRoundPanel extends BasePanel {
         this.settings = plugin.getSettings();
 
         setLayout(new BorderLayout());
-        setBorder(new EmptyBorder(5, 0, 0, 0));
+        setBorder(new EmptyBorder(5, 0, 0, 1));
 
         JPanel contents = new JPanel();
         contents.setLayout(new GridBagLayout());
@@ -109,12 +109,14 @@ public class GameRoundPanel extends BasePanel {
         resultTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         constraints.gridwidth = 2;
         constraints.fill = GridBagConstraints.BOTH;
+        constraints.weightx = 1;
         constraints.weighty = 1;
         JScrollPane scrollPane = new JScrollPane(resultTable);
         contents.add(scrollPane, constraints);
         constraints.gridwidth = 1;
         constraints.gridy++;
         constraints.weighty = 0;
+        constraints.weightx = 0;
 
         contents.add(numFinished, constraints);
 

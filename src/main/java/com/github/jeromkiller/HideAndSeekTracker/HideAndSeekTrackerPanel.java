@@ -38,14 +38,14 @@ public class HideAndSeekTrackerPanel extends PluginPanel {
         JTabbedPane tabPane = new JTabbedPane(JTabbedPane.TOP, JTabbedPane.SCROLL_TAB_LAYOUT);
 
         // maybe replace the text with icons
-        setupPanel = new GameSetupPanel(plugin);
-        tabPane.addTab("Players", new JScrollPane(setupPanel));
-
         areaPanel = new CaptureAreaManagementPanel(plugin);
         tabPane.addTab("Areas", new JScrollPane(areaPanel));
 
         scorePanel = new ScoringPanel(plugin);
-        tabPane.add("Score", new JScrollPane(scorePanel));
+        tabPane.add("Points", new JScrollPane(scorePanel));
+
+        setupPanel = new GameSetupPanel(plugin);
+        tabPane.addTab("Players", new JScrollPane(setupPanel));
 
         gamePanel = new GamePanel(plugin);
         tabPane.addTab("Game", gamePanel);

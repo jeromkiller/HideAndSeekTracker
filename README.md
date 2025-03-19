@@ -3,12 +3,18 @@ A player tracker for the hide and seek (GieliGuessr) events hosted in the offici
 
 ![the race is on](images/Race.png)
 
+## What's new!
+  - Added Customizable Point system
+  - Games can now have multiple rounds
+  - Improved the result export format.
+  - Changed the old export option to a developer option.
+
 ## Features
   - Automatic placement tracking of participants.
   - Timing Leniency for shared placements.
+  - Customizable score system.
   - Capture Area import and export function for easy sharing between hosts.
-  - Export of placement and hints to clipboard for easy pasting into spreadsheets.
-
+  - Easy copying of results to clipboard.
 
 ## setting up a game
 
@@ -26,20 +32,29 @@ You may also hide any unused capture areas from the world, these will not be use
 
 ![AreaPanel.png](images/AreaPanel.png)
 
-### Setting up Game rules
-After setting up the desired Capture Areas you can set up the participant list.
+### Setup points and penalties
+After setting up the desired Capture Areas you can modify how points are given to every player.
+Points can be positive to give points to a player or negative to penalize a player.
+Negative points aren't carried over to the next round
+
+The score rules in the image below are as follows:
+ - The player who finishes first gets 5 points,
+ - The player who finishes second gets 4 points,
+ - Players finishing 3rd through 5th get 3 points each,
+ - Players finishing 6th through 10th get 2 points each,
+ - Anyone finishing past 10th place doesn't get any points.
+ - Players get a point penalty for every hint given before they finished.
+
+![PointsPanel.png](images/PointsPanel.png)
+
+### Add participants
+When the rules are all set up all there is left to do is to add the participants of the game.
 Simply enter the character name of every player who wishes to participate and click the 'Save Participant Names' button.
 Duplicate names will be automatically removed from the list.
 
-If there are a lot of participants you can also place down a capture area automatically add playernames of anyone inside it to the list using the 'Automatically Fill Names' option.
+If there are a lot of participants, or if you know people will be joining half way through the game. you can toggle the 'Automatically Fill Names' option to automatically register anyone who enters one of your capture areas/
 
-![Settings](images/SettingsPanel.png)
-
-The 'Placement Leniency Ticks' option changes within how many ticks two players have to finnish in order to share a position on the leaderboard.
-We recommend setting this to 2 ticks at its lowest as that's most reliable.
-
-###### note: at 0 ticks players entering the area on the same tick will not share a spot, the player whose name comes first in the alphabet will be placed first
-###### note: at 1 tick players running one tile behind each other may or may not get to share a placement depending on what tile they enter the area on.
+![Players](images/PlayersPanel.png)
 
 ### Tracking players
 
@@ -52,11 +67,21 @@ Parts of the area outside of render distance are shown in a different color as s
 
 ![Incorrect](images/IncorrectZoning.png)
 
-When players enter the Area they will automatically be added to the scoreboard.
+When players enter the Area they will automatically be added to the scoreboard of the active round.
 
 Update the hint counter whenever a new hint is given.
 
 ![game panel](images/Placement.png)
 
-After a round is over copy the scores to your clipboard with the buttons at the top and paste them to a spreadsheet software of your choice.
+At the end of a round you can start a new round by pressing the ![NewRound](images/addRound.png) button.
+You can navigate between the results of past round by using the arrows at the top of the panel.
 
+You can copy the results of each round to your clipboard by pressing the clipboard icon at the bottom. 
+
+## Other settings
+
+The 'Placement Leniency Ticks' option changes within how many ticks two players have to finnish in order to share a position on the leaderboard.
+We recommend setting this to 2 ticks at its lowest as that's most reliable.
+
+###### note: at 0 ticks players entering the area on the same tick will not share a spot, the player whose name comes first in the alphabet will be placed first
+###### note: at 1 tick players running one tile behind each other may or may not get to share a placement depending on what tile they enter the area on.
