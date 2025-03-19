@@ -124,8 +124,8 @@ public class GameRoundPanel extends BasePanel {
         GridBagConstraints bottomConstraints = new GridBagConstraints();
 
         setupImageIcon(copyResultButton, "Copy results to clipboard", COPY_ICON, COPY_ICON_HOVER, this::plainTextExport);
-        setupImageIcon(exportResultButton, "Export round data to clipboard", EXPORT_ICON, EXPORT_ICON_HOVER, () -> System.out.println("Implement in future"));
-        setupImageIcon(importResultButton, "Import round data from clipboard", IMPORT_ICON, IMPORT_ICON_HOVER, () -> System.out.println("Implement in future"));
+        //setupImageIcon(exportResultButton, "Export round data to clipboard", EXPORT_ICON, EXPORT_ICON_HOVER, () -> {});       // Implement in the future
+        //setupImageIcon(importResultButton, "Import round data from clipboard", IMPORT_ICON, IMPORT_ICON_HOVER, () -> {});     // Implement in the future
 
         bottomConstraints.gridx = 0;
         bottomConstraints.ipadx = 4;
