@@ -195,4 +195,8 @@ public class GamePanel extends BasePanel {
             panel.updateRoundLabel();
         }
     }
+
+    public void updateTimer(int tick) {
+        activeRoundPanel.updateRoundTimer(tick);
+    }
 }

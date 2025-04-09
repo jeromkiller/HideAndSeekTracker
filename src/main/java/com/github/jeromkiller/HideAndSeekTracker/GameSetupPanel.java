@@ -11,8 +11,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -171,18 +169,6 @@ public class GameSetupPanel extends JPanel {
         loadPlayerNames(settings.getPlayerNames());
     }
 
-    private void getInAreaPlayers()
-    {
-        final List<String> inAreaPlayers = plugin.getInRangePlayers();
-        final int numPlayers = inAreaPlayers.size();
-        if(numPlayers == 0) {
-            setStatusLabel("No players found in area(s)");
-        } else {
-            exportPlayerNames(inAreaPlayers);
-            setStatusLabel(String.format("Copied %d names to clipboard", numPlayers));
-        }
-    }
-
     private void enableNotSavedWarning()
     {
         if(!isAutomaticUpdate) {
@@ -212,24 +198,15 @@ public class GameSetupPanel extends JPanel {
         settings.setPlayerNames(playerNameList);
     }
 
-    public void addPlayerNames(LinkedHashSet<String> names)
+    public void addPlayerName(String name)
     {
         isAutomaticUpdate = true;
-        playerNameList.addAll(names);
+        playerNameList.add(name);
         final String playerNameString = String.join(System.lineSeparator(), playerNameList);
         playerNames.setText(playerNameString);
         isAutomaticUpdate = false;
 
         settings.setPlayerNames(playerNameList);
-    }
-
-    private void exportPlayerNames(List<String> playerNames)
-    {
-        List<String> inRangePlayers = playerNames;
-        String exportString = String.join("\n", inRangePlayers);
-        final StringSelection selection = new StringSelection(exportString);
-        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-        clipboard.setContents(selection, selection);
     }
 
 }

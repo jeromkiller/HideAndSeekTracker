@@ -49,7 +49,9 @@ public class HideAndSeekPlayer {
     }
 
     @Getter
-    private final String  name;
+    private final String name;
+    @Getter
+    private int tickCount;
     @Getter
     private int internalPlacement;
     @Getter
@@ -103,9 +105,10 @@ public class HideAndSeekPlayer {
         return printString;
     }
 
-    public void setStats(int internal_placement, int placement, int hints)
+    public void setStats(int internal_placement, int placement, int hints, int tickCount)
     {
         this.internalPlacement = internal_placement;
+        this.tickCount = tickCount;
         this.placementValue = placement;
         this.placement = Placement.fromValue(placement);
         this.hints = hints;

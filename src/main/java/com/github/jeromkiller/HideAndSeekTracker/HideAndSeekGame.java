@@ -26,12 +26,17 @@ public class HideAndSeekGame {
 
     public int newRound()
     {
+        activeRound.endRound();
         pastRounds.add(activeRound);
         ArrayList<String> previousPlayers = new ArrayList<>(activeRound.getParticipants().keySet());
         activeRound = new HideAndSeekRound(plugin, activeRound.getRoundNumber() + 1);
         activeRound.setPlayers(previousPlayers);
         final int savedRoundIndex = pastRounds.size() -1;
         return savedRoundIndex;
+    }
+
+    public void startRound() {
+        activeRound.startRound();
     }
 
     public LinkedHashSet<String> setPlayers(List<String> playerNames)
@@ -41,11 +46,10 @@ public class HideAndSeekGame {
         return parsedNames;
     }
 
-    public LinkedHashSet<String> addPlayerNames(List<String> playerNames)
+    public void addPlayerName(String playerNames)
     {
-        final LinkedHashSet<String> parsedNames = activeRound.addPlayers(playerNames);
+        activeRound.addPlayer(playerNames);
         plugin.getPanel().getGamePanel().updatePlacements();
-        return parsedNames;
     }
 
     public void tick()
@@ -112,7 +116,9 @@ public class HideAndSeekGame {
                 position++;
                 prevScore = score;
             }
-            player.setStats(internalPlacement, position, 0);
+            final int prevHints = player.getHints();
+            final int prevTicks = player.getTickCount();
+            player.setStats(internalPlacement, position, prevHints, prevTicks);
             internalPlacement++;
             scoreTotals.put(player.getName(), player);
         }

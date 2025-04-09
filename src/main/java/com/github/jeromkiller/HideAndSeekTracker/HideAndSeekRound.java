@@ -11,12 +11,13 @@ public class HideAndSeekRound {
     private int leniencyCounter;
     private int sharedPlacementSpot;
     private int roundNumber;
+    private boolean roundStarted;
+    private int gameTime;
     private final HashMap<String, HideAndSeekPlayer> participants;
 
     private final HideAndSeekTrackerPlugin plugin;
 
     HideAndSeekRound(HideAndSeekTrackerPlugin plugin, int roundNumber) {
-
         this.hintsGiven = 1;
         this.placementIndex = 0;
         this.leniencyCounter = 0;
@@ -24,26 +25,28 @@ public class HideAndSeekRound {
         this.roundNumber = roundNumber;
         this.participants = new HashMap<>();
         this.plugin = plugin;
+        this.roundStarted = false;
+        this.gameTime = 0;
     }
 
-    public LinkedHashSet<String> addPlayers(List<String> playerNames)
+    public String addPlayer(String playerName)
     {
         // list of lowercase names to return without duplicates
-        LinkedHashSet<String> parsedNames = new LinkedHashSet<>();
-        for(String playerName : playerNames) {
-            playerName = playerName.toLowerCase();
-            parsedNames.add(playerName);
-            if(!participants.containsKey(playerName)) {
-                participants.put(playerName, new HideAndSeekPlayer(playerName));
-            }
+        playerName = playerName.toLowerCase();
+        if(!participants.containsKey(playerName)) {
+            participants.put(playerName, new HideAndSeekPlayer(playerName));
         }
-        return parsedNames;
+        return playerName;
     }
 
     public LinkedHashSet<String> setPlayers(List<String> playerNames)
     {
         // add missing players to the list
-         LinkedHashSet<String> parsedNames = addPlayers(playerNames);
+        LinkedHashSet<String> parsedNames = new LinkedHashSet<>();
+        for(String playerName : playerNames) {
+            String parsedName = addPlayer(playerName);
+            parsedNames.add(parsedName);
+        }
 
         // remove players who's names have been erased
         Set<String> removeNames = new HashSet<>(participants.keySet());
@@ -61,10 +64,17 @@ public class HideAndSeekRound {
         {
             leniencyCounter -= 1;
         }
+        if(roundStarted) {
+            gameTime++;
+        }
+        plugin.getPanel().getGamePanel().updateTimer(gameTime);
     }
 
     public void playerFound(String playerName)
     {
+        if(!roundStarted) {
+            return;
+        }
         playerName = playerName.toLowerCase();
 
         HideAndSeekPlayer player = participants.get(playerName);
@@ -82,11 +92,19 @@ public class HideAndSeekRound {
             leniencyCounter = plugin.getSettings().getTickLenience();
         }
 
-        participants.get(playerName).setStats(placementIndex, sharedPlacementSpot, hintsGiven);
+        participants.get(playerName).setStats(placementIndex, sharedPlacementSpot, hintsGiven, gameTime);
         final int points = plugin.getScoreRules().scorePlayer(player, this);
         participants.get(playerName).setScore(points);
         placementIndex += 1;
         plugin.getPanel().getGamePanel().updatePlacements();
+    }
+
+    public void startRound() {
+        roundStarted = true;
+    }
+
+    public void endRound() {
+        roundStarted = false;
     }
 
     public String plainTextExport() {

@@ -1,10 +1,13 @@
 package com.github.jeromkiller.HideAndSeekTracker;
 
 import lombok.Getter;
+import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.FontManager;
 
 import javax.swing.*;
+import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
@@ -22,6 +25,8 @@ public class GameRoundPanel extends BasePanel {
     private final JLabel newRoundButton = new JLabel();
     private final JLabel deleteRoundButton = new JLabel();
     private final JLabel statusLabel = new JLabel(" ");
+    private final JButton btnStartRound;
+    private final JLabel roundTimeLabel = new JLabel();
 
     @Getter
     private final HideAndSeekRound gameRound;
@@ -93,6 +98,20 @@ public class GameRoundPanel extends BasePanel {
         }
 
         constraints.gridx = 0;
+        contents.add(new JLabel("Round Time:"), constraints);
+        constraints.gridx = 1;
+        btnStartRound = new JButton("Start Round");
+        btnStartRound.addActionListener(e -> startRound());
+        contents.add(btnStartRound, constraints);
+        roundTimeLabel.setFont(FontManager.getDefaultFont());
+        roundTimeLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+        roundTimeLabel.setVisible(false);
+        roundTimeLabel.setBorder(new CompoundBorder(new LineBorder(ColorScheme.BORDER_COLOR), new EmptyBorder(1,0,0,0)));
+        contents.add(roundTimeLabel, constraints);
+        updateRoundTimer(0);
+        constraints.gridy++;
+        constraints.gridx = 0;
+
         JLabel txt_hints = new JLabel("Hints Given:");
         txt_hints.setFont(FontManager.getRunescapeFont());
         txt_hints.setHorizontalAlignment(SwingConstants.LEFT);
@@ -223,6 +242,8 @@ public class GameRoundPanel extends BasePanel {
         updateRoundLabel();
         hintCount.setEnabled(false);
         deleteRoundButton.setVisible(true);
+        btnStartRound.setVisible(false);
+        roundTimeLabel.setVisible(true);
     }
 
     public void updateDevMode() {
@@ -241,5 +262,26 @@ public class GameRoundPanel extends BasePanel {
         plugin.game.deleteRound(roundNumber);
         parentPanel.deleteRound(roundNumber);
         parentPanel.relabelRounds();
+    }
+
+    public void startRound() {
+        plugin.game.startRound();
+        btnStartRound.setVisible(false);
+        roundTimeLabel.setVisible(true);
+    }
+
+    public void updateRoundTimer(int ticks) {
+        SwingUtilities.invokeLater(() -> {
+            roundTimeLabel.setText(ticksToTime(ticks));
+        });
+    }
+
+    public String ticksToTime(int ticks) {
+        int hours = ticks / 6000;
+        ticks = ticks % 6000;
+        int minutes = ticks / 100;
+        ticks = ticks % 100;
+        double rest = ticks * 0.6;
+        return String.format("%02d:%02d:%04.1f ", hours, minutes, rest);
     }
 }

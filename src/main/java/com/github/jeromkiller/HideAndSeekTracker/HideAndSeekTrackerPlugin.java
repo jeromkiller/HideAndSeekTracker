@@ -8,7 +8,6 @@ import com.google.gson.reflect.TypeToken;
 import javax.inject.Inject;
 import javax.swing.*;
 
-import com.google.inject.Provides;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -126,14 +125,7 @@ public class HideAndSeekTrackerPlugin extends Plugin
 	@Subscribe
 	public void onGameTick(GameTick tick)
 	{
-		final List<String> inRangePlayers = findPlayersInRange();
-		if(autofillNames && !inRangePlayers.isEmpty()) {
-			addPlayerNames(inRangePlayers);
-		}
-
-		for(String playerName : inRangePlayers) {
-			game.playerFound(playerName);
-		}
+		checkPlayersInRange();
 		game.tick();
 	}
 
@@ -157,20 +149,19 @@ public class HideAndSeekTrackerPlugin extends Plugin
 		SwingUtilities.invokeLater(panel.getScorePanel()::rebuild);
 	}
 
-	private List<String> findPlayersInRange()
+	private void checkPlayersInRange()
 	{
-		List<String> playerNames = new ArrayList<>();
 		List<? extends  Player> playersList = client.getPlayers();	// is there a non deprecated method of getting this information?
 		Player localPlayer = client.getLocalPlayer();
 		if(localPlayer == null) {
-			return new ArrayList<>();
+			return;
 		}
 
 		for(CaptureArea area : captureAreas)
 		{
 			WorldPoint playerLoc = localPlayer.getWorldLocation();
 			if(playerLoc == null) {
-				return new ArrayList<>();
+				return;
 			}
 
 			if(area.notWorthChecking(playerLoc)) {
@@ -184,13 +175,17 @@ public class HideAndSeekTrackerPlugin extends Plugin
 				}
 
 				final String playerName = player.getName();
+
 				if(area.playerInArea(player.getWorldLocation()))
 				{
-					playerNames.add(playerName);
+					if(autofillNames) {
+						game.addPlayerName(playerName);
+						panel.getSetupPanel().addPlayerName(playerName);
+					}
+					game.playerFound(playerName);
 				}
 			}
 		}
-		return playerNames;
 	}
 
 	public LinkedHashSet<String> setPlayerNames(List<String> nameList)
@@ -198,17 +193,6 @@ public class HideAndSeekTrackerPlugin extends Plugin
 		final LinkedHashSet<String> setNames = game.setPlayers(nameList);
 		panel.getSetupPanel().loadPlayerNames(setNames);
 		return setNames;
-	}
-
-	public void addPlayerNames(List<String> nameList)
-	{
-		final LinkedHashSet<String> addNames = game.addPlayerNames(nameList);
-		panel.getSetupPanel().addPlayerNames(addNames);
-	}
-
-	public List<String> getInRangePlayers()
-	{
-        return findPlayersInRange();
 	}
 
 	public void startCaptureAreaCreation()
