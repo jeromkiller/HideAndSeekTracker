@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class ScoringPair {
-    private int setting;
+public class ScoringPair<T> {
+    private T setting;
     private int points;
 }

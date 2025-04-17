@@ -1,7 +1,9 @@
 package com.github.jeromkiller.HideAndSeekTracker;
 
+import com.github.jeromkiller.HideAndSeekTracker.Scoring.NumberScoring;
 import com.github.jeromkiller.HideAndSeekTracker.Scoring.PointSystem;
 import com.github.jeromkiller.HideAndSeekTracker.Scoring.ScoringPair;
+import com.github.jeromkiller.HideAndSeekTracker.Widgets.NumberScoreTextEntry;
 import lombok.Data;
 import net.runelite.client.ui.ColorScheme;
 
@@ -42,31 +44,18 @@ public class ScoringSettingPanel extends BasePanel {
     public class SettingsRow {
         private final HideAndSeekTrackerPlugin plugin;
         private final int index;
-        private final ScoringPair scoringPair;
+        private final ScoringPair<?> scoringPair;
         private final JFormattedTextField settingBox;
         private final JFormattedTextField pointsBox;
         private final JLabel deleteLabel = new JLabel();
 
-        SettingsRow(HideAndSeekTrackerPlugin plugin, ScoringPair scoringPair, int index, int minValue, JPanel container, GridBagConstraints constraints) {
+        SettingsRow(HideAndSeekTrackerPlugin plugin, NumberScoring pointSystem, ScoringPair<Integer> scoringPair, int index, int minValue, JPanel container, GridBagConstraints constraints) {
             this.plugin = plugin;
             this.index = index;
             this.scoringPair = scoringPair;
 
-            // formating rules for the setting box
-            NumberFormatter settingFormatter = new NumberFormatter(NumberFormat.getInstance());
-            settingFormatter.setValueClass(Integer.class);
-            settingFormatter.setMinimum(minValue);
-            settingFormatter.setMaximum(Integer.MAX_VALUE);
-            settingFormatter.setAllowsInvalid(true);
-            settingFormatter.setCommitsOnValidEdit(true);
-
-            settingBox = new JFormattedTextField(settingFormatter);
-            settingBox.setValue(scoringPair.getSetting());
+            settingBox = new NumberScoreTextEntry(scoringPair.getSetting(), minValue);
             settingBox.addFocusListener(new FocusAdapter() {
-                @Override
-                public void focusGained(FocusEvent e) {
-                    selectText(e);
-                }
                 @Override
                 public void focusLost(FocusEvent e) {
                     pointSystem.updateSetting(index, (int)settingBox.getValue());
@@ -85,7 +74,7 @@ public class ScoringSettingPanel extends BasePanel {
                 }
                 @Override
                 public void focusLost(FocusEvent e) {
-                    pointSystem.updatePoints(index, (int)pointsBox.getValue());
+                    pointSystem.updatePoints(index, (Integer) pointsBox.getValue());
                     rebuild();
                     plugin.updateScoreRules();
                 }
@@ -109,11 +98,11 @@ public class ScoringSettingPanel extends BasePanel {
     private final JComboBox<String> scoreTypes;
 
     private final HideAndSeekTrackerPlugin plugin;
-    private final PointSystem pointSystem;
+    private final PointSystem<?> pointSystem;
     private final JPanel content = new JPanel(new GridBagLayout());
     private final List<SettingsRow> settingsRows = new ArrayList<>();
 
-    public ScoringSettingPanel(HideAndSeekTrackerPlugin plugin, PointSystem pointSystem) {
+    public ScoringSettingPanel(HideAndSeekTrackerPlugin plugin, PointSystem<?> pointSystem) {
         this.plugin = plugin;
         this.pointSystem = pointSystem;
 
@@ -177,10 +166,28 @@ public class ScoringSettingPanel extends BasePanel {
         constraints.gridx = 0;
         constraints.gridy++;
 
+        switch(pointSystem.getScoreType()) {
+            case POSITION:
+            case HINTS:
+                addNumberTextBoxes((NumberScoring) pointSystem, constraints);
+                break;
+            case TIME:
+                // todo
+                break;
+            case NAME:
+                // todo
+                break;
+        }
+
+        repaint();
+        revalidate();
+    }
+
+    public void addNumberTextBoxes(NumberScoring pointSystem, GridBagConstraints constraints) {
         int index = 0;
         int prev_value = 0;
-        for(ScoringPair pair : pointSystem.getScoringPairs()) {
-            SettingsRow row = new SettingsRow(plugin, pair, index, prev_value + 1, content, constraints);
+        for(ScoringPair<Integer> pair : pointSystem.getScorePairs()) {
+            SettingsRow row = new SettingsRow(plugin, pointSystem, pair, index, prev_value + 1, content, constraints);
             settingsRows.add(row);
 
             prev_value = pair.getSetting();
@@ -206,7 +213,7 @@ public class ScoringSettingPanel extends BasePanel {
             }
             @Override
             public void focusLost(FocusEvent e) {
-                pointSystem.updateFallFallthroughPoints((int)fallThroughPoints.getValue());
+                pointSystem.setFallThroughScore((int)fallThroughPoints.getValue());
                 rebuild();
                 plugin.updateScoreRules();
             }
@@ -216,9 +223,6 @@ public class ScoringSettingPanel extends BasePanel {
         content.add(fallThroughSetting, constraints);
         constraints.gridx = 1;
         content.add(fallThroughPoints, constraints);
-
-        repaint();
-        revalidate();
     }
 
     public void comboBoxChanged(ActionEvent e) {

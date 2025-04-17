@@ -2,13 +2,22 @@ package com.github.jeromkiller.HideAndSeekTracker.Scoring;
 
 import com.github.jeromkiller.HideAndSeekTracker.HideAndSeekPlayer;
 import com.github.jeromkiller.HideAndSeekTracker.HideAndSeekRound;
+import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public interface PointSystem {
-    enum ScoreType {
+@Data
+public abstract class PointSystem <T> {
+    final ScoreType scoreType;
+    List<ScoringPair<T>> scorePairs;
+    int fallThroughScore;
+
+    public enum ScoreType {
         POSITION("Position"),
-        HINTS("Hints");
+        HINTS("Hints"),
+        TIME("Time"),
+        NAME("Players");
 
         final String name;
 
@@ -26,23 +35,39 @@ public interface PointSystem {
                     return POSITION;
                 case "Hints":
                     return HINTS;
+                case "Time":
+                    return TIME;
+                case "Players":
+                    return NAME;
             }
             return null;
         }
     };
 
-    ScoreType getScoreType();
+    PointSystem(ScoreType type) {
+        this.scoreType = type;
+        scorePairs = new ArrayList<>();
+        this.fallThroughScore = -1;
+    }
 
-    List<ScoringPair> getScoringPairs();
-    int getFallThroughScore();
-    void setFallThroughScore(int score);
+    public abstract int scorePlayer(HideAndSeekPlayer player, HideAndSeekRound round);
+    public abstract void addSetting();
+    public abstract void updateSetting(int index, T value);
 
-    int scorePlayer(HideAndSeekPlayer player, HideAndSeekRound round);
+    public void addScorePair(T setting, int points) {
+        scorePairs.add(new ScoringPair<>(setting, points));
+    }
 
-    void addSetting();
-    void deleteSetting(int index);
-
-    void updateSetting(int index, int value);
-    void updatePoints(int index, int value);
-    void updateFallFallthroughPoints(int value);
+    public void deleteSetting(int index) {
+        if(index >= scorePairs.size()) {
+            return;
+        }
+        scorePairs.remove(index);
+    }
+    public void updatePoints(int index, int value) {
+        if(index >= scorePairs.size()) {
+            return;
+        }
+        scorePairs.get(index).setPoints(value);
+    }
 }

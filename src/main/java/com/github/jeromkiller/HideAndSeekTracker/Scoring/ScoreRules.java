@@ -1,7 +1,6 @@
 package com.github.jeromkiller.HideAndSeekTracker.Scoring;
 
-import com.github.jeromkiller.HideAndSeekTracker.HideAndSeekPlayer;
-import com.github.jeromkiller.HideAndSeekTracker.HideAndSeekRound;
+import com.github.jeromkiller.HideAndSeekTracker.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -35,10 +34,10 @@ public class ScoreRules {
         PointSystem newSystem = null;
         switch (catagory) {
             case POSITION:
-                newSystem = new PositionScoring(system.getScoringPairs(), system.getFallThroughScore());
+                newSystem = new PositionScoring();
                 break;
             case HINTS:
-                newSystem = new HintScoring(system.getScoringPairs(), system.getFallThroughScore());
+                newSystem = new HintScoring();
                 break;
         }
         final int index = pointSystems.indexOf(system);
@@ -49,15 +48,16 @@ public class ScoreRules {
         ScoreRules scoreRules = new ScoreRules();
 
         PositionScoring posScore = new PositionScoring();
-        posScore.getScoringPairs().add(new ScoringPair(1, 6));
-        posScore.getScoringPairs().add(new ScoringPair(2, 5));
-        posScore.getScoringPairs().add(new ScoringPair(3, 4));
+        posScore.addScorePair(1, 6);
+        posScore.addScorePair(1, 6);
+        posScore.addScorePair(2, 5);
+        posScore.addScorePair(3, 4);
         posScore.setFallThroughScore(3);
         scoreRules.getPointSystems().add(posScore);
 
         HintScoring hintScore = new HintScoring();
-        hintScore.getScoringPairs().add(new ScoringPair(1, 0));
-        hintScore.getScoringPairs().add(new ScoringPair(2, -1));
+        hintScore.addScorePair(1, 0);
+        hintScore.addScorePair(2, -1);
         hintScore.setFallThroughScore(-2);
         scoreRules.getPointSystems().add(hintScore);
 

@@ -46,7 +46,7 @@ public class GameSetupPanel extends JPanel {
         ));
     }
 
-    GameSetupPanel(HideAndSeekTrackerPlugin plugin)
+    public GameSetupPanel(HideAndSeekTrackerPlugin plugin)
     {
         this.plugin = plugin;
         this.settings = plugin.getSettings();
