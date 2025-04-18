@@ -1,9 +1,10 @@
 package com.github.jeromkiller.HideAndSeekTracker;
 
-import com.github.jeromkiller.HideAndSeekTracker.Scoring.NumberScoring;
 import com.github.jeromkiller.HideAndSeekTracker.Scoring.PointSystem;
 import com.github.jeromkiller.HideAndSeekTracker.Scoring.ScoringPair;
+import com.github.jeromkiller.HideAndSeekTracker.Widgets.NameScoreTextEntry;
 import com.github.jeromkiller.HideAndSeekTracker.Widgets.NumberScoreTextEntry;
+import com.github.jeromkiller.HideAndSeekTracker.Widgets.TimeScoreTextEntry;
 import lombok.Data;
 import net.runelite.client.ui.ColorScheme;
 
@@ -15,10 +16,11 @@ import javax.swing.text.NumberFormatter;
 import java.awt.*;
 import java.awt.event.*;
 import java.text.NumberFormat;
+import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ScoringSettingPanel extends BasePanel {
+public class ScoringSettingPanel<T> extends BasePanel {
 
     private static final NumberFormatter pointsFormatter;
 
@@ -41,29 +43,42 @@ public class ScoringSettingPanel extends BasePanel {
     }
 
     @Data
-    public class SettingsRow {
+    public class SettingsRow<T> {
         private final HideAndSeekTrackerPlugin plugin;
         private final int index;
-        private final ScoringPair<?> scoringPair;
+        private final ScoringPair<T> scoringPair;
         private final JFormattedTextField settingBox;
         private final JFormattedTextField pointsBox;
         private final JLabel deleteLabel = new JLabel();
 
-        SettingsRow(HideAndSeekTrackerPlugin plugin, NumberScoring pointSystem, ScoringPair<Integer> scoringPair, int index, int minValue, JPanel container, GridBagConstraints constraints) {
+        SettingsRow(HideAndSeekTrackerPlugin plugin, PointSystem<T> pointSystem, ScoringPair<T> scoringPair, int index, T prevValue, JPanel container, GridBagConstraints constraints) {
             this.plugin = plugin;
             this.index = index;
             this.scoringPair = scoringPair;
 
-            settingBox = new NumberScoreTextEntry(scoringPair.getSetting(), minValue);
+            switch(pointSystem.getScoreType()) {
+                case POSITION:
+                case HINTS:
+                    settingBox = new NumberScoreTextEntry((int) scoringPair.getSetting(), (int)prevValue + 1);
+                    break;
+                case TIME:
+                    settingBox = new TimeScoreTextEntry((LocalTime) scoringPair.getSetting(), ((LocalTime) prevValue).plusSeconds(1));
+                    break;
+                case NAME:
+                    settingBox = new NameScoreTextEntry((String) scoringPair.getSetting());
+                    break;
+                default:
+                    settingBox = new JFormattedTextField();
+            }
+
             settingBox.addFocusListener(new FocusAdapter() {
                 @Override
                 public void focusLost(FocusEvent e) {
-                    pointSystem.updateSetting(index, (int)settingBox.getValue());
+                    pointSystem.updateSetting(index, (T) settingBox.getValue());
                     rebuild();
                     plugin.updateScoreRules();
                 }
             });
-
 
             pointsBox = new JFormattedTextField(pointsFormatter);
             pointsBox.setValue(scoringPair.getPoints());
@@ -74,7 +89,7 @@ public class ScoringSettingPanel extends BasePanel {
                 }
                 @Override
                 public void focusLost(FocusEvent e) {
-                    pointSystem.updatePoints(index, (Integer) pointsBox.getValue());
+                    scoringPair.setPoints((Integer) pointsBox.getValue());
                     rebuild();
                     plugin.updateScoreRules();
                 }
@@ -98,11 +113,11 @@ public class ScoringSettingPanel extends BasePanel {
     private final JComboBox<String> scoreTypes;
 
     private final HideAndSeekTrackerPlugin plugin;
-    private final PointSystem<?> pointSystem;
+    private final PointSystem<T> pointSystem;
     private final JPanel content = new JPanel(new GridBagLayout());
-    private final List<SettingsRow> settingsRows = new ArrayList<>();
+    private final List<JTextField> settingsRows = new ArrayList<>();
 
-    public ScoringSettingPanel(HideAndSeekTrackerPlugin plugin, PointSystem<?> pointSystem) {
+    public ScoringSettingPanel(HideAndSeekTrackerPlugin plugin, PointSystem<T> pointSystem) {
         this.plugin = plugin;
         this.pointSystem = pointSystem;
 
@@ -166,36 +181,63 @@ public class ScoringSettingPanel extends BasePanel {
         constraints.gridx = 0;
         constraints.gridy++;
 
-        switch(pointSystem.getScoreType()) {
-            case POSITION:
-            case HINTS:
-                addNumberTextBoxes((NumberScoring) pointSystem, constraints);
-                break;
-            case TIME:
-                // todo
-                break;
-            case NAME:
-                // todo
-                break;
+        if(pointSystem.getScoreType() == PointSystem.ScoreType.NAME) {
+            addNumberTextBoxes(pointSystem, constraints);
+        } else {
+            addNumberTextBoxes(pointSystem, constraints);
         }
 
         repaint();
         revalidate();
     }
 
-    public void addNumberTextBoxes(NumberScoring pointSystem, GridBagConstraints constraints) {
+    public void addNumberTextBoxes(PointSystem<T> pointSystem, GridBagConstraints constraints) {
         int index = 0;
-        int prev_value = 0;
-        for(ScoringPair<Integer> pair : pointSystem.getScorePairs()) {
-            SettingsRow row = new SettingsRow(plugin, pointSystem, pair, index, prev_value + 1, content, constraints);
-            settingsRows.add(row);
+        T prev_value = null;
+
+        switch(pointSystem.getScoreType()) {
+            case POSITION:
+            case HINTS: {
+                Integer val = 0;
+                prev_value = (T) val;
+                break;
+            }
+            case NAME: {
+                prev_value = (T) "";
+                break;
+            }
+            case TIME: {
+                prev_value = (T) LocalTime.ofSecondOfDay(0);
+                break;
+            }
+        }
+
+        for(ScoringPair<T> pair : pointSystem.getScorePairs()) {
+            SettingsRow<T> row = new SettingsRow<>(plugin, pointSystem, pair, index, prev_value, content, constraints);
+            settingsRows.add(row.settingBox);
 
             prev_value = pair.getSetting();
             constraints.gridy++;
             index++;
         }
 
-        JTextField fallThroughSetting = new JTextField((prev_value + 1) + "+");
+        String fallThroughValue = "Others";
+        switch(pointSystem.getScoreType()) {
+            case HINTS:
+            case POSITION: {
+                fallThroughValue = ((int)prev_value + 1) + "+";
+                break;
+            }
+            case TIME:{
+               final LocalTime new_value = ((LocalTime) prev_value).plusSeconds(1);
+               fallThroughValue = new_value + "+";
+               break;
+            }
+            case NAME: {
+                fallThroughValue = "Others";
+            }
+        }
+        JTextField fallThroughSetting = new JTextField(fallThroughValue);
         fallThroughSetting.setForeground(ColorScheme.MEDIUM_GRAY_COLOR);
         fallThroughSetting.addFocusListener(new FocusAdapter() {
             @Override
@@ -236,6 +278,6 @@ public class ScoringSettingPanel extends BasePanel {
         pointSystem.addSetting();
         plugin.updateScoreRules();
         this.rebuild();
-        settingsRows.get(settingsRows.size() - 1).getSettingBox().requestFocus();
+        settingsRows.get(settingsRows.size() - 1).requestFocus();
     }
 }

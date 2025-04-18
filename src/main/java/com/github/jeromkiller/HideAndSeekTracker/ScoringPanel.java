@@ -11,10 +11,12 @@ public class ScoringPanel extends JPanel {
     public final HideAndSeekTrackerPlugin plugin;
     public final ScoreRules scoreRules;
     public final JPanel rulesView = new JPanel(new GridBagLayout());
+    public boolean creatingSetting;
 
     public ScoringPanel(HideAndSeekTrackerPlugin plugin) {
         this.plugin = plugin;
         this.scoreRules = plugin.getScoreRules();
+        this.creatingSetting = false;
 
         setLayout(new BorderLayout());
 
@@ -30,12 +32,6 @@ public class ScoringPanel extends JPanel {
         content.add(rulesView, constraints);
         constraints.gridy++;
 
-        JButton newRulesButton = new JButton("New points/penalty");
-        newRulesButton.addActionListener(e -> addNewRule());
-        content.add(newRulesButton, constraints);
-        newRulesButton.setVisible(false); // Hiding until more rule types are implemented
-        constraints.gridy++;
-
         add(content, BorderLayout.NORTH);
     }
 
@@ -48,18 +44,41 @@ public class ScoringPanel extends JPanel {
         constraints.gridx = 0;
         constraints.gridy = 0;
 
-        for(PointSystem system : scoreRules.getPointSystems()) {
+        for(PointSystem<?> system : scoreRules.getPointSystems()) {
             ScoringSettingPanel panel = new ScoringSettingPanel(plugin, system);
             rulesView.add(panel, constraints);
             constraints.gridy++;
         }
 
+        JButton newRulesButton = new JButton("New points/penalty");
+        newRulesButton.addActionListener(e -> startNewRuleCreation());
+        rulesView.add(newRulesButton, constraints);
+        constraints.gridy++;
+
+        NewScoreSettingPanel creationPanel = new NewScoreSettingPanel(plugin, this);
+        rulesView.add(creationPanel, constraints);
+        constraints.gridy++;
+
+        newRulesButton.setVisible(!creatingSetting);
+        creationPanel.setVisible(creatingSetting);
+
         repaint();
         revalidate();
     }
 
-    private void addNewRule() {
-        scoreRules.addSystem();
+    private void startNewRuleCreation() {
+        creatingSetting = true;
+        rebuild();
+    }
+
+    public void cancelNewRuleCreation() {
+        creatingSetting = false;
+        rebuild();
+    }
+
+    public void addNewRule(PointSystem.ScoreType scoreType) {
+        creatingSetting = false;
+        scoreRules.addSystem(scoreType);
         rebuild();
         plugin.updateScoreRules();
     }

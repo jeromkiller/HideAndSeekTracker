@@ -8,7 +8,6 @@ import java.awt.event.FocusListener;
 import java.text.NumberFormat;
 
 public class NumberScoreTextEntry extends JFormattedTextField implements FocusListener {
-    //private int value;
     private final int minValue;
     private final AbstractFormatterFactory formatterFactory;
 

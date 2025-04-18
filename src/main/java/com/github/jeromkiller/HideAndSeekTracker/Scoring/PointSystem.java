@@ -47,7 +47,7 @@ public abstract class PointSystem <T> {
     PointSystem(ScoreType type) {
         this.scoreType = type;
         scorePairs = new ArrayList<>();
-        this.fallThroughScore = -1;
+        this.fallThroughScore = 0;
     }
 
     public abstract int scorePlayer(HideAndSeekPlayer player, HideAndSeekRound round);

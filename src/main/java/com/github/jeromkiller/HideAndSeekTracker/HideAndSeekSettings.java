@@ -1,17 +1,15 @@
 package com.github.jeromkiller.HideAndSeekTracker;
 
-import com.github.jeromkiller.HideAndSeekTracker.Scoring.HintScoring;
-import com.github.jeromkiller.HideAndSeekTracker.Scoring.PointSystem;
-import com.github.jeromkiller.HideAndSeekTracker.Scoring.PositionScoring;
-import com.github.jeromkiller.HideAndSeekTracker.Scoring.ScoreRules;
+import com.github.jeromkiller.HideAndSeekTracker.Scoring.*;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
 import joptsimple.internal.Strings;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.util.RuntimeTypeAdapterFactory;
 
 import javax.inject.Inject;
+import java.time.LocalTime;
 import java.util.*;
 
 public class HideAndSeekSettings {
@@ -25,10 +23,21 @@ public class HideAndSeekSettings {
     public static final String HIDE_UNFINISHED_KEY = "HaS_HideUnfinishedPlayers";
     public static final String DEV_MODE_KEY = "HaS_DevMode";
 
+    public static final RuntimeTypeAdapterFactory<PointSystem> pointsystemTypeFactory;
+
     @Inject
     private ConfigManager configManager;
     @Inject
     private Gson gson;
+
+    static {
+        pointsystemTypeFactory = RuntimeTypeAdapterFactory
+                .of(PointSystem.class)
+                .registerSubtype(PositionScoring.class)
+                .registerSubtype(HintScoring.class)
+                .registerSubtype(NameScoring.class)
+                .registerSubtype(TimeScoring.class);
+    }
 
     private void setValue(String key, Object value)
     {
@@ -101,32 +110,28 @@ public class HideAndSeekSettings {
     }
 
     public ScoreRules getScoreRules() {
-        final RuntimeTypeAdapterFactory<PointSystem> typeFactory = RuntimeTypeAdapterFactory
-                .of(PointSystem.class)
-                .registerSubtype(PositionScoring.class)
-                .registerSubtype(HintScoring.class);
-
         final Gson scoreRulesGson = gson.newBuilder().registerTypeAdapterFactory(
-                typeFactory).create();
-
+                pointsystemTypeFactory).registerTypeAdapter(LocalTime.class, new LocalTimeConverter()).create();
 
         final String json = configManager.getConfiguration(CONFIG_GROUP, SCORERULES_KEY);
         if(Strings.isNullOrEmpty(json)){
             return ScoreRules.getDefaultRules();
         }
 
-        final ScoreRules newRules = scoreRulesGson.fromJson(json, new TypeToken<ScoreRules>(){}.getType());
+        ScoreRules newRules = ScoreRules.getDefaultRules();;
+        try {
+            newRules = scoreRulesGson.fromJson(json, new TypeToken<ScoreRules>() {
+            }.getType());
+        } catch (JsonParseException e) {
+            return ScoreRules.getDefaultRules();
+        }
         return newRules;
     }
 
     public void setScoreRules(ScoreRules rules) {
-        final RuntimeTypeAdapterFactory<PointSystem> typeFactory = RuntimeTypeAdapterFactory
-                .of(PointSystem.class)
-                .registerSubtype(PositionScoring.class)
-                .registerSubtype(HintScoring.class);
-
         final Gson scoreRulesGson = gson.newBuilder().registerTypeAdapterFactory(
-                typeFactory).create();
+                pointsystemTypeFactory).registerTypeAdapter(LocalTime.class, new LocalTimeConverter()).create();
+
 
         final String json = scoreRulesGson.toJson(rules);
         configManager.setConfiguration(CONFIG_GROUP, SCORERULES_KEY, json);

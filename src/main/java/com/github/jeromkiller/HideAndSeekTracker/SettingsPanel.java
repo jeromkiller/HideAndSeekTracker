@@ -13,7 +13,7 @@ public class SettingsPanel extends BasePanel {
     private final HideAndSeekTrackerPlugin plugin;
     private final HideAndSeekSettings settings;
 
-    SettingsPanel(HideAndSeekTrackerPlugin plugin)
+    public SettingsPanel(HideAndSeekTrackerPlugin plugin)
     {
         this.plugin = plugin;
         this.settings = plugin.getSettings();

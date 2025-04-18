@@ -13,12 +13,29 @@ public class ScoreRules {
     private final List<PointSystem> pointSystems = new ArrayList<>();
 
     public int scorePlayer(HideAndSeekPlayer player, HideAndSeekRound round) {
+        if(!player.hasPlaced()) {
+            return 0;
+        }
         final int sum = pointSystems.stream().mapToInt(system -> system.scorePlayer(player, round)).sum();
         return Integer.max(sum, 0);
     }
 
-    public void addSystem() {
-        pointSystems.add(new PositionScoring());
+    public void addSystem(PointSystem.ScoreType type) {
+        switch (type) {
+            case POSITION:
+                pointSystems.add(new PositionScoring());
+                return;
+            case HINTS:
+                pointSystems.add(new HintScoring());
+                return;
+            case NAME:
+                pointSystems.add(new NameScoring());
+                return;
+            case TIME:
+                pointSystems.add(new TimeScoring());
+            default:
+                return;
+        }
     }
 
     public void deleteSystem(PointSystem system) {
@@ -39,6 +56,8 @@ public class ScoreRules {
             case HINTS:
                 newSystem = new HintScoring();
                 break;
+            case NAME:
+                newSystem = new NameScoring();
         }
         final int index = pointSystems.indexOf(system);
         pointSystems.set(index, newSystem);
@@ -48,7 +67,6 @@ public class ScoreRules {
         ScoreRules scoreRules = new ScoreRules();
 
         PositionScoring posScore = new PositionScoring();
-        posScore.addScorePair(1, 6);
         posScore.addScorePair(1, 6);
         posScore.addScorePair(2, 5);
         posScore.addScorePair(3, 4);

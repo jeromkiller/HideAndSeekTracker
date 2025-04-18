@@ -9,7 +9,7 @@ public abstract class NumberScoring extends PointSystem<Integer> {
     @Override
     public void addSetting() {
         if(scorePairs.isEmpty()) {
-            scorePairs.add(new ScoringPair<>(1, 1));
+            scorePairs.add(new ScoringPair<>(1, 0));
             return;
         }
         ScoringPair<Integer> lastPair = scorePairs.get(scorePairs.size() -1);
