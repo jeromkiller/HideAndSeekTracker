@@ -44,6 +44,9 @@ public class ScoringSettingPanel<T> extends BasePanel {
         });
     }
 
+    // maybe consider moving this class to a separate file
+    // if I'm in the mood to refactor this
+    // but not right now, figuring out the formatters for this gave me a headache for 2 days straight
     @Data
     public class SettingsRow<T> {
         private final HideAndSeekTrackerPlugin plugin;
@@ -127,13 +130,8 @@ public class ScoringSettingPanel<T> extends BasePanel {
         setBorder(new CompoundBorder(new EmptyBorder(2, 2, 2, 2),
                 new LineBorder(ColorScheme.DARKER_GRAY_COLOR, 1)));
 
-        List<String> scoreTypeNames = new ArrayList<>();
-        for(PointSystem.ScoreType st : PointSystem.ScoreType.values()) {
-            scoreTypeNames.add(st.toString());
-        }
-        scoreTypes = new JComboBox<>(scoreTypeNames.toArray(new String[0]));
+        scoreTypes = new JComboBox<>();
         scoreTypes.getModel().setSelectedItem(pointSystem.getScoreType().toString());
-        scoreTypes.addActionListener(this::comboBoxChanged);
 
         this.add(content);
 
@@ -172,7 +170,6 @@ public class ScoringSettingPanel<T> extends BasePanel {
         constraints.gridx = 2;
         constraints.gridwidth = 1;
         content.add(deleteSystem, constraints);
-        deleteSystem.setVisible(false); // Hiding until more rule types are implemented
         constraints.gridy++;
 
         constraints.gridx = 0;
@@ -183,17 +180,13 @@ public class ScoringSettingPanel<T> extends BasePanel {
         constraints.gridx = 0;
         constraints.gridy++;
 
-        if(pointSystem.getScoreType() == PointSystem.ScoreType.NAME) {
-            addNumberTextBoxes(pointSystem, constraints);
-        } else {
-            addNumberTextBoxes(pointSystem, constraints);
-        }
+        TextBoxes(pointSystem, constraints);
 
         repaint();
         revalidate();
     }
 
-    public void addNumberTextBoxes(PointSystem<T> pointSystem, GridBagConstraints constraints) {
+    public void TextBoxes(PointSystem<T> pointSystem, GridBagConstraints constraints) {
         int index = 0;
         T prev_value = null;
 
@@ -267,13 +260,6 @@ public class ScoringSettingPanel<T> extends BasePanel {
         content.add(fallThroughSetting, constraints);
         constraints.gridx = 1;
         content.add(fallThroughPoints, constraints);
-    }
-
-    public void comboBoxChanged(ActionEvent e) {
-        final String pickedOption = (String)scoreTypes.getSelectedItem();
-        plugin.getScoreRules().changePointSystemCatagory(pointSystem, PointSystem.ScoreType.fromString(pickedOption));
-        plugin.getPanel().getScorePanel().rebuild();
-        plugin.updateScoreRules();
     }
 
     public void fallThroughSettingSelected() {

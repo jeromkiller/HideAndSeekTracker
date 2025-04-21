@@ -1,13 +1,14 @@
 package com.github.jeromkiller.HideAndSeekTracker.Panels.PointsPanel;
 
 import com.github.jeromkiller.HideAndSeekTracker.HideAndSeekTrackerPlugin;
+import com.github.jeromkiller.HideAndSeekTracker.Panels.BasePanel;
 import com.github.jeromkiller.HideAndSeekTracker.Scoring.PointSystem;
 import com.github.jeromkiller.HideAndSeekTracker.Scoring.ScoreRules;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class ScoringPanel extends JPanel {
+public class ScoringPanel extends BasePanel {
 
     public final HideAndSeekTrackerPlugin plugin;
     public final ScoreRules scoreRules;
