@@ -1,5 +1,9 @@
-package com.github.jeromkiller.HideAndSeekTracker;
+package com.github.jeromkiller.HideAndSeekTracker.Panels.GamePanel;
 
+import com.github.jeromkiller.HideAndSeekTracker.Panels.HideAndSeekSettings;
+import com.github.jeromkiller.HideAndSeekTracker.HideAndSeekTrackerPlugin;
+import com.github.jeromkiller.HideAndSeekTracker.Panels.BasePanel;
+import com.github.jeromkiller.HideAndSeekTracker.Panels.Widgets.HideAndSeekTable;
 import lombok.Getter;
 
 import javax.swing.*;

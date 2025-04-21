@@ -1,5 +1,6 @@
-package com.github.jeromkiller.HideAndSeekTracker;
+package com.github.jeromkiller.HideAndSeekTracker.game;
 
+import com.github.jeromkiller.HideAndSeekTracker.HideAndSeekTrackerPlugin;
 import lombok.Data;
 
 import java.util.*;

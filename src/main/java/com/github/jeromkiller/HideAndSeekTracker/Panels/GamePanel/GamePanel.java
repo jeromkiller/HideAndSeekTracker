@@ -1,5 +1,8 @@
-package com.github.jeromkiller.HideAndSeekTracker;
+package com.github.jeromkiller.HideAndSeekTracker.Panels.GamePanel;
 
+
+import com.github.jeromkiller.HideAndSeekTracker.HideAndSeekTrackerPlugin;
+import com.github.jeromkiller.HideAndSeekTracker.Panels.BasePanel;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -22,7 +25,7 @@ public class GamePanel extends BasePanel {
     private GameRoundPanel activeRoundPanel;
     private final GameTotalPanel scoreTotalPanel;
 
-    GamePanel(HideAndSeekTrackerPlugin plugin)
+    public GamePanel(HideAndSeekTrackerPlugin plugin)
     {
         this.plugin = plugin;
         this.currentCardIndex = 0;

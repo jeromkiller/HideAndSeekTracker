@@ -1,8 +1,8 @@
 package com.github.jeromkiller.HideAndSeekTracker.Scoring;
 
-import com.github.jeromkiller.HideAndSeekTracker.HideAndSeekPlayer;
-import com.github.jeromkiller.HideAndSeekTracker.HideAndSeekRound;
-import com.github.jeromkiller.HideAndSeekTracker.TimeUtil;
+import com.github.jeromkiller.HideAndSeekTracker.game.HideAndSeekPlayer;
+import com.github.jeromkiller.HideAndSeekTracker.game.HideAndSeekRound;
+import com.github.jeromkiller.HideAndSeekTracker.Util.TimeUtil;
 
 import java.time.*;
 

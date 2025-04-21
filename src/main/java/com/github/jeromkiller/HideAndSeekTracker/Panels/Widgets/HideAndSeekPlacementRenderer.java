@@ -1,4 +1,4 @@
-package com.github.jeromkiller.HideAndSeekTracker;
+package com.github.jeromkiller.HideAndSeekTracker.Panels.Widgets;
 
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
@@ -6,7 +6,7 @@ import java.awt.*;
 public class HideAndSeekPlacementRenderer extends DefaultTableCellRenderer {
     Color defaultColor;
 
-    HideAndSeekPlacementRenderer() {
+    public HideAndSeekPlacementRenderer() {
         super();
         defaultColor = getForeground();
     }

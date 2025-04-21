@@ -1,5 +1,6 @@
-package com.github.jeromkiller.HideAndSeekTracker;
+package com.github.jeromkiller.HideAndSeekTracker.game;
 
+import com.github.jeromkiller.HideAndSeekTracker.HideAndSeekTrackerPlugin;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +17,7 @@ public class HideAndSeekGame {
     private final HideAndSeekTrackerPlugin plugin;
     private final HashMap<String, HideAndSeekPlayer> scoreTotals;
 
-    HideAndSeekGame(HideAndSeekTrackerPlugin plugin)
+    public HideAndSeekGame(HideAndSeekTrackerPlugin plugin)
     {
         this.plugin = plugin;
         this.activeRound = new HideAndSeekRound(plugin, 1);

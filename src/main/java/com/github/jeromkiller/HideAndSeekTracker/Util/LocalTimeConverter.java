@@ -1,4 +1,4 @@
-package com.github.jeromkiller.HideAndSeekTracker;
+package com.github.jeromkiller.HideAndSeekTracker.Util;
 
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;

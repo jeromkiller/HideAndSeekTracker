@@ -1,4 +1,6 @@
-package com.github.jeromkiller.HideAndSeekTracker;
+package com.github.jeromkiller.HideAndSeekTracker.Panels.Widgets;
+
+import com.github.jeromkiller.HideAndSeekTracker.game.HideAndSeekPlayer;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package com.github.jeromkiller.HideAndSeekTracker.Widgets;
+package com.github.jeromkiller.HideAndSeekTracker.Panels.Widgets;
 
 import javax.swing.*;
 import javax.swing.text.DefaultFormatterFactory;

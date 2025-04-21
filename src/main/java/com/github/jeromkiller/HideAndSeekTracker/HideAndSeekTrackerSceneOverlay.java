@@ -1,5 +1,7 @@
 package com.github.jeromkiller.HideAndSeekTracker;
 
+import com.github.jeromkiller.HideAndSeekTracker.Panels.CaptureArea.CaptureCreationOptions;
+import com.github.jeromkiller.HideAndSeekTracker.game.CaptureArea;
 import net.runelite.api.Point;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;

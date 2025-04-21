@@ -1,5 +1,8 @@
-package com.github.jeromkiller.HideAndSeekTracker;
+package com.github.jeromkiller.HideAndSeekTracker.Panels.CaptureArea;
 
+import com.github.jeromkiller.HideAndSeekTracker.game.CaptureArea;
+import com.github.jeromkiller.HideAndSeekTracker.HideAndSeekTrackerPlugin;
+import com.github.jeromkiller.HideAndSeekTracker.Panels.BasePanel;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.components.PluginErrorPanel;
 
@@ -17,7 +20,7 @@ public class CaptureAreaManagementPanel extends BasePanel {
 
     private final HideAndSeekTrackerPlugin plugin;
 
-    CaptureAreaManagementPanel(HideAndSeekTrackerPlugin plugin)
+    public CaptureAreaManagementPanel(HideAndSeekTrackerPlugin plugin)
     {
         this.plugin = plugin;
 

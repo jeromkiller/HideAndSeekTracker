@@ -1,4 +1,6 @@
-package com.github.jeromkiller.HideAndSeekTracker;
+package com.github.jeromkiller.HideAndSeekTracker.Panels.Widgets;
+
+import com.github.jeromkiller.HideAndSeekTracker.game.HideAndSeekPlayer;
 
 import javax.swing.*;
 import javax.swing.table.TableRowSorter;
@@ -7,7 +9,7 @@ import java.util.HashMap;
 public class HideAndSeekTable extends JTable {
     final TableRowSorter<HideAndSeekTableModel> sorter;
 
-    HideAndSeekTable(HashMap<String, HideAndSeekPlayer> data)
+    public HideAndSeekTable(HashMap<String, HideAndSeekPlayer> data)
     {
         super(new HideAndSeekTableModel(data));
         sorter = new TableRowSorter<>(model());

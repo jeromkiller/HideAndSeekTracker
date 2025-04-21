@@ -1,4 +1,7 @@
-package com.github.jeromkiller.HideAndSeekTracker;
+package com.github.jeromkiller.HideAndSeekTracker.Panels;
+
+import com.github.jeromkiller.HideAndSeekTracker.HideAndSeekTrackerPlugin;
+import com.github.jeromkiller.HideAndSeekTracker.Panels.Widgets.BlinklessToggleButton;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;

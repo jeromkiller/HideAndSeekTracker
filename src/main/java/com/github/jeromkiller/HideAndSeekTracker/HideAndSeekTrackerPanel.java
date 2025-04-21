@@ -1,5 +1,10 @@
 package com.github.jeromkiller.HideAndSeekTracker;
 
+import com.github.jeromkiller.HideAndSeekTracker.Panels.CaptureArea.CaptureAreaManagementPanel;
+import com.github.jeromkiller.HideAndSeekTracker.Panels.GamePanel.GamePanel;
+import com.github.jeromkiller.HideAndSeekTracker.Panels.GameSetupPanel;
+import com.github.jeromkiller.HideAndSeekTracker.Panels.PointsPanel.ScoringPanel;
+import com.github.jeromkiller.HideAndSeekTracker.Panels.SettingsPanel;
 import lombok.Getter;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;

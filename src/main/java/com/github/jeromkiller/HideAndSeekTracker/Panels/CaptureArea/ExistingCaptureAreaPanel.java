@@ -1,5 +1,9 @@
-package com.github.jeromkiller.HideAndSeekTracker;
+package com.github.jeromkiller.HideAndSeekTracker.Panels.CaptureArea;
 
+import com.github.jeromkiller.HideAndSeekTracker.game.CaptureArea;
+import com.github.jeromkiller.HideAndSeekTracker.HideAndSeekTrackerPlugin;
+import com.github.jeromkiller.HideAndSeekTracker.Panels.BasePanel;
+import com.github.jeromkiller.HideAndSeekTracker.Panels.Widgets.BlinklessToggleButton;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.FontManager;
 import net.runelite.client.ui.components.FlatTextField;

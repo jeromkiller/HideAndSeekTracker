@@ -1,5 +1,6 @@
-package com.github.jeromkiller.HideAndSeekTracker;
+package com.github.jeromkiller.HideAndSeekTracker.Panels;
 
+import com.github.jeromkiller.HideAndSeekTracker.HideAndSeekTrackerPlugin;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.util.ImageUtil;
 
@@ -11,50 +12,50 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 
 public class BasePanel extends JPanel {
-    protected static final Border NAME_BOTTOM_BORDER = new CompoundBorder(
+    public static final Border NAME_BOTTOM_BORDER = new CompoundBorder(
             BorderFactory.createMatteBorder(0, 0, 1, 0, ColorScheme.DARK_GRAY_COLOR),
             BorderFactory.createLineBorder(ColorScheme.DARKER_GRAY_COLOR));
-    protected static final int MAX_ALPHA = 255;
+    public static final int MAX_ALPHA = 255;
 
-    protected static final ImageIcon COLOR_ICON;
-    protected static final ImageIcon COLOR_HOVER_ICON;
+    public static final ImageIcon COLOR_ICON;
+    public static final ImageIcon COLOR_HOVER_ICON;
 
-    protected static final ImageIcon LABEL_ICON;
-    protected static final ImageIcon LABEL_HOVER_ICON;
-    protected static final ImageIcon NO_LABEL_ICON;
-    protected static final ImageIcon NO_LABEL_HOVER_ICON;
+    public static final ImageIcon LABEL_ICON;
+    public static final ImageIcon LABEL_HOVER_ICON;
+    public static final ImageIcon NO_LABEL_ICON;
+    public static final ImageIcon NO_LABEL_HOVER_ICON;
 
-    protected static final ImageIcon VISIBLE_ICON;
-    protected static final ImageIcon VISIBLE_HOVER_ICON;
-    protected static final ImageIcon INVISIBLE_ICON;
-    protected static final ImageIcon INVISIBLE_HOVER_ICON;
+    public static final ImageIcon VISIBLE_ICON;
+    public static final ImageIcon VISIBLE_HOVER_ICON;
+    public static final ImageIcon INVISIBLE_ICON;
+    public static final ImageIcon INVISIBLE_HOVER_ICON;
 
-    protected static final ImageIcon DELETE_ICON;
-    protected static final ImageIcon DELETE_HOVER_ICON;
+    public static final ImageIcon DELETE_ICON;
+    public static final ImageIcon DELETE_HOVER_ICON;
 
-    protected static final ImageIcon COPY_ICON;
-    protected static final ImageIcon COPY_ICON_HOVER;
-    protected static final ImageIcon IMPORT_ICON;
-    protected static final ImageIcon IMPORT_ICON_HOVER;
-    protected static final ImageIcon EXPORT_ICON;
-    protected static final ImageIcon EXPORT_ICON_HOVER;
-    protected static final ImageIcon NEW_ROUND_ICON;
-    protected static final ImageIcon NEW_ROUND_ICON_HOVER;
-    protected static final ImageIcon DELETE_ROUND_ICON;
-    protected static final ImageIcon DELETE_ROUND_ICON_HOVER;
+    public static final ImageIcon COPY_ICON;
+    public static final ImageIcon COPY_ICON_HOVER;
+    public static final ImageIcon IMPORT_ICON;
+    public static final ImageIcon IMPORT_ICON_HOVER;
+    public static final ImageIcon EXPORT_ICON;
+    public static final ImageIcon EXPORT_ICON_HOVER;
+    public static final ImageIcon NEW_ROUND_ICON;
+    public static final ImageIcon NEW_ROUND_ICON_HOVER;
+    public static final ImageIcon DELETE_ROUND_ICON;
+    public static final ImageIcon DELETE_ROUND_ICON_HOVER;
 
-    protected static final ImageIcon ARROW_LEFT_ICON;
-    protected static final ImageIcon ARROW_LEFT_HOVER_ICON;
-    protected static final ImageIcon ARROW_RIGHT_ICON;
-    protected static final ImageIcon ARROW_RIGHT_HOVER_ICON;
+    public static final ImageIcon ARROW_LEFT_ICON;
+    public static final ImageIcon ARROW_LEFT_HOVER_ICON;
+    public static final ImageIcon ARROW_RIGHT_ICON;
+    public static final ImageIcon ARROW_RIGHT_HOVER_ICON;
 
-    protected static final ImageIcon MINUS_ICON;
-    protected static final ImageIcon MINUS_HOVER_ICON;
+    public static final ImageIcon MINUS_ICON;
+    public static final ImageIcon MINUS_HOVER_ICON;
 
-    protected static final ImageIcon ON_SWITCHER;
-    protected static final ImageIcon ON_SWITCHER_HOVER;
-    protected static final ImageIcon OFF_SWITCHER;
-    protected static final ImageIcon OFF_SWITCHER_HOVER;
+    public static final ImageIcon ON_SWITCHER;
+    public static final ImageIcon ON_SWITCHER_HOVER;
+    public static final ImageIcon OFF_SWITCHER;
+    public static final ImageIcon OFF_SWITCHER_HOVER;
 
     static {
         final BufferedImage copyImg = ImageUtil.loadImageResource(HideAndSeekTrackerPlugin.class, "copy_icon.png");

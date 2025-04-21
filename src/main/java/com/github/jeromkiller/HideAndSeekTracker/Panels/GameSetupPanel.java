@@ -1,5 +1,7 @@
-package com.github.jeromkiller.HideAndSeekTracker;
+package com.github.jeromkiller.HideAndSeekTracker.Panels;
 
+import com.github.jeromkiller.HideAndSeekTracker.HideAndSeekTrackerPlugin;
+import com.github.jeromkiller.HideAndSeekTracker.Panels.Widgets.BlinklessToggleButton;
 import joptsimple.internal.Strings;
 import lombok.Getter;
 import net.runelite.client.util.ImageUtil;

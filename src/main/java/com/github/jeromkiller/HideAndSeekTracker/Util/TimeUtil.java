@@ -1,4 +1,4 @@
-package com.github.jeromkiller.HideAndSeekTracker;
+package com.github.jeromkiller.HideAndSeekTracker.Util;
 
 import java.time.LocalTime;
 

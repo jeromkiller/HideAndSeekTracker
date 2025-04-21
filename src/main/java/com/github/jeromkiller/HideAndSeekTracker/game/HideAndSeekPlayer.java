@@ -1,4 +1,4 @@
-package com.github.jeromkiller.HideAndSeekTracker;
+package com.github.jeromkiller.HideAndSeekTracker.game;
 
 import lombok.Getter;
 import lombok.Setter;

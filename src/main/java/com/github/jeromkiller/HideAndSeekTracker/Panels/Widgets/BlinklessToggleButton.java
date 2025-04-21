@@ -1,5 +1,6 @@
-package com.github.jeromkiller.HideAndSeekTracker;
+package com.github.jeromkiller.HideAndSeekTracker.Panels.Widgets;
 
+import com.github.jeromkiller.HideAndSeekTracker.Panels.BasePanel;
 import lombok.Getter;
 
 import javax.swing.*;
@@ -17,9 +18,9 @@ public class BlinklessToggleButton extends JLabel {
     @Getter
     boolean selected = false;
 
-    BlinklessToggleButton(ImageIcon selectedIcon, ImageIcon selectedIconHover,
-                          ImageIcon deselectedIcon, ImageIcon deselectedIconHover,
-                          String selectedTooltipText, String deselectedTooltipText) {
+    public BlinklessToggleButton(ImageIcon selectedIcon, ImageIcon selectedIconHover,
+                                 ImageIcon deselectedIcon, ImageIcon deselectedIconHover,
+                                 String selectedTooltipText, String deselectedTooltipText) {
         this.selectedIcon = selectedIcon;
         this.selectedIconHover = selectedIconHover;
         this.deselectedIcon = deselectedIcon;
@@ -42,7 +43,7 @@ public class BlinklessToggleButton extends JLabel {
         });
     }
 
-    BlinklessToggleButton(String selectedTooltipText) {
+    public BlinklessToggleButton(String selectedTooltipText) {
         this.selectedIcon = BasePanel.ON_SWITCHER;
         this.selectedIconHover = BasePanel.ON_SWITCHER_HOVER;
         this.deselectedIcon = BasePanel.OFF_SWITCHER;

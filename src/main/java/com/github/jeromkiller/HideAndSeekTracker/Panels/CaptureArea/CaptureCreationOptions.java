@@ -1,4 +1,4 @@
-package com.github.jeromkiller.HideAndSeekTracker;
+package com.github.jeromkiller.HideAndSeekTracker.Panels.CaptureArea;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
