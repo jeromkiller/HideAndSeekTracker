@@ -97,6 +97,7 @@ public class HideAndSeekRound {
         final int points = plugin.getScoreRules().scorePlayer(player, this);
         participants.get(playerName).setScore(points);
         placementIndex += 1;
+        recalculateScores();
         plugin.getPanel().getGamePanel().updatePlacements();
     }
 

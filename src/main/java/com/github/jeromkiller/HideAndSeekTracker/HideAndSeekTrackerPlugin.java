@@ -1,7 +1,7 @@
 package com.github.jeromkiller.HideAndSeekTracker;
 
 import com.github.jeromkiller.HideAndSeekTracker.Panels.CaptureArea.CaptureCreationOptions;
-import com.github.jeromkiller.HideAndSeekTracker.Panels.HideAndSeekSettings;
+import com.github.jeromkiller.HideAndSeekTracker.Util.HideAndSeekSettings;
 import com.github.jeromkiller.HideAndSeekTracker.Scoring.ScoreRules;
 import com.github.jeromkiller.HideAndSeekTracker.game.CaptureArea;
 import com.github.jeromkiller.HideAndSeekTracker.game.HideAndSeekGame;

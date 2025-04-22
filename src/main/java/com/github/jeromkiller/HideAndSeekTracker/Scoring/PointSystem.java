@@ -4,20 +4,24 @@ import com.github.jeromkiller.HideAndSeekTracker.game.HideAndSeekPlayer;
 import com.github.jeromkiller.HideAndSeekTracker.game.HideAndSeekRound;
 import lombok.Data;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
 @Data
 public abstract class PointSystem <T> {
     final ScoreType scoreType;
+    final boolean canBeCalculatedOnce;
     List<ScoringPair<T>> scorePairs;
     int fallThroughScore;
+    boolean calcEveryRound;
 
     public enum ScoreType {
         POSITION("Position"),
         HINTS("Hints"),
         TIME("Time"),
-        NAME("Players");
+        NAME("Players"),
+        PERCENTILE("Percentile");
 
         final String name;
 
@@ -39,18 +43,22 @@ public abstract class PointSystem <T> {
                     return TIME;
                 case "Players":
                     return NAME;
+                case "Percentile":
+                    return PERCENTILE;
             }
             return null;
         }
     };
 
-    PointSystem(ScoreType type) {
+    PointSystem(ScoreType type, boolean canCalcOnce) {
         this.scoreType = type;
+        this.canBeCalculatedOnce = canCalcOnce;
         scorePairs = new ArrayList<>();
         this.fallThroughScore = 0;
+        this.calcEveryRound = true;
     }
 
-    public abstract int scorePlayer(HideAndSeekPlayer player, HideAndSeekRound round);
+    public abstract int scorePlayer(HideAndSeekPlayer player, @Nullable HideAndSeekRound round);
     public abstract void addSetting();
     public abstract void updateSetting(int index, T value);
 

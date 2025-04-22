@@ -1,6 +1,5 @@
-package com.github.jeromkiller.HideAndSeekTracker.Panels;
+package com.github.jeromkiller.HideAndSeekTracker.Util;
 
-import com.github.jeromkiller.HideAndSeekTracker.Util.LocalTimeConverter;
 import com.github.jeromkiller.HideAndSeekTracker.Scoring.*;
 import com.github.jeromkiller.HideAndSeekTracker.game.CaptureArea;
 import com.google.gson.Gson;
@@ -38,7 +37,8 @@ public class HideAndSeekSettings {
                 .registerSubtype(PositionScoring.class)
                 .registerSubtype(HintScoring.class)
                 .registerSubtype(NameScoring.class)
-                .registerSubtype(TimeScoring.class);
+                .registerSubtype(TimeScoring.class)
+                .registerSubtype(PercentileScoring.class);
     }
 
     private void setValue(String key, Object value)

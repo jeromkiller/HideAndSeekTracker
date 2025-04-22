@@ -11,14 +11,20 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 public class ScoreRules {
-    private final List<PointSystem> pointSystems = new ArrayList<>();
-
+    private final List<PointSystem<?>> pointSystems = new ArrayList<>();
     public int scorePlayer(HideAndSeekPlayer player, HideAndSeekRound round) {
         if(!player.hasPlaced()) {
             return 0;
         }
-        final int sum = pointSystems.stream().mapToInt(system -> system.scorePlayer(player, round)).sum();
+        final int sum = pointSystems.stream().filter(PointSystem::isCalcEveryRound)
+                .mapToInt(system -> system.scorePlayer(player, round)).sum();
         return Integer.max(sum, 0);
+    }
+
+    public int scorePlayerOnce(HideAndSeekPlayer player) {
+        final int sum = pointSystems.stream().filter(system -> {return !system.isCalcEveryRound();})
+                .mapToInt(system -> system.scorePlayer(player, null)).sum();
+        return sum;
     }
 
     public void addSystem(PointSystem.ScoreType type) {
@@ -34,12 +40,16 @@ public class ScoreRules {
                 return;
             case TIME:
                 pointSystems.add(new TimeScoring());
+                return;
+            case PERCENTILE:
+                pointSystems.add(new PercentileScoring());
+                return;
             default:
                 return;
         }
     }
 
-    public void deleteSystem(PointSystem system) {
+    public void deleteSystem(PointSystem<?> system) {
         pointSystems.remove(system);
     }
 
@@ -48,8 +58,8 @@ public class ScoreRules {
         pointSystems.addAll(rules.getPointSystems());
     }
 
-    public void changePointSystemCatagory(PointSystem system, PointSystem.ScoreType catagory) {
-        PointSystem newSystem = null;
+    public void changePointSystemCatagory(PointSystem<?> system, PointSystem.ScoreType catagory) {
+        PointSystem<?> newSystem = null;
         switch (catagory) {
             case POSITION:
                 newSystem = new PositionScoring();

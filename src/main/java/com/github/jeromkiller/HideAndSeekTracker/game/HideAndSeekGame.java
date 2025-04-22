@@ -65,17 +65,22 @@ public class HideAndSeekGame {
 
     public int calculatePlayerScore(String playerName) {
         int total = 0;
+        HideAndSeekPlayer player = null;
         for(final HideAndSeekRound round : pastRounds) {
             if(!round.getParticipants().containsKey(playerName)) {
                 continue;
             }
-            HideAndSeekPlayer player = round.getParticipants().get(playerName);
+            player = round.getParticipants().get(playerName);
             total += player.getScore();
         }
 
         if(activeRound.getParticipants().containsKey(playerName)) {
-            HideAndSeekPlayer player = activeRound.getParticipants().get(playerName);
+            player = activeRound.getParticipants().get(playerName);
             total += player.getScore();
+        }
+
+        if(player != null) {
+            total += plugin.getScoreRules().scorePlayerOnce(player);
         }
 
         return total;

@@ -8,7 +8,7 @@ import java.time.*;
 
 public class TimeScoring extends PointSystem<LocalTime> {
     TimeScoring() {
-        super(ScoreType.TIME);
+        super(ScoreType.TIME, false);
     }
 
     @Override

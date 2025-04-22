@@ -6,7 +6,7 @@ import com.github.jeromkiller.HideAndSeekTracker.game.HideAndSeekRound;
 public class HintScoring extends NumberScoring {
 
     HintScoring() {
-        super(ScoreType.HINTS);
+        super(ScoreType.HINTS, false);
     }
 
     @Override

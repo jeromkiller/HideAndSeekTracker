@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public class NameScoring extends PointSystem<String> {
     NameScoring() {
-        super(ScoreType.NAME);
+        super(ScoreType.NAME, true);
     }
 
     @Override

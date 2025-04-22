@@ -2,6 +2,7 @@ package com.github.jeromkiller.HideAndSeekTracker.Panels.PointsPanel;
 
 import com.github.jeromkiller.HideAndSeekTracker.HideAndSeekTrackerPlugin;
 import com.github.jeromkiller.HideAndSeekTracker.Panels.BasePanel;
+import com.github.jeromkiller.HideAndSeekTracker.Panels.Widgets.PercentileScoreTextEntry;
 import com.github.jeromkiller.HideAndSeekTracker.Scoring.PointSystem;
 import com.github.jeromkiller.HideAndSeekTracker.Scoring.ScoringPair;
 import com.github.jeromkiller.HideAndSeekTracker.Panels.Widgets.NameScoreTextEntry;
@@ -14,6 +15,8 @@ import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.text.NumberFormatter;
 import java.awt.*;
 import java.awt.event.*;
@@ -65,6 +68,9 @@ public class ScoringSettingPanel<T> extends BasePanel {
                 case POSITION:
                 case HINTS:
                     settingBox = new NumberScoreTextEntry((int) scoringPair.getSetting(), (int)prevValue + 1);
+                    break;
+                case PERCENTILE:
+                    settingBox = new PercentileScoreTextEntry((int) scoringPair.getSetting(), (int)prevValue - 1);
                     break;
                 case TIME:
                     settingBox = new TimeScoreTextEntry((LocalTime) scoringPair.getSetting(), ((LocalTime) prevValue).plusSeconds(1));
@@ -173,6 +179,22 @@ public class ScoringSettingPanel<T> extends BasePanel {
         constraints.gridy++;
 
         constraints.gridx = 0;
+        constraints.gridwidth = 3;
+        JCheckBox calcEveryRoundCheckbox = new JCheckBox(" Calculate Every Round", pointSystem.isCalcEveryRound());
+        calcEveryRoundCheckbox.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                pointSystem.setCalcEveryRound(calcEveryRoundCheckbox.isSelected());
+                plugin.updateScoreRules();
+            }
+        });
+        calcEveryRoundCheckbox.setVisible(pointSystem.isCanBeCalculatedOnce());
+        content.add(calcEveryRoundCheckbox, constraints);
+        constraints.gridy++;
+        constraints.gridwidth = 1;
+
+
+        constraints.gridx = 0;
         content.add(new JLabel("Setting", SwingConstants.CENTER), constraints);
         constraints.gridx = 1;
         content.add(new JLabel("Points", SwingConstants.CENTER), constraints);
@@ -180,13 +202,13 @@ public class ScoringSettingPanel<T> extends BasePanel {
         constraints.gridx = 0;
         constraints.gridy++;
 
-        TextBoxes(pointSystem, constraints);
+        addTextBoxes(pointSystem, constraints);
 
         repaint();
         revalidate();
     }
 
-    public void TextBoxes(PointSystem<T> pointSystem, GridBagConstraints constraints) {
+    public void addTextBoxes(PointSystem<T> pointSystem, GridBagConstraints constraints) {
         int index = 0;
         T prev_value = null;
 
@@ -197,6 +219,10 @@ public class ScoringSettingPanel<T> extends BasePanel {
                 prev_value = (T) val;
                 break;
             }
+            case PERCENTILE:
+                Integer val = 100;
+                prev_value = (T) val;
+                break;
             case NAME: {
                 prev_value = (T) "";
                 break;
@@ -217,6 +243,7 @@ public class ScoringSettingPanel<T> extends BasePanel {
         }
 
         String fallThroughValue = "Others";
+        boolean showFallThrough = true;
         switch(pointSystem.getScoreType()) {
             case HINTS:
             case POSITION: {
@@ -230,6 +257,11 @@ public class ScoringSettingPanel<T> extends BasePanel {
             }
             case NAME: {
                 fallThroughValue = "Others";
+                break;
+            }
+            case PERCENTILE: {
+                showFallThrough = (int)prev_value != 0;
+                break;
             }
         }
         JTextField fallThroughSetting = new JTextField(fallThroughValue);
@@ -258,8 +290,10 @@ public class ScoringSettingPanel<T> extends BasePanel {
 
         constraints.gridx = 0;
         content.add(fallThroughSetting, constraints);
+        fallThroughSetting.setVisible(showFallThrough);
         constraints.gridx = 1;
         content.add(fallThroughPoints, constraints);
+        fallThroughPoints.setVisible(showFallThrough);
     }
 
     public void fallThroughSettingSelected() {

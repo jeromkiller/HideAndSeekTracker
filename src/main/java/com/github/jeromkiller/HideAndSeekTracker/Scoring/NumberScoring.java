@@ -2,8 +2,8 @@ package com.github.jeromkiller.HideAndSeekTracker.Scoring;
 
 public abstract class NumberScoring extends PointSystem<Integer> {
 
-    public NumberScoring(ScoreType type) {
-        super(type);
+    public NumberScoring(ScoreType type, boolean canCalcOnce) {
+        super(type, canCalcOnce);
     }
 
     @Override

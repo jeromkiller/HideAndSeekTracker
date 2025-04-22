@@ -5,7 +5,7 @@ import com.github.jeromkiller.HideAndSeekTracker.game.HideAndSeekRound;
 
 public class PositionScoring extends NumberScoring {
     public PositionScoring() {
-        super(ScoreType.POSITION);
+        super(ScoreType.POSITION, false);
     }
 
     @Override
