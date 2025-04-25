@@ -3,8 +3,10 @@ package com.github.jeromkiller.HideAndSeekTracker;
 import com.github.jeromkiller.HideAndSeekTracker.Panels.CaptureArea.CaptureCreationOptions;
 import com.github.jeromkiller.HideAndSeekTracker.Util.HideAndSeekSettings;
 import com.github.jeromkiller.HideAndSeekTracker.Scoring.ScoreRules;
+import com.github.jeromkiller.HideAndSeekTracker.Util.roundExport;
 import com.github.jeromkiller.HideAndSeekTracker.game.CaptureArea;
 import com.github.jeromkiller.HideAndSeekTracker.game.HideAndSeekGame;
+import com.github.jeromkiller.HideAndSeekTracker.game.HideAndSeekRound;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
@@ -41,6 +43,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @PluginDescriptor(
@@ -86,6 +89,9 @@ public class HideAndSeekTrackerPlugin extends Plugin
 	public HideAndSeekGame game;
 
 	@Getter
+	private String localPlayerName = null;
+
+	@Getter
 	private final List<CaptureArea> captureAreas = new ArrayList<>();
 
 	@Getter
@@ -129,6 +135,7 @@ public class HideAndSeekTrackerPlugin extends Plugin
 	@Subscribe
 	public void onGameTick(GameTick tick)
 	{
+		SetLocalPlayerName();
 		checkPlayersInRange();
 		game.tick();
 	}
@@ -197,6 +204,22 @@ public class HideAndSeekTrackerPlugin extends Plugin
 		final LinkedHashSet<String> setNames = game.setPlayers(nameList);
 		panel.getSetupPanel().loadPlayerNames(setNames);
 		return setNames;
+	}
+
+	public void SetLocalPlayerName()
+	{
+		Player localPlayer = client.getLocalPlayer();
+		if(localPlayer == null) {
+			return;
+		}
+
+		String name = localPlayer.getName();
+		if(Objects.equals(localPlayerName, name)) {
+			return;
+		}
+
+		localPlayerName = name;
+		game.setLocalHostNames(localPlayerName);
 	}
 
 	public void startCaptureAreaCreation()
@@ -335,5 +358,78 @@ public class HideAndSeekTrackerPlugin extends Plugin
 				.type(ChatMessageType.CONSOLE)
 				.runeLiteFormattedMessage(message)
 				.build());
+	}
+
+	public void exportRoundToClip(final List<Integer> rounds)
+	{
+		log.info("rounds: {}", rounds);
+
+		LinkedHashSet<roundExport> roundsToExport = new LinkedHashSet<>();
+		for(final int round_number : rounds) {
+			int numRounds = game.getPastRounds().size();
+			if(round_number < numRounds) {
+				if(round_number >= 0) {
+					HideAndSeekRound round = game.getPastRounds().get(round_number);
+					roundExport exportObject = new roundExport(round);
+					roundsToExport.add(exportObject);
+				}
+			} else {
+				HideAndSeekRound round = game.getActiveRound();
+				if(!round.isRoundStarted()) {
+					continue;
+				}
+				roundExport exportObject = new roundExport(round);
+				roundsToExport.add(exportObject);
+			}
+		}
+
+		String json = gson.toJson(roundsToExport);
+		final StringSelection selection = new StringSelection(json);
+		Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+		clipboard.setContents(selection, selection);
+	}
+
+	public void importRoundFromClip() {
+		String clipboardText;
+		try {
+			clipboardText = Toolkit.getDefaultToolkit()
+					.getSystemClipboard()
+					.getData(DataFlavor.stringFlavor)
+					.toString();
+		} catch (IOException | UnsupportedFlavorException ex) {
+			sendChatMessage("Unable to read system clipboard.");
+			log.warn("error reading clipboard", ex);
+			return;
+		}
+
+		if (clipboardText.isEmpty())
+			return;
+
+		ArrayList<roundExport> importRounds;
+		try {
+			importRounds = gson.fromJson(clipboardText, new TypeToken<ArrayList<roundExport>>(){}.getType());
+		}
+		catch (JsonSyntaxException e) {
+			sendChatMessage("You do not have any rounds saved to the clipboard");
+			return;
+		}
+
+		if(importRounds.isEmpty()) {
+			sendChatMessage("You do not have any rounds saved to the clipboard");
+			return;
+		}
+
+		List<Long> roundIds = game.getPastRounds().stream().mapToLong(HideAndSeekRound::getId).boxed().collect(Collectors.toList());
+		roundIds.add(game.getActiveRound().getId());
+
+		importRounds.removeIf(r -> roundIds.contains(r.getId()));
+
+		List<HideAndSeekRound> newRounds = importRounds.stream().map(r -> r.toHideAndSeekRound(this)).collect(Collectors.toList());
+		game.importRounds(newRounds);
+
+		sendChatMessage("Imported " + importRounds.size() + " round(s) from clipboard");
+
+		panel.getAreaPanel().rebuild();
+		updateCaptureAreas();
 	}
 }

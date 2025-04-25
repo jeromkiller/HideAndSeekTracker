@@ -25,19 +25,30 @@ public class HideAndSeekGame {
         this.scoreTotals = new HashMap<>();
     }
 
-    public int newRound()
+    public void newRound()
     {
         activeRound.endRound();
         pastRounds.add(activeRound);
         ArrayList<String> previousPlayers = new ArrayList<>(activeRound.getParticipants().keySet());
         activeRound = new HideAndSeekRound(plugin, activeRound.getRoundNumber() + 1);
         activeRound.setPlayers(previousPlayers);
-        final int savedRoundIndex = pastRounds.size() -1;
-        return savedRoundIndex;
     }
 
     public void startRound() {
         activeRound.startRound();
+    }
+
+    public void setLocalHostNames(String localHostName)
+    {
+        for(HideAndSeekRound round : pastRounds) {
+            if(round.getHost() == null) {
+                round.setHost(localHostName);
+            }
+        }
+
+        if(activeRound.getHost() == null) {
+            activeRound.setHost(localHostName);
+        }
     }
 
     public LinkedHashSet<String> setPlayers(List<String> playerNames)
@@ -189,5 +200,19 @@ public class HideAndSeekGame {
             roundNumber++;
         }
         activeRound.setRoundNumber(roundNumber);
+    }
+
+    public void importRounds(List<HideAndSeekRound> rounds) {
+        // renumber the incoming rounds
+        int newRoundNumber = activeRound.getRoundNumber();
+        for(HideAndSeekRound round : rounds) {
+            round.setRoundNumber(newRoundNumber);
+            plugin.getPanel().getGamePanel().importRound(round);
+            newRoundNumber++;
+        }
+        pastRounds.addAll(rounds);
+        activeRound.setRoundNumber(newRoundNumber);
+
+        plugin.getPanel().getGamePanel().getActiveRoundPanel().updateRoundLabel();
     }
 }

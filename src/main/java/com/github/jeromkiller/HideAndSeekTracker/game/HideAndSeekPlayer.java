@@ -69,6 +69,16 @@ public class HideAndSeekPlayer {
         this.placementValue = 0;
         this.placement = Placement.DNF;
         this.hints = 0;
+        this.tickCount = 0;
+    }
+
+    public HideAndSeekPlayer(String name, int tickCount, int hints) {
+        this.name = name;
+        this.internalPlacement = Integer.MAX_VALUE;
+        this.placementValue = 0;
+        this.placement = Placement.DNF;
+        this.hints = hints;
+        this.tickCount = tickCount;
     }
 
     public String getPlacementExportString()

@@ -1,16 +1,22 @@
 package com.github.jeromkiller.HideAndSeekTracker.game;
 
 import com.github.jeromkiller.HideAndSeekTracker.HideAndSeekTrackerPlugin;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.time.Instant;
 import java.util.*;
 
 @Data
+@AllArgsConstructor
 public class HideAndSeekRound {
+    private long id;
+
     private int hintsGiven;
     private int placementIndex;
     private int leniencyCounter;
     private int sharedPlacementSpot;
+    private String host;
     private int roundNumber;
     private boolean roundStarted;
     private int gameTime;
@@ -19,11 +25,13 @@ public class HideAndSeekRound {
     private final HideAndSeekTrackerPlugin plugin;
 
     HideAndSeekRound(HideAndSeekTrackerPlugin plugin, int roundNumber) {
+        this.id = Instant.now().toEpochMilli();
         this.hintsGiven = 1;
         this.placementIndex = 0;
         this.leniencyCounter = 0;
         this.sharedPlacementSpot = 0;
         this.roundNumber = roundNumber;
+        this.host = plugin.getLocalPlayerName();
         this.participants = new HashMap<>();
         this.plugin = plugin;
         this.roundStarted = false;
@@ -114,6 +122,7 @@ public class HideAndSeekRound {
         playerList.sort(Comparator.comparingInt(HideAndSeekPlayer::getInternalPlacement));
 
         StringBuilder exportString = new StringBuilder();
+        exportString.append("Host: ").append(getHost()).append("\n");
         exportString.append("Round ").append(getRoundNumber()).append(": ");
 
         for(final HideAndSeekPlayer player: playerList) {
@@ -184,6 +193,32 @@ public class HideAndSeekRound {
     public int getNumParticipants()
     {
         return participants.size();
+    }
+
+    public void recalculatePlacements()
+    {
+        // sort the players in the order they finished
+        List<HideAndSeekPlayer> players = new ArrayList<>(participants.values());
+        players.sort(Comparator.comparingInt(HideAndSeekPlayer::getTickCount));
+
+        int leniencyTime = 0;
+        int newInternalPlacement = 1;
+        int newPlacement = 1;
+        for(HideAndSeekPlayer player : players) {
+            int hintsUsed = player.getHints();
+            int time = player.getTickCount();
+            participants.get(player.getName()).setStats(newInternalPlacement, newPlacement, hintsUsed, time);
+            if(time > leniencyTime) {
+                leniencyTime = time + plugin.getSettings().getTickLenience();
+                newPlacement++;
+            }
+            newInternalPlacement++;
+        }
+
+        sharedPlacementSpot = newPlacement;
+        placementIndex = newInternalPlacement;
+
+        recalculateScores();
     }
 
     public void recalculateScores()

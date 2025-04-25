@@ -42,9 +42,9 @@ public class GameRoundPanel extends BasePanel {
     @Getter
     private boolean roundFinished = false;
 
-    GameRoundPanel(HideAndSeekTrackerPlugin plugin, GamePanel parentPanel) {
+    GameRoundPanel(HideAndSeekTrackerPlugin plugin, GamePanel parentPanel, HideAndSeekRound round) {
         this.plugin = plugin;
-        this.gameRound = plugin.game.getActiveRound();
+        this.gameRound = round; //plugin.game.getActiveRound();
         this.parentPanel = parentPanel;
         this.settings = plugin.getSettings();
 
@@ -148,18 +148,16 @@ public class GameRoundPanel extends BasePanel {
         GridBagConstraints bottomConstraints = new GridBagConstraints();
 
         setupImageIcon(copyResultButton, "Copy results to clipboard", COPY_ICON, COPY_ICON_HOVER, this::plainTextExport);
-        //setupImageIcon(exportResultButton, "Export round data to clipboard", EXPORT_ICON, EXPORT_ICON_HOVER, () -> {});       // Implement in the future
-        //setupImageIcon(importResultButton, "Import round data from clipboard", IMPORT_ICON, IMPORT_ICON_HOVER, () -> {});     // Implement in the future
+        setupImageIcon(exportResultButton, "Export round data to clipboard", EXPORT_ICON, EXPORT_ICON_HOVER, () -> {plugin.exportRoundToClip(java.util.List.of(gameRound.getRoundNumber() -1));});       // Implement in the future
+        setupImageIcon(importResultButton, "Import round data from clipboard", IMPORT_ICON, IMPORT_ICON_HOVER, plugin::importRoundFromClip);     // Implement in the future
 
         bottomConstraints.gridx = 0;
         bottomConstraints.ipadx = 4;
         bottomButtonPanel.add(copyResultButton, bottomConstraints);
         bottomConstraints.gridx = 1;
         bottomButtonPanel.add(exportResultButton, bottomConstraints);
-        exportResultButton.setVisible(false);   // for future implementation
         bottomConstraints.gridx = 2;
         bottomButtonPanel.add(importResultButton, bottomConstraints);
-        importResultButton.setVisible(false);
 
         JPanel bottomButtonWrapper = new JPanel(new BorderLayout());
         bottomButtonWrapper.add(bottomButtonPanel, BorderLayout.LINE_END);
@@ -278,6 +276,12 @@ public class GameRoundPanel extends BasePanel {
     public void updateRoundTimer(int ticks) {
         SwingUtilities.invokeLater(() -> {
             roundTimeLabel.setText(ticksToTime(ticks));
+        });
+    }
+
+    public void updateHints(int hints) {
+        SwingUtilities.invokeLater(() -> {
+            hintCount.setValue(hints);
         });
     }
 

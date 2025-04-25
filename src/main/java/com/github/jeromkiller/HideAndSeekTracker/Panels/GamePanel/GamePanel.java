@@ -3,6 +3,8 @@ package com.github.jeromkiller.HideAndSeekTracker.Panels.GamePanel;
 
 import com.github.jeromkiller.HideAndSeekTracker.HideAndSeekTrackerPlugin;
 import com.github.jeromkiller.HideAndSeekTracker.Panels.BasePanel;
+import com.github.jeromkiller.HideAndSeekTracker.game.HideAndSeekRound;
+import lombok.Getter;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -22,6 +24,7 @@ public class GamePanel extends BasePanel {
     private final JButton activeRoundButton;
     private final JButton scoreTotalButton;
 
+    @Getter
     private GameRoundPanel activeRoundPanel;
     private final GameTotalPanel scoreTotalPanel;
 
@@ -85,7 +88,7 @@ public class GamePanel extends BasePanel {
         scoreTotalPanel = new GameTotalPanel(plugin, this);
         cardsPanel.add(scoreTotalPanel);
 
-        activeRoundPanel = new GameRoundPanel(plugin, this);
+        activeRoundPanel = new GameRoundPanel(plugin, this, plugin.game.getActiveRound());
         addRoundPanel(activeRoundPanel);
 
         constraints.fill = GridBagConstraints.BOTH;
@@ -98,6 +101,15 @@ public class GamePanel extends BasePanel {
     private void addRoundPanel(JPanel panel) {
         cardsPanel.add(activeRoundPanel, cardsPanel.getComponentCount() - 1);
         roundPanels.add(activeRoundPanel);
+    }
+
+    public void importRound(HideAndSeekRound round) {
+        GameRoundPanel importedPanel = new GameRoundPanel(plugin, this, round);
+        importedPanel.roundFinished();
+        importedPanel.updateRoundTimer(round.getGameTime());
+        importedPanel.updateHints(round.getHintsGiven());
+        cardsPanel.add(importedPanel, cardsPanel.getComponentCount() - 2);
+        roundPanels.add(roundPanels.size() - 1, importedPanel);
     }
 
     private void firstRound() {
@@ -146,7 +158,7 @@ public class GamePanel extends BasePanel {
     public void newRound() {
         plugin.game.newRound();
         activeRoundPanel.roundFinished();
-        activeRoundPanel = new GameRoundPanel(plugin, this);
+        activeRoundPanel = new GameRoundPanel(plugin, this, plugin.game.getActiveRound());
         addRoundPanel(activeRoundPanel);
         activeRound();
     }
