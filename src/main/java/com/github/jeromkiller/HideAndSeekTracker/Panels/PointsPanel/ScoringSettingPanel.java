@@ -164,7 +164,7 @@ public class ScoringSettingPanel<T> extends BasePanel {
         JLabel deleteSystem = new JLabel();
         setupImageIcon(deleteSystem, "Delete Rule", DELETE_ICON, DELETE_HOVER_ICON, () -> {
             int confirm = JOptionPane.showConfirmDialog(ScoringSettingPanel.this,
-                    "Are you sure you want to permanently delete this scoring rule",
+                    "Are you sure you want to permanently delete this scoring rule?",
                     "Warning", JOptionPane.OK_CANCEL_OPTION);
 
             if(confirm == 0) {

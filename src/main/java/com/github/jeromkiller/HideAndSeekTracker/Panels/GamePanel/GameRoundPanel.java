@@ -44,7 +44,7 @@ public class GameRoundPanel extends BasePanel {
 
     GameRoundPanel(HideAndSeekTrackerPlugin plugin, GamePanel parentPanel, HideAndSeekRound round) {
         this.plugin = plugin;
-        this.gameRound = round; //plugin.game.getActiveRound();
+        this.gameRound = round;
         this.parentPanel = parentPanel;
         this.settings = plugin.getSettings();
 
@@ -148,7 +148,7 @@ public class GameRoundPanel extends BasePanel {
         GridBagConstraints bottomConstraints = new GridBagConstraints();
 
         setupImageIcon(copyResultButton, "Copy results to clipboard", COPY_ICON, COPY_ICON_HOVER, this::plainTextExport);
-        setupImageIcon(exportResultButton, "Export round data to clipboard", EXPORT_ICON, EXPORT_ICON_HOVER, () -> {plugin.exportRoundToClip(java.util.List.of(gameRound.getRoundNumber() -1));});       // Implement in the future
+        setupImageIcon(exportResultButton, "Export round data to clipboard", EXPORT_ICON, EXPORT_ICON_HOVER, this::exportRound);       // Implement in the future
         setupImageIcon(importResultButton, "Import round data from clipboard", IMPORT_ICON, IMPORT_ICON_HOVER, plugin::importRoundFromClip);     // Implement in the future
 
         bottomConstraints.gridx = 0;
@@ -182,7 +182,7 @@ public class GameRoundPanel extends BasePanel {
         final StringSelection selection = new StringSelection(exportString);
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         clipboard.setContents(selection, selection);
-        showCopiedText();
+        setCopiedText("Copied to clipboard");
     }
 
     private void devExport(boolean discordExport)
@@ -191,11 +191,11 @@ public class GameRoundPanel extends BasePanel {
         final StringSelection selection = new StringSelection(exportString);
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         clipboard.setContents(selection, selection);
-        showCopiedText();
+        setCopiedText("Copied to clipboard");
     }
 
-    private void showCopiedText() {
-        statusLabel.setText("Copied to clipboard!");
+    private void setCopiedText(String text) {
+        statusLabel.setText(text);
         Timer hideStatusTimer = new Timer(1000, e -> statusLabel.setText(" "));
         hideStatusTimer.setRepeats(false);
         hideStatusTimer.start();
@@ -245,6 +245,7 @@ public class GameRoundPanel extends BasePanel {
         updateRoundLabel();
         hintCount.setEnabled(false);
         deleteRoundButton.setVisible(true);
+        newRoundButton.setVisible(false);
         btnStartRound.setVisible(false);
         roundTimeLabel.setVisible(true);
     }
@@ -261,6 +262,14 @@ public class GameRoundPanel extends BasePanel {
     }
 
     public void deleteRound() {
+        int confirm = JOptionPane.showConfirmDialog(GameRoundPanel.this,
+                "Are you sure you want to permanently delete this round?",
+                "Warning", JOptionPane.OK_CANCEL_OPTION);
+
+        if(confirm != 0) {
+            return;
+        }
+
         final int roundNumber = gameRound.getRoundNumber() - 1;
         plugin.game.deleteRound(roundNumber);
         parentPanel.deleteRound(roundNumber);
@@ -292,5 +301,10 @@ public class GameRoundPanel extends BasePanel {
         ticks = ticks % 100;
         double rest = ticks * 0.6;
         return String.format("%02d:%02d:%04.1f ", hours, minutes, rest);
+    }
+
+    public void exportRound() {
+        plugin.exportRoundToClip(java.util.List.of(gameRound.getRoundNumber() -1));
+        setCopiedText("Exported round to Clipboard!");
     }
 }
