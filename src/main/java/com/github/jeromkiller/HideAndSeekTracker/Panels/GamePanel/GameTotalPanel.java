@@ -20,7 +20,6 @@ public class GameTotalPanel extends BasePanel {
     private final JLabel copyResultButton = new JLabel();
     private final JLabel importResultButton = new JLabel();
     private final JLabel exportResultButton = new JLabel();
-    private final JLabel newRoundButton = new JLabel();
     private final JLabel statusLabel = new JLabel(" ");
 
     @Getter
@@ -49,12 +48,6 @@ public class GameTotalPanel extends BasePanel {
 
         roundTitle = new JLabel("Score Totals");
         contents.add(roundTitle, constraints);
-        constraints.gridx = 1;
-
-        setupImageIcon(newRoundButton, "Start new round",NEW_ROUND_ICON, NEW_ROUND_ICON_HOVER, parentPanel::newRound);
-        JPanel roundButtonPanelContainer = new JPanel(new BorderLayout());
-        roundButtonPanelContainer.add(newRoundButton, BorderLayout.LINE_END);
-        contents.add(roundButtonPanelContainer, constraints);
         constraints.gridy++;
 
         resultTable = new HideAndSeekTable(plugin.game.getScoreTotals());
