@@ -207,6 +207,9 @@ public class HideAndSeekRound {
         for(HideAndSeekPlayer player : players) {
             int hintsUsed = player.getHints();
             int time = player.getTickCount();
+            if(time < 0) {
+                continue;
+            }
             participants.get(player.getName()).setStats(newInternalPlacement, newPlacement, hintsUsed, time);
             if(time > leniencyTime) {
                 leniencyTime = time + plugin.getSettings().getTickLenience();

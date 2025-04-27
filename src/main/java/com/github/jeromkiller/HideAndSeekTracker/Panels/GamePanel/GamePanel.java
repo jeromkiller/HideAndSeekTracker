@@ -108,8 +108,12 @@ public class GamePanel extends BasePanel {
         importedPanel.roundFinished();
         importedPanel.updateRoundTimer(round.getGameTime());
         importedPanel.updateHints(round.getHintsGiven());
+
+        // add before active round
         cardsPanel.add(importedPanel, cardsPanel.getComponentCount() - 2);
         roundPanels.add(roundPanels.size() - 1, importedPanel);
+
+        activeRound();
     }
 
     private void firstRound() {
@@ -128,6 +132,7 @@ public class GamePanel extends BasePanel {
             roundCards.next(cardsPanel);
             currentCardIndex++;
         }
+        updateCardFlipButtons();
     }
 
     private void prevRound() {
