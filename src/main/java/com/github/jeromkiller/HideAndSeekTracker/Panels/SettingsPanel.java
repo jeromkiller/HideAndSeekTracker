@@ -11,6 +11,7 @@ import java.awt.*;
 public class SettingsPanel extends BasePanel {
     private final JSpinner tickLeniency = new JSpinner(new SpinnerNumberModel(2, 0, 100, 1));
     private final BlinklessToggleButton showRenderDist;
+    private final BlinklessToggleButton hideOverlay;
     private final BlinklessToggleButton hideUnfinishedPlayers;
     private final BlinklessToggleButton useDevMode;
 
@@ -37,15 +38,23 @@ public class SettingsPanel extends BasePanel {
         tickLeniency.addChangeListener(e -> settings.setTickLenience((int) tickLeniency.getValue()));
         addSettingRow("Placement Leniency Ticks", tickLeniency, contents, constraints);
 
-        showRenderDist = new BlinklessToggleButton("Show Render Distance");
-        showRenderDist.setSelected(settings.getShowRenderDist());
-        showRenderDist.addItemListener(() -> settings.setShowRenderDist(showRenderDist.isSelected()));
-        addSettingRow("Show Render Distance", showRenderDist, contents, constraints);
-
         hideUnfinishedPlayers = new BlinklessToggleButton("Show Render Distance");
         hideUnfinishedPlayers.setSelected(settings.getHideUnfinished());
         hideUnfinishedPlayers.addItemListener(() -> settings.setHideUnfinished(hideUnfinishedPlayers.isSelected()));
         addSettingRow("Hide Unfinished Players", hideUnfinishedPlayers, contents, constraints);
+
+        hideOverlay = new BlinklessToggleButton("Hide the in game overlay. \nCapture areas previously set to 'visible' are still enabled");
+        hideOverlay.setSelected(settings.getHideOverlay());
+        hideOverlay.addItemListener(() -> {
+            settings.setHideOverlay(hideOverlay.isSelected());
+            updateDisabledButtons();
+        });
+        addSettingRow("Hide Overlay", hideOverlay, contents, constraints);
+
+        showRenderDist = new BlinklessToggleButton("Show Render Distance");
+        showRenderDist.setSelected(settings.getShowRenderDist());
+        showRenderDist.addItemListener(() -> settings.setShowRenderDist(showRenderDist.isSelected()));
+        addSettingRow("Show Render Distance", showRenderDist, contents, constraints);
 
         useDevMode = new BlinklessToggleButton("Use Dev Mode");
         useDevMode.setSelected(settings.getDevMode());
@@ -79,5 +88,11 @@ public class SettingsPanel extends BasePanel {
 
         final boolean useDevModeSetting = settings.getDevMode();
         useDevMode.setSelected(useDevModeSetting);
+
+        updateDisabledButtons();
+    }
+
+    public void updateDisabledButtons() {
+        showRenderDist.setEnabled(!settings.getHideOverlay());
     }
 }

@@ -43,6 +43,10 @@ public class HideAndSeekTrackerSceneOverlay extends Overlay
     @Override
     public Dimension render(Graphics2D graphics)
     {
+        if(plugin.getSettings().getHideOverlay()) {
+            return null;
+        }
+
         WorldPoint playerLoc = client.getLocalPlayer().getWorldLocation();
 
         drawCreationArea(graphics, plugin.getCaptureCreationOptions(), playerLoc);
