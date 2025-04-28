@@ -164,16 +164,4 @@ public class HideAndSeekSettings {
         return gson.fromJson(json, new TypeToken<Boolean>(){}.getType());
     }
 
-    public void setDevMode(boolean show) {
-        setValue(DEV_MODE_KEY, show);
-    }
-
-    public boolean getDevMode() {
-        final String json = configManager.getConfiguration(CONFIG_GROUP, DEV_MODE_KEY);
-        if(Strings.isNullOrEmpty(json)){
-            return false;
-        }
-        return gson.fromJson(json, new TypeToken<Boolean>(){}.getType());
-    }
-
 }

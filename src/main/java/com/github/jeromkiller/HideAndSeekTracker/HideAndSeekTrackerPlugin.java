@@ -47,11 +47,11 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @PluginDescriptor(
-	name = "HideAndSeekTracker"
+	name = "E.T. - Racing & Hide and Seek"
 )
 public class HideAndSeekTrackerPlugin extends Plugin
 {
-	private static final String PLUGIN_NAME = "Hide And Seek Tracker";
+	private static final String PLUGIN_NAME = "Event Tools - Racing & Hide and Seek";
 
 	@Inject
 	private Client client;
@@ -110,7 +110,7 @@ public class HideAndSeekTrackerPlugin extends Plugin
 		overlayManager.add(sceneOverlay);
 		game = new HideAndSeekGame(this);
         panel = new HideAndSeekTrackerPanel(this);
-		final BufferedImage icon = ImageUtil.loadImageResource(getClass(), "HnS_icon.png");
+		final BufferedImage icon = ImageUtil.loadImageResource(getClass(), "racing.png");
 		navButton = NavigationButton.builder()
 				.tooltip(PLUGIN_NAME)
 				.priority(5)
@@ -143,9 +143,6 @@ public class HideAndSeekTrackerPlugin extends Plugin
 	@Subscribe
 	public void onConfigChanged(ConfigChanged event)
 	{
-		if(Objects.equals(event.getKey(), HideAndSeekSettings.DEV_MODE_KEY)) {
-			panel.getGamePanel().updateDevModeSetting();
-		}
 		if(Objects.equals(event.getKey(), HideAndSeekSettings.HIDE_UNFINISHED_KEY)) {
 			panel.getGamePanel().updateHidePlayerSetting();
 		}
@@ -162,7 +159,7 @@ public class HideAndSeekTrackerPlugin extends Plugin
 
 	private void checkPlayersInRange()
 	{
-		List<? extends  Player> playersList = client.getPlayers();	// is there a non deprecated method of getting this information?
+		List<? extends  Player> playersList = client.getPlayers();
 		Player localPlayer = client.getLocalPlayer();
 		if(localPlayer == null) {
 			return;
@@ -362,8 +359,6 @@ public class HideAndSeekTrackerPlugin extends Plugin
 
 	public void exportRoundToClip(final List<Integer> rounds)
 	{
-		log.info("rounds: {}", rounds);
-
 		LinkedHashSet<roundExport> roundsToExport = new LinkedHashSet<>();
 		for(final int round_number : rounds) {
 			int numRounds = game.getPastRounds().size();

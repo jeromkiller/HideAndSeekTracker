@@ -1,26 +1,33 @@
-# HideAndSeekTracker
-A player tracker for the hide and seek (GieliGuessr) events hosted in the official Old-School Runescape discord server.
+# Event Tools - Racing & Hide and Seek
+A player tracker racing events such as hide and seek (GieliGuessr) events hosted in the official Old-School Runescape discord server.
 
 ![the race is on](images/Race.png)
 
 ## What's new!
-  - Added Customizable Point system
-  - Games can now have multiple rounds
-  - Improved the result export format.
-  - Changed the old export option to a developer option.
+  - Added 3 new score types.
+  - Added round data importing and exporting.
+  - UI improvements for the score setup panel.
+  - A setting for disabling the overlay without disabling tracking.
 
 ## Features
   - Automatic placement tracking of participants.
   - Timing Leniency for shared placements.
   - Customizable score system.
   - Capture Area import and export function for easy sharing between hosts.
+  - Round data import and export function for collating data from other hosts.
   - Easy copying of results to clipboard.
-  - Easy [attendance counting](#attendance-counting) for other events
 
 ## Setting up a game
+Before you can run your event you'll have to set up your capture areas, 
+decide how your players will receive points
+and enter the names of the participants of the race.
+
+The article below will guide you through the steps of setting up your game.
+
 ### Creating Capture Areas
-To track whoever reaches you first we'll first need to create a 'Capture Area'
-These can be created from the 'Area' tab in the hide and seek side panel.
+To track whoever reaches you first we'll first need to create a 'Capture Area'.
+Which will serve as your finish line.
+These can be created from the 'Area' tab in the side panel.
 This will give you a new area creation panel to define an area around your character. Resize the area to your liking and click the 'Tick' button to place the capture area in the world. Now its ready to track players entering the area.
 ##### Note: do not make the capture areas smaller than two tiles in width or height, these can be skipped over when a player runs across it
 
@@ -37,13 +44,12 @@ After setting up the desired Capture Areas you can modify how points are given t
 Points can be positive to give points to a player or negative to penalize a player.
 Negative points aren't carried over to the next round
 
-The score rules in the image below are as follows:
- - The player who finishes first gets 5 points,
- - The player who finishes second gets 4 points,
- - Players finishing 3rd through 5th get 3 points each,
- - Players finishing 6th through 10th get 2 points each,
- - Anyone finishing past 10th place doesn't get any points.
- - Players get a point penalty for every hint given before they finished.
+The plugin supports 5 different scoring types:
+- Position, give points or a penalty based on in what position a player placed.
+- Hints, give points or a penalty based on how many hints were given when this player finished.
+- Time, give points or a penalty based on how much time a player took to finish.
+- Percentile, give points or a penalty based on the percentile a player finished in. Great for large events!
+- Player Name, give a bonus or penalty to a specific player.
 
 ![PointsPanel.png](images/PointsPanel.png)
 
@@ -58,7 +64,7 @@ If there are a lot of participants, or if you know people will be joining halfwa
 
 ### Tracking players
 
-After the rules have been setup and the names of all participating players have been entered you can switch over to the 'Game' tab.
+After the rules have been set up and the names of all participating players have been entered you can switch over to the 'Game' tab.
 
 It's your job to stand in the capture area to track the players entering.
 
@@ -78,6 +84,21 @@ You can navigate between the results of past round by using the arrows at the to
 
 You can copy the results of each round to your clipboard by pressing the clipboard icon at the bottom. 
 
+The score total page shows the ranking of each player based on the amount of points they received over the previous rounds.
+
+### Collating round data from other hosts
+If your event has multiple hosts who each take turns tracking the finishing players.
+You'll have to collate the data of every host in order to calculate the point total for each player.
+Each secondary host can export their round data using the ![Export](images/export_icon.png) button.
+This will copy the round data in json format to the clipboard.
+Ready to be pasted wherever you need.
+
+The main host simply has to copy this data to their clipboard and hit the ![Import](images/import_icon.png) button.
+This will append the copied over round data to the previous rounds.
+
+The scores will automatically be recalculated after importing.
+So the main host doesn't have to worry if their other hosts are using the exact same ruleset as them.
+
 ## Other settings
 ### Placement Leniency
 The 'Placement Leniency Ticks' option changes within how many ticks two players have to finish in order to share a position on the leaderboard.
@@ -86,28 +107,15 @@ We recommend setting this to 2 ticks at its lowest as that's most reliable.
 ###### Note: at 0 ticks players entering the area on the same tick will not share a spot, the player whose name comes first in the alphabet will be placed first
 ###### Note: at 1 tick players running one tile behind each other may or may not get to share a placement depending on what tile they enter the area on.
 
-### Developer Mode
-When you run an event where multiple hosts take turns hiding you'll probably want to Collate the round data of the hosts.
-If you flip on 'Use Dev mode' you'll get the button to export placement and hints used for each round.
-These results can be pasted into a spreadsheet, a template can be found [here](https://docs.google.com/spreadsheets/d/1leeNCB7a1NIevrRDJqrV6-WJg6XdybvjVIjme-y32zE/edit?usp=sharing).
+### Hide Unfinished Players
+The 'Hide Unfinished Players' option hides any players who have not finished yet from the score board.
 
-Make sure each host has an exact copy of the player names list, as this will be the order the data is copied out as.
-###### Note: round scores aren't copied out, if you use different score rules you'll have to set those in the spreadsheet. We hope to improve on this in a future update.
+### Hide Overlay
+The 'Hide Overlay' option disables the in game capture area overlay without disabling the tracking on any capture areas that have been set to 'Visible'.
+This could be useful for capturing clean footage for your events cool highlight reel.
 
-## Other use cases
-### Attendance counting
-If you run a different type of event this plugin can also be used to count attendance.
+### Show Render Distance
+The 'Show Render Distance' option shows you a blue outline of the 31x31 render distance area in which players and npc's are rendered.
 
-To do this: 
- - Create a capture area in a location where players attending the event will definitely pass through.
-Such as a doorway or the lobby area of a minigame. 
- - Toggle on 'Automatically Fill Names' in the players tab so everyone passing through the area while it is within render distance will be added to the participant list.
-
-The amount of players who have passed through the capture area will be shown on the scoreboard 
-and the number of players who have participated will be shown at the bottom of the scoreboard.
-
-![number finished](images/NumFinished.png)
-
-![ZalcanoEvent](images/ZalcanoParty.png)
 
 

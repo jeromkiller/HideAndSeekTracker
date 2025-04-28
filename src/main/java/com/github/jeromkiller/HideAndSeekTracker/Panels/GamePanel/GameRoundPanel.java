@@ -16,11 +16,10 @@ import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
+import java.util.ArrayList;
 
 public class GameRoundPanel extends BasePanel {
     private final JLabel roundTitle;
-    private final JButton btnDevExportDiscord;
-    private final JButton btnDevExportDirect;
     private final JSpinner hintCount;
     private final HideAndSeekTable resultTable;
     private final JLabel numFinished = new JLabel("999/999 Finished");
@@ -87,21 +86,6 @@ public class GameRoundPanel extends BasePanel {
         constraints.gridx = 0;
         constraints.gridy++;
 
-        btnDevExportDirect = new JButton("Export (dev)");
-        btnDevExportDirect.addActionListener(e -> devExport(false));
-        contents.add(btnDevExportDirect, constraints);
-
-        constraints.gridx = 1;
-        btnDevExportDiscord = new JButton("Export Discord");
-        btnDevExportDiscord.addActionListener(e -> devExport(true));
-        contents.add(btnDevExportDiscord, constraints);
-        constraints.gridy++;
-
-        if(!settings.getDevMode()) {
-            btnDevExportDiscord.setVisible(false);
-            btnDevExportDirect.setVisible(false);
-        }
-
         constraints.gridx = 0;
         contents.add(new JLabel("Round Time:"), constraints);
         constraints.gridx = 1;
@@ -148,8 +132,8 @@ public class GameRoundPanel extends BasePanel {
         GridBagConstraints bottomConstraints = new GridBagConstraints();
 
         setupImageIcon(copyResultButton, "Copy results to clipboard", COPY_ICON, COPY_ICON_HOVER, this::plainTextExport);
-        setupImageIcon(exportResultButton, "Export round data to clipboard", EXPORT_ICON, EXPORT_ICON_HOVER, this::exportRound);       // Implement in the future
-        setupImageIcon(importResultButton, "Import round data from clipboard", IMPORT_ICON, IMPORT_ICON_HOVER, plugin::importRoundFromClip);     // Implement in the future
+        setupImageIcon(exportResultButton, "Export round data to clipboard", EXPORT_ICON, EXPORT_ICON_HOVER, this::exportRound);
+        setupImageIcon(importResultButton, "Import round data from clipboard", IMPORT_ICON, IMPORT_ICON_HOVER, plugin::importRoundFromClip);
 
         bottomConstraints.gridx = 0;
         bottomConstraints.ipadx = 4;
@@ -179,15 +163,6 @@ public class GameRoundPanel extends BasePanel {
 
     private void plainTextExport() {
         final String exportString = gameRound.plainTextExport();
-        final StringSelection selection = new StringSelection(exportString);
-        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-        clipboard.setContents(selection, selection);
-        setCopiedText("Copied to clipboard");
-    }
-
-    private void devExport(boolean discordExport)
-    {
-        final String exportString = gameRound.devExport(discordExport);
         final StringSelection selection = new StringSelection(exportString);
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         clipboard.setContents(selection, selection);
@@ -250,12 +225,6 @@ public class GameRoundPanel extends BasePanel {
         roundTimeLabel.setVisible(true);
     }
 
-    public void updateDevMode() {
-        final boolean enable = settings.getDevMode();
-        btnDevExportDiscord.setVisible(enable);
-        btnDevExportDirect.setVisible(enable);
-    }
-
     public void updateHidePlayers() {
         final boolean hide = settings.getHideUnfinished();
         resultTable.enableHidenPlayerFilter(hide);
@@ -304,7 +273,32 @@ public class GameRoundPanel extends BasePanel {
     }
 
     public void exportRound() {
-        plugin.exportRoundToClip(java.util.List.of(gameRound.getRoundNumber() -1));
-        setCopiedText("Exported round to Clipboard!");
+        String[] options = {"Yes", "No, only this round", "Cancel"};
+        int confirm = JOptionPane.showOptionDialog(GameRoundPanel.this,
+                "Do you want to export all rounds to your clipboard?",
+                "Confirm", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
+
+        switch (confirm) {
+            case 0: {
+                int num_rounds = plugin.game.getPastRounds().size();
+                java.util.List<Integer> exportRounds = new ArrayList<>(num_rounds);
+                for(int i = 0; i < num_rounds; i++) {
+                    exportRounds.add(i);
+                }
+                if(plugin.game.getActiveRound().isRoundStarted()) {
+                    exportRounds.add(num_rounds);
+                }
+                plugin.exportRoundToClip(exportRounds);
+                setCopiedText("Exported All rounds to Clipboard!");
+                break;
+            }
+            case 1: {
+                plugin.exportRoundToClip(java.util.List.of(gameRound.getRoundNumber() -1));
+                setCopiedText("Exported this round to Clipboard!");
+                break;
+            }
+        }
+
+
     }
 }

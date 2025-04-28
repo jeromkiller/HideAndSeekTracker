@@ -190,12 +190,6 @@ public class GamePanel extends BasePanel {
         }
     }
 
-    public void updateDevModeSetting() {
-        for(GameRoundPanel panel : roundPanels){
-            panel.updateDevMode();
-        }
-    }
-
     public void updateHidePlayerSetting() {
         for(GameRoundPanel panel : roundPanels){
             panel.updateHidePlayers();

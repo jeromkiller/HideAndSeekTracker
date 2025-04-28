@@ -13,7 +13,6 @@ public class SettingsPanel extends BasePanel {
     private final BlinklessToggleButton showRenderDist;
     private final BlinklessToggleButton hideOverlay;
     private final BlinklessToggleButton hideUnfinishedPlayers;
-    private final BlinklessToggleButton useDevMode;
 
     private final HideAndSeekTrackerPlugin plugin;
     private final HideAndSeekSettings settings;
@@ -56,11 +55,6 @@ public class SettingsPanel extends BasePanel {
         showRenderDist.addItemListener(() -> settings.setShowRenderDist(showRenderDist.isSelected()));
         addSettingRow("Show Render Distance", showRenderDist, contents, constraints);
 
-        useDevMode = new BlinklessToggleButton("Use Dev Mode");
-        useDevMode.setSelected(settings.getDevMode());
-        useDevMode.addItemListener(() -> settings.setDevMode(useDevMode.isSelected()));
-        addSettingRow("Use Dev Mode", useDevMode, contents, constraints);
-
         add(contents, BorderLayout.NORTH);
         loadSettings();
     }
@@ -85,9 +79,6 @@ public class SettingsPanel extends BasePanel {
 
         final boolean hideUnfinishedPlayersSetting = settings.getHideUnfinished();
         hideUnfinishedPlayers.setSelected(hideUnfinishedPlayersSetting);
-
-        final boolean useDevModeSetting = settings.getDevMode();
-        useDevMode.setSelected(useDevModeSetting);
 
         updateDisabledButtons();
     }
