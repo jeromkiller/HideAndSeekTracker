@@ -13,7 +13,7 @@ public class NameScoring extends PointSystem<String> {
 
     @Override
     public int scorePlayer(HideAndSeekPlayer player, HideAndSeekRound round) {
-        Optional<ScoringPair<String>> foundPair = scorePairs.stream().filter(
+        Optional<ScoringPair<String>> foundPair = scoreTiers.stream().filter(
                 s -> {return s.getSetting().equals(player.getName());}).findFirst();
 
         return foundPair.map(ScoringPair::getPoints).orElse(0);
@@ -21,20 +21,20 @@ public class NameScoring extends PointSystem<String> {
 
     @Override
     public void addSetting() {
-        scorePairs.add(new ScoringPair<>("new_name", 1));
+        scoreTiers.add(new ScoringPair<>("new_name", 1));
     }
 
     @Override
     public void updateSetting(int index, String value) {
-        if(index >= scorePairs.size()) {
+        if(index >= scoreTiers.size()) {
             return;
         }
 
         String name = value.toLowerCase(Locale.ROOT);
-        if(scorePairs.stream().anyMatch(s -> {return s.getSetting().equals(name);})) {
+        if(scoreTiers.stream().anyMatch(s -> {return s.getSetting().equals(name);})) {
             return; // don't save duplicates
         }
 
-        scorePairs.get(index).setSetting(name);
+        scoreTiers.get(index).setSetting(name);
     }
 }

@@ -12,7 +12,7 @@ public class HintScoring extends NumberScoring {
     @Override
     public int scorePlayer(HideAndSeekPlayer player, HideAndSeekRound round) {
         final int hints = player.getHints();
-        for(final ScoringPair<Integer> pair: scorePairs) {
+        for(final ScoringPair<Integer> pair: scoreTiers) {
             if(hints <= pair.getSetting()) {
                 return pair.getPoints();
             }

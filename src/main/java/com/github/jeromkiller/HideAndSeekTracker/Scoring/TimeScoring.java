@@ -14,7 +14,7 @@ public class TimeScoring extends PointSystem<LocalTime> {
     @Override
     public int scorePlayer(HideAndSeekPlayer player, HideAndSeekRound round) {
         final int ticks = player.getTickCount();
-        for(final ScoringPair<LocalTime> pair: scorePairs) {
+        for(final ScoringPair<LocalTime> pair: scoreTiers) {
             final long time_ticks = TimeUtil.timeToTick(pair.getSetting());
             if(ticks < time_ticks) {
                 return pair.getPoints();
@@ -25,29 +25,29 @@ public class TimeScoring extends PointSystem<LocalTime> {
 
     @Override
     public void addSetting() {
-        if(scorePairs.isEmpty()) {
-            scorePairs.add(new ScoringPair<>(LocalTime.ofSecondOfDay(1), fallThroughScore));
+        if(scoreTiers.isEmpty()) {
+            scoreTiers.add(new ScoringPair<>(LocalTime.ofSecondOfDay(1), fallThroughScore));
             return;
         }
-        ScoringPair<LocalTime> lastPair = scorePairs.get(scorePairs.size() - 1);
+        ScoringPair<LocalTime> lastPair = scoreTiers.get(scoreTiers.size() - 1);
         ScoringPair<LocalTime> newLast = new ScoringPair<>(lastPair.getSetting().plusSeconds(1), fallThroughScore);
-        scorePairs.add(newLast);
+        scoreTiers.add(newLast);
     }
 
     @Override
     public void updateSetting(int index, LocalTime value) {
-        if(index >= scorePairs.size()) {
+        if(index >= scoreTiers.size()) {
             return;
         }
-        scorePairs.get(index).setSetting(value);
+        scoreTiers.get(index).setSetting(value);
 
         // if you change the setting to something higher than the ones after this,
         // they should all go up, since they have to follow a set order
-        if(scorePairs.size() == index + 1) {
+        if(scoreTiers.size() == index + 1) {
             return; // don't have to update
         }
 
-        final LocalTime nextSetting = scorePairs.get(index + 1).getSetting();
+        final LocalTime nextSetting = scoreTiers.get(index + 1).getSetting();
         if(nextSetting.compareTo(value) > 0) {
             return; // next setting is still smaller higher than current value
         }

@@ -12,7 +12,7 @@ import java.util.List;
 public abstract class PointSystem <T> {
     final ScoreType scoreType;
     final boolean canBeCalculatedOnce;
-    List<ScoringPair<T>> scorePairs;
+    List<ScoringPair<T>> scoreTiers;
     int fallThroughScore;
     boolean calcEveryRound;
 
@@ -53,7 +53,7 @@ public abstract class PointSystem <T> {
     PointSystem(ScoreType type, boolean canCalcOnce) {
         this.scoreType = type;
         this.canBeCalculatedOnce = canCalcOnce;
-        scorePairs = new ArrayList<>();
+        scoreTiers = new ArrayList<>();
         this.fallThroughScore = 0;
         this.calcEveryRound = true;
     }
@@ -63,19 +63,19 @@ public abstract class PointSystem <T> {
     public abstract void updateSetting(int index, T value);
 
     public void addScorePair(T setting, int points) {
-        scorePairs.add(new ScoringPair<>(setting, points));
+        scoreTiers.add(new ScoringPair<>(setting, points));
     }
 
     public void deleteSetting(int index) {
-        if(index >= scorePairs.size()) {
+        if(index >= scoreTiers.size()) {
             return;
         }
-        scorePairs.remove(index);
+        scoreTiers.remove(index);
     }
     public void updatePoints(int index, int value) {
-        if(index >= scorePairs.size()) {
+        if(index >= scoreTiers.size()) {
             return;
         }
-        scorePairs.get(index).setPoints(value);
+        scoreTiers.get(index).setPoints(value);
     }
 }

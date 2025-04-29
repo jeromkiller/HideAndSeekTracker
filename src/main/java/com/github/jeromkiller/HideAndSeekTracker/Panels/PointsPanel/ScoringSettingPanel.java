@@ -233,7 +233,7 @@ public class ScoringSettingPanel<T> extends BasePanel {
             }
         }
 
-        for(ScoringPair<T> pair : pointSystem.getScorePairs()) {
+        for(ScoringPair<T> pair : pointSystem.getScoreTiers()) {
             SettingsRow<T> row = new SettingsRow<>(plugin, pointSystem, pair, index, prev_value, content, constraints);
             settingsRows.add(row.settingBox);
 

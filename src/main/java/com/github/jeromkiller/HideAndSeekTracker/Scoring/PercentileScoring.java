@@ -19,7 +19,7 @@ public class PercentileScoring extends PointSystem<Integer> {
         final double totalPlacedPlayers = round.getSharedPlacementSpot();
         double percentilePlacement = (double) (player.getPlacementValue() - 1) / totalPlacedPlayers;
         percentilePlacement = (1 - percentilePlacement) * 100;
-        for(final ScoringPair<Integer> pair : scorePairs) {
+        for(final ScoringPair<Integer> pair : scoreTiers) {
             if(percentilePlacement >= pair.getSetting()) {
                 return pair.getPoints();
             }
@@ -29,35 +29,35 @@ public class PercentileScoring extends PointSystem<Integer> {
 
     @Override
     public void addSetting() {
-        if(scorePairs.isEmpty()) {
-            scorePairs.add(new ScoringPair<>(99, 0));
+        if(scoreTiers.isEmpty()) {
+            scoreTiers.add(new ScoringPair<>(99, 0));
             return;
         }
-        ScoringPair<Integer> lastPair = scorePairs.get(scorePairs.size() -1);
+        ScoringPair<Integer> lastPair = scoreTiers.get(scoreTiers.size() -1);
         ScoringPair<Integer> newLast = new ScoringPair<>(lastPair.getSetting() - 1, fallThroughScore);
-        scorePairs.add(newLast);
+        scoreTiers.add(newLast);
     }
 
     @Override
     public void updateSetting(int index, Integer value) {
-        if(index >= scorePairs.size()) {
+        if(index >= scoreTiers.size()) {
             return;
         }
-        scorePairs.get(index).setSetting(value);
+        scoreTiers.get(index).setSetting(value);
 
         // if you change the setting to something lower than the ones after this,
         // they should all go up, since they have to follow a set order
-        if(scorePairs.size() == index + 1) {
+        if(scoreTiers.size() == index + 1) {
             return; // don't have to update
         }
 
-        if(scorePairs.get(index + 1).getSetting() < value) {
+        if(scoreTiers.get(index + 1).getSetting() < value) {
             return;
         }
 
         int newSetting = value - 1;
-        for(int i = index + 1; i < scorePairs.size(); i++) {
-            scorePairs.get(i).setSetting(newSetting);
+        for(int i = index + 1; i < scoreTiers.size(); i++) {
+            scoreTiers.get(i).setSetting(newSetting);
             newSetting--;
         }
     }

@@ -14,7 +14,7 @@ public class PositionScoring extends NumberScoring {
         if(position == 0) {
             return 0;
         }
-        for(final ScoringPair<Integer> pair: scorePairs) {
+        for(final ScoringPair<Integer> pair: scoreTiers) {
             if(position <= pair.getSetting()) {
                 return pair.getPoints();
             }
