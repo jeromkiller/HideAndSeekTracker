@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.events.*;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.callback.ClientThread;
 import net.runelite.client.chat.ChatMessageManager;
 import net.runelite.client.chat.QueuedMessage;
 import net.runelite.client.config.ConfigManager;
@@ -55,6 +56,8 @@ public class HideAndSeekTrackerPlugin extends Plugin
 
 	@Inject
 	private Client client;
+	@Inject
+	private ClientThread clientThread;
 
 	@Inject
 	private HideAndSeekTrackerSceneOverlay sceneOverlay;
@@ -227,24 +230,26 @@ public class HideAndSeekTrackerPlugin extends Plugin
 
 	public void finishCaptureAreaCreation()
 	{
-		final int width = (captureCreationOptions.getEast() + captureCreationOptions.getWest() + 1);
-		final int height = (captureCreationOptions.getNorth() + captureCreationOptions.getSouth() + 1);
-		final int xOffset = -captureCreationOptions.getWest();
-		final int yOffset = -captureCreationOptions.getSouth();
+		clientThread.invokeLater(() -> {
+			final int width = (captureCreationOptions.getEast() + captureCreationOptions.getWest() + 1);
+			final int height = (captureCreationOptions.getNorth() + captureCreationOptions.getSouth() + 1);
+			final int xOffset = -captureCreationOptions.getWest();
+			final int yOffset = -captureCreationOptions.getSouth();
 
-		Player localPlayer = client.getLocalPlayer();
-		if(null == localPlayer)
-			return;
-		WorldPoint playerLocation = localPlayer.getWorldLocation();
-		WorldPoint swTile = playerLocation.dx(xOffset).dy(yOffset);
-		CaptureArea setupArea = new CaptureArea(swTile, width, height,
-				captureCreationOptions.getColor(),
-				captureCreationOptions.getLabel(),
-				captureCreationOptions.isLabelVisible());
-		captureCreationOptions.resetOptions();
+			Player localPlayer = client.getLocalPlayer();
+			if (null == localPlayer)
+				return;
+			WorldPoint playerLocation = localPlayer.getWorldLocation();
+			WorldPoint swTile = playerLocation.dx(xOffset).dy(yOffset);
+			CaptureArea setupArea = new CaptureArea(swTile, width, height,
+					captureCreationOptions.getColor(),
+					captureCreationOptions.getLabel(),
+					captureCreationOptions.isLabelVisible());
+			captureCreationOptions.resetOptions();
 
-		addCaptureArea(setupArea);
-		panel.getAreaPanel().rebuild();
+			addCaptureArea(setupArea);
+			panel.getAreaPanel().rebuild();
+		});
 	}
 
 	public void cancelCaptureAreaCreation()
